@@ -57,6 +57,70 @@
   display: block;
 }
 
+.gs-fab-gift {
+  overflow: visible;
+}
+
+.gs-fab-gift__halo {
+  fill: rgba(255, 255, 255, 0.12);
+  transform-origin: center;
+  animation: gsFabHalo 2.2s ease-in-out infinite;
+}
+
+.gs-fab-gift__box,
+.gs-fab-gift__lid {
+  fill: #fff5fb;
+}
+
+.gs-fab-gift__ribbon {
+  fill: #c84380;
+}
+
+.gs-fab-gift__bow {
+  fill: #ffd2e4;
+}
+
+.gs-fab-gift__spark {
+  fill: #fff8b8;
+  transform-origin: center;
+  animation: gsFabSpark 1.9s ease-in-out infinite;
+}
+
+.gs-fab-gift__spark--two {
+  animation-delay: 0.35s;
+}
+
+.gs-fab:hover .gs-fab-gift__box,
+.gs-fab:hover .gs-fab-gift__lid {
+  fill: #ffffff;
+}
+
+@keyframes gsFabHalo {
+  0%,
+  100% {
+    transform: scale(0.92);
+    opacity: 0.7;
+  }
+
+  50% {
+    transform: scale(1.05);
+    opacity: 1;
+  }
+}
+
+@keyframes gsFabSpark {
+  0%,
+  100% {
+    transform: scale(0.75) rotate(0deg);
+    opacity: 0.5;
+  }
+
+  50% {
+    transform: scale(1.05) rotate(12deg);
+    opacity: 1;
+  }
+}
+
 .gs-sr-only {
   position: absolute;
   width: 1px;

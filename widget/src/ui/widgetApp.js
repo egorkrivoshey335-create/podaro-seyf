@@ -1,4 +1,3 @@
-import lottie from "lottie-web/build/player/lottie_svg";
 import { gsap } from "gsap";
 
 import { TEXTS, getPrizeVisual } from "../config.js";
@@ -30,6 +29,25 @@ function formatCountdown(expiresAt) {
   return `${hours}:${minutes}:${seconds}`;
 }
 
+function getFabIconMarkup() {
+  return `
+    <svg class="gs-fab-gift" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <circle class="gs-fab-gift__halo" cx="32" cy="32" r="26" />
+      <path
+        class="gs-fab-gift__box"
+        d="M18 28.5C18 26.567 19.567 25 21.5 25H42.5C44.433 25 46 26.567 46 28.5V42.5C46 44.433 44.433 46 42.5 46H21.5C19.567 46 18 44.433 18 42.5V28.5Z"
+      />
+      <path class="gs-fab-gift__lid" d="M16 24.5C16 22.567 17.567 21 19.5 21H44.5C46.433 21 48 22.567 48 24.5C48 26.433 46.433 28 44.5 28H19.5C17.567 28 16 26.433 16 24.5Z" />
+      <path class="gs-fab-gift__ribbon" d="M30 21H34V46H30V21Z" />
+      <path class="gs-fab-gift__ribbon" d="M18 31H46V35H18V31Z" />
+      <path class="gs-fab-gift__bow" d="M32 21C32 16.582 35.134 13 39 13C40.657 13 42 14.343 42 16C42 19.866 38.418 23 34 23H32V21Z" />
+      <path class="gs-fab-gift__bow" d="M32 21C32 16.582 28.866 13 25 13C23.343 13 22 14.343 22 16C22 19.866 25.582 23 30 23H32V21Z" />
+      <path class="gs-fab-gift__spark gs-fab-gift__spark--one" d="M50 15L51.6 18.4L55 20L51.6 21.6L50 25L48.4 21.6L45 20L48.4 18.4L50 15Z" />
+      <path class="gs-fab-gift__spark gs-fab-gift__spark--two" d="M16 15L17.2 17.8L20 19L17.2 20.2L16 23L14.8 20.2L12 19L14.8 17.8L16 15Z" />
+    </svg>
+  `;
+}
+
 export class WidgetApp {
   constructor({ host, shadowRoot, runtimeConfig, api, guestId, fingerprintPromise, client, widgetState, scenario }) {
     this.host = host;
@@ -45,7 +63,6 @@ export class WidgetApp {
     this.countdownTimer = null;
     this.isUnlocking = false;
     this.modalOpen = false;
-    this.fabAnimation = null;
     this.autoOpenDismissed = false;
     this.hideModalCall = null;
   }
@@ -65,8 +82,6 @@ export class WidgetApp {
     gsap.killTweensOf(this.refs?.backdrop);
     this.hideModalCall?.kill?.();
     this.hideModalCall = null;
-    this.fabAnimation?.destroy?.();
-    this.fabAnimation = null;
     this.host.remove();
   }
 
@@ -87,7 +102,7 @@ export class WidgetApp {
           aria-label="${TEXTS.guestFab}"
           title="${TEXTS.guestFab}"
         >
-          <span class="gs-fab-icon" data-gs-fab-icon aria-hidden="true"></span>
+          <span class="gs-fab-icon" data-gs-fab-icon aria-hidden="true">${getFabIconMarkup()}</span>
           <span class="gs-sr-only" data-gs-fab-label>${TEXTS.guestFab}</span>
         </button>
         <div class="gs-modal" hidden>
@@ -147,24 +162,6 @@ export class WidgetApp {
     this.refs.fab.addEventListener("click", () => this.openFromButton());
     this.shadowRoot.querySelector(".gs-backdrop").addEventListener("click", () => this.closeModal());
     this.refs.close.addEventListener("click", () => this.closeModal());
-  }
-
-  ensureFabAnimation() {
-    if (!this.refs?.fabIcon || this.fabAnimation) {
-      return;
-    }
-
-    this.fabAnimation = lottie.loadAnimation({
-      container: this.refs.fabIcon,
-      renderer: "svg",
-      loop: true,
-      autoplay: true,
-      path: this.runtimeConfig.fabLottieUrl,
-    });
-
-    this.fabAnimation.addEventListener?.("DOMLoaded", () => {
-      this.fabAnimation?.resize?.();
-    });
   }
 
   resetStage(statusText) {
@@ -238,8 +235,6 @@ export class WidgetApp {
       button.hidden = false;
       button.className = "gs-fab";
       setFabLabel(TEXTS.guestFab);
-      this.ensureFabAnimation();
-      this.fabAnimation?.resize?.();
       this.startFabPulse();
       return;
     }
@@ -248,8 +243,6 @@ export class WidgetApp {
       button.hidden = false;
       button.className = "gs-fab";
       setFabLabel(TEXTS.pendingFab);
-      this.ensureFabAnimation();
-      this.fabAnimation?.resize?.();
       this.startFabPulse();
       return;
     }
@@ -258,8 +251,6 @@ export class WidgetApp {
       button.hidden = false;
       button.className = "gs-fab gs-fab--accent";
       setFabLabel(TEXTS.claimedFab);
-      this.ensureFabAnimation();
-      this.fabAnimation?.resize?.();
       this.startFabPulse();
       return;
     }

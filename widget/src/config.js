@@ -67,7 +67,6 @@ export function getRuntimeConfig() {
     assetsBaseUrl: externalConfig.assetsBaseUrl || baseOrigin,
     registerUrl: externalConfig.registerUrl || "/client/new",
     modalDelayMs: externalConfig.modalDelayMs || MODAL_DELAY_MS,
-    fabLottieUrl: externalConfig.fabLottieUrl || `${baseOrigin}/assets/lottie/fab-gift.json`,
     prizeVideoBaseUrl: externalConfig.prizeVideoBaseUrl || `${baseOrigin}/assets/prizes`,
     safeVideo: {
       mp4Url: externalConfig.safeVideoMp4 || `${baseOrigin}/assets/safe-open.mp4`,
