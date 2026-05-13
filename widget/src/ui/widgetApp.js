@@ -1,4 +1,4 @@
-import lottie from "lottie-web/build/player/lottie_light";
+import lottie from "lottie-web/build/player/lottie_svg";
 import { gsap } from "gsap";
 
 import { TEXTS, getPrizeVisual } from "../config.js";
@@ -47,6 +47,7 @@ export class WidgetApp {
     this.modalOpen = false;
     this.fabAnimation = null;
     this.autoOpenDismissed = false;
+    this.hideModalCall = null;
   }
 
   mount() {
@@ -61,6 +62,9 @@ export class WidgetApp {
     window.clearInterval(this.countdownTimer);
     gsap.killTweensOf(this.refs?.fab);
     gsap.killTweensOf(this.refs?.panel);
+    gsap.killTweensOf(this.refs?.backdrop);
+    this.hideModalCall?.kill?.();
+    this.hideModalCall = null;
     this.fabAnimation?.destroy?.();
     this.fabAnimation = null;
     this.host.remove();
@@ -296,6 +300,10 @@ export class WidgetApp {
       return;
     }
 
+    this.hideModalCall?.kill?.();
+    this.hideModalCall = null;
+    gsap.killTweensOf(this.refs.panel);
+    gsap.killTweensOf(this.refs.backdrop);
     window.clearTimeout(this.autoOpenTimer);
     this.modalOpen = true;
     this.refs.modal.hidden = false;
@@ -319,6 +327,10 @@ export class WidgetApp {
       return;
     }
 
+    this.hideModalCall?.kill?.();
+    this.hideModalCall = null;
+    gsap.killTweensOf(this.refs.panel);
+    gsap.killTweensOf(this.refs.backdrop);
     this.autoOpenDismissed = true;
     window.__giftSafeAutoOpenDismissed = true;
     window.clearTimeout(this.autoOpenTimer);
@@ -333,12 +345,13 @@ export class WidgetApp {
 
     gsap.to(this.refs.backdrop, {
       autoAlpha: 0,
-      duration: 0.38,
+      duration: 0.48,
       ease: "power2.in",
     });
-    gsap.delayedCall(0.38, () => {
+    this.hideModalCall = gsap.delayedCall(0.48, () => {
       this.modalOpen = false;
       this.refs.modal.hidden = true;
+      this.hideModalCall = null;
     });
   }
 

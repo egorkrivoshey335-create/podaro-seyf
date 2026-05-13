@@ -15,6 +15,12 @@
   z-index: 2147483600;
 }
 
+.gs-modal[hidden],
+.gs-fab[hidden] {
+  display: none !important;
+  pointer-events: none !important;
+}
+
 .gs-fab {
   position: fixed;
   left: 24px;

@@ -87,8 +87,17 @@ async function syncAuthorizedState({ api, guestId, client, widgetState }) {
 }
 
 export async function initGiftSafeWidget() {
+  if (window.__giftSafeWidgetInstance) {
+    return window.__giftSafeWidgetInstance;
+  }
+
+  if (window.__giftSafeWidgetInitPromise) {
+    return window.__giftSafeWidgetInitPromise;
+  }
+
+  window.__giftSafeWidgetInitPromise = (async () => {
   if (!document.body) {
-    return null;
+      return null;
   }
 
   const runtimeConfig = getRuntimeConfig();
@@ -123,21 +132,29 @@ export async function initGiftSafeWidget() {
   }
 
   if (scenario === "hidden") {
-    return null;
+      return null;
   }
 
-  return mountWidget({
-    runtimeConfig,
-    api,
-    guestId,
-    fingerprintPromise,
-    client,
-    widgetState,
-    scenario,
-  });
+    return mountWidget({
+      runtimeConfig,
+      api,
+      guestId,
+      fingerprintPromise,
+      client,
+      widgetState,
+      scenario,
+    });
+  })();
+
+  try {
+    return await window.__giftSafeWidgetInitPromise;
+  } finally {
+    window.__giftSafeWidgetInitPromise = null;
+  }
 }
 
-if (!window.__GIFT_SAFE_WIDGET_SKIP_AUTO_INIT__) {
+if (!window.__GIFT_SAFE_WIDGET_SKIP_AUTO_INIT__ && !window.__giftSafeWidgetAutoInitScheduled) {
+  window.__giftSafeWidgetAutoInitScheduled = true;
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", () => {
       initGiftSafeWidget();
