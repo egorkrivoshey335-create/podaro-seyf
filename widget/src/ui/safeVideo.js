@@ -59,11 +59,45 @@ export function prepareSafeVideo(root, runtimeConfig) {
   video.controls = false;
   video.disablePictureInPicture = true;
   video.playsInline = true;
+  video.preload = "auto";
   video.innerHTML = `
     ${webmUrl ? `<source src="${webmUrl}" type="video/webm" />` : ""}
     ${mp4Url ? `<source src="${mp4Url}" type="video/mp4" />` : ""}
   `;
   video.load();
+}
+
+export function showSafeVideoPreview(root, runtimeConfig, statusText) {
+  if (!hasSafeVideoSources(runtimeConfig)) {
+    return false;
+  }
+
+  prepareSafeVideo(root, runtimeConfig);
+
+  const { shell, video, status } = getRefs(root);
+  if (!video) {
+    return false;
+  }
+
+  if (status && statusText) {
+    status.textContent = statusText;
+  }
+
+  root.dataset.gsMode = "video";
+  if (shell) {
+    shell.hidden = false;
+  }
+
+  try {
+    video.pause();
+    video.muted = true;
+    video.volume = 0;
+    video.currentTime = 0;
+  } catch {
+    // Ignore preview sync issues; the static scene will still be hidden.
+  }
+
+  return true;
 }
 
 export function resetSafeVideo(root) {

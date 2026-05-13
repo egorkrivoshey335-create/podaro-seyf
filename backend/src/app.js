@@ -37,6 +37,10 @@ import {
 } from "./services/spinService.js";
 
 const app = express();
+const insalesXmlBodyParser = express.text({
+  type: ["application/xml", "text/xml", "*/xml"],
+  limit: "1mb",
+});
 
 const spinStatusSchema = z.enum(["WON", "CLAIMED", "AWAITING_FULFILL", "FULFILLED", "EXPIRED"]);
 
@@ -244,7 +248,7 @@ app.post("/api/deliver", async (request, response) => {
   });
 });
 
-app.post("/api/insales/external-discounts/free-shipping", async (request, response) => {
+app.post("/api/insales/external-discounts/free-shipping", insalesXmlBodyParser, async (request, response) => {
   const token = request.query.token || request.headers["x-insales-token"];
   assertInsalesToken(token, config.insales.externalDiscountToken, "INSALES_DISCOUNT_FORBIDDEN");
 
@@ -252,7 +256,7 @@ app.post("/api/insales/external-discounts/free-shipping", async (request, respon
   response.json(discountResponse);
 });
 
-app.post("/api/insales/webhooks/order-status", async (request, response) => {
+app.post("/api/insales/webhooks/order-status", insalesXmlBodyParser, async (request, response) => {
   const token = request.query.token || request.headers["x-insales-token"];
   assertInsalesToken(token, config.insales.webhookToken, "INSALES_WEBHOOK_FORBIDDEN");
 

@@ -1,9 +1,60 @@
 import prismaClientPkg from "@prisma/client";
+import { XMLParser } from "fast-xml-parser";
 
 import { AppError } from "../lib/errors.js";
 import { logger } from "../lib/logger.js";
 
 const { PrizeType, SpinStatus } = prismaClientPkg;
+const xmlParser = new XMLParser({
+  ignoreAttributes: true,
+  parseTagValue: false,
+});
+
+function unwrapValue(value) {
+  if (Array.isArray(value)) {
+    return unwrapValue(value[0]);
+  }
+
+  if (value && typeof value === "object") {
+    if ("#text" in value) {
+      return unwrapValue(value["#text"]);
+    }
+  }
+
+  return value;
+}
+
+function pickFirst(...values) {
+  for (const value of values) {
+    const unwrapped = unwrapValue(value);
+    if (unwrapped != null && unwrapped !== "") {
+      return unwrapped;
+    }
+  }
+
+  return null;
+}
+
+function normalizeInsalesPayload(payload) {
+  if (typeof payload === "string") {
+    const trimmed = payload.trim();
+    if (!trimmed) {
+      return {};
+    }
+
+    if (trimmed.startsWith("<")) {
+      return xmlParser.parse(trimmed);
+    }
+
+    return {};
+  }
+
+  if (typeof Buffer !== "undefined" && Buffer.isBuffer(payload)) {
+    return normalizeInsalesPayload(payload.toString("utf8"));
+  }
+
+  return payload || {};
+}
 
 function normalizeEmail(value) {
   return typeof value === "string" && value.trim() ? value.trim().toLowerCase() : null;
@@ -29,17 +80,20 @@ function toNumber(...values) {
 }
 
 export function parseInsalesOrderPayload(payload) {
-  const order = payload?.order || payload || {};
-  const client = order.client || payload?.client || {};
+  const normalizedPayload = normalizeInsalesPayload(payload);
+  const order = normalizedPayload?.order || normalizedPayload || {};
+  const client = order.client || normalizedPayload?.client || {};
 
   return {
-    raw: payload,
+    raw: normalizedPayload,
     order,
-    orderId: order.id != null ? String(order.id) : order.number != null ? String(order.number) : null,
+    orderId: pickFirst(order.id, order.number) != null ? String(pickFirst(order.id, order.number)) : null,
     clientId:
-      client.id != null ? String(client.id) : order.client_id != null ? String(order.client_id) : null,
-    email: normalizeEmail(client.email || order.email || order.client_email),
-    phone: normalizePhone(client.phone || order.phone || order.client_phone),
+      pickFirst(client.id, order.client_id, normalizedPayload?.client_id) != null
+        ? String(pickFirst(client.id, order.client_id, normalizedPayload?.client_id))
+        : null,
+    email: normalizeEmail(pickFirst(client.email, order.email, order.client_email)),
+    phone: normalizePhone(pickFirst(client.phone, order.phone, order.client_phone)),
     deliveryPrice: toNumber(
       order.delivery_price,
       order.full_delivery_price,
@@ -47,7 +101,7 @@ export function parseInsalesOrderPayload(payload) {
       order.delivery_variant?.delivery_price,
       order.delivery_variant?.price,
     ),
-    financialStatus: String(order.financial_status || payload?.financial_status || "").toLowerCase(),
+    financialStatus: String(pickFirst(order.financial_status, normalizedPayload?.financial_status) || "").toLowerCase(),
   };
 }
 

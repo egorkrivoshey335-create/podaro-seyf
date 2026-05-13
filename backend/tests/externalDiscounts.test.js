@@ -29,6 +29,28 @@ test("parseInsalesOrderPayload extracts client and delivery fields", () => {
   assert.equal(result.financialStatus, "pending");
 });
 
+test("parseInsalesOrderPayload supports XML webhook payloads", () => {
+  const result = parseInsalesOrderPayload(`
+    <order>
+      <id>777</id>
+      <financial_status>accepted</financial_status>
+      <delivery_price>390</delivery_price>
+      <client>
+        <id>88</id>
+        <email>XmlWinner@example.com</email>
+        <phone>+79995554433</phone>
+      </client>
+    </order>
+  `);
+
+  assert.equal(result.orderId, "777");
+  assert.equal(result.clientId, "88");
+  assert.equal(result.email, "xmlwinner@example.com");
+  assert.equal(result.phone, "+79995554433");
+  assert.equal(result.deliveryPrice, 390);
+  assert.equal(result.financialStatus, "accepted");
+});
+
 test("getFreeShippingDiscountResponse returns money discount for matching active prize", async () => {
   const fakeDb = {
     spin: {

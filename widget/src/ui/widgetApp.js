@@ -1,9 +1,10 @@
+import lottie from "lottie-web/build/player/lottie_light";
 import { gsap } from "gsap";
 
 import { TEXTS, getPrizeVisual } from "../config.js";
 import { patchWidgetState, writeWidgetState } from "../core/storage.js";
 import { playUnlockSequence, resetSafeScene, revealPrizeState, showPrizeState } from "./safeSequence.js";
-import { hasSafeVideoSources, playSafeVideo, prepareSafeVideo, resetSafeVideo } from "./safeVideo.js";
+import { hasSafeVideoSources, playSafeVideo, prepareSafeVideo, resetSafeVideo, showSafeVideoPreview } from "./safeVideo.js";
 
 function escapeHtml(value) {
   return String(value || "")
@@ -44,6 +45,7 @@ export class WidgetApp {
     this.countdownTimer = null;
     this.isUnlocking = false;
     this.modalOpen = false;
+    this.fabAnimation = null;
   }
 
   mount() {
@@ -58,6 +60,8 @@ export class WidgetApp {
     window.clearInterval(this.countdownTimer);
     gsap.killTweensOf(this.refs?.fab);
     gsap.killTweensOf(this.refs?.panel);
+    this.fabAnimation?.destroy?.();
+    this.fabAnimation = null;
     this.host.remove();
   }
 
@@ -70,7 +74,17 @@ export class WidgetApp {
   renderShell() {
     this.shadowRoot.innerHTML = `
       <div class="gs-widget">
-        <button class="gs-fab" type="button" hidden data-action="fab"></button>
+        <button
+          class="gs-fab"
+          type="button"
+          hidden
+          data-action="fab"
+          aria-label="${TEXTS.guestFab}"
+          title="${TEXTS.guestFab}"
+        >
+          <span class="gs-fab-icon" data-gs-fab-icon aria-hidden="true"></span>
+          <span class="gs-sr-only" data-gs-fab-label>${TEXTS.guestFab}</span>
+        </button>
         <div class="gs-modal" hidden>
           <div class="gs-backdrop" data-action="close"></div>
           <section class="gs-panel" role="dialog" aria-modal="true" aria-label="Подарок из сейфа">
@@ -115,6 +129,8 @@ export class WidgetApp {
 
     this.refs = {
       fab: this.shadowRoot.querySelector(".gs-fab"),
+      fabIcon: this.shadowRoot.querySelector("[data-gs-fab-icon]"),
+      fabLabel: this.shadowRoot.querySelector("[data-gs-fab-label]"),
       modal: this.shadowRoot.querySelector(".gs-modal"),
       panel: this.shadowRoot.querySelector(".gs-panel"),
       close: this.shadowRoot.querySelector(".gs-close"),
@@ -125,6 +141,21 @@ export class WidgetApp {
     this.refs.fab.addEventListener("click", () => this.openFromButton());
     this.shadowRoot.querySelector(".gs-backdrop").addEventListener("click", () => this.closeModal());
     this.refs.close.addEventListener("click", () => this.closeModal());
+    this.ensureFabAnimation();
+  }
+
+  ensureFabAnimation() {
+    if (!this.refs?.fabIcon || this.fabAnimation) {
+      return;
+    }
+
+    this.fabAnimation = lottie.loadAnimation({
+      container: this.refs.fabIcon,
+      renderer: "svg",
+      loop: true,
+      autoplay: true,
+      path: this.runtimeConfig.fabLottieUrl,
+    });
   }
 
   resetStage(statusText) {
@@ -143,7 +174,9 @@ export class WidgetApp {
     window.clearTimeout(this.autoOpenTimer);
 
     if (this.scenario === "guest-fresh") {
-      this.resetStage(TEXTS.stageIdle);
+      if (!showSafeVideoPreview(this.refs.stage, this.runtimeConfig, TEXTS.stageIdle)) {
+        this.resetStage(TEXTS.stageIdle);
+      }
       this.renderWelcome();
       this.scheduleAutoOpen();
       return;
@@ -180,11 +213,18 @@ export class WidgetApp {
 
   updateButton() {
     const button = this.refs.fab;
+    const setFabLabel = (label) => {
+      button.setAttribute("aria-label", label);
+      button.title = label;
+      if (this.refs.fabLabel) {
+        this.refs.fabLabel.textContent = label;
+      }
+    };
 
     if (this.scenario === "guest-fresh") {
       button.hidden = false;
       button.className = "gs-fab";
-      button.textContent = TEXTS.guestFab;
+      setFabLabel(TEXTS.guestFab);
       this.startFabPulse();
       return;
     }
@@ -192,7 +232,7 @@ export class WidgetApp {
     if (this.scenario === "guest-pending") {
       button.hidden = false;
       button.className = "gs-fab";
-      button.textContent = TEXTS.pendingFab;
+      setFabLabel(TEXTS.pendingFab);
       this.startFabPulse();
       return;
     }
@@ -200,10 +240,7 @@ export class WidgetApp {
     if (this.scenario === "authorized-claim") {
       button.hidden = false;
       button.className = "gs-fab gs-fab--accent";
-      const countdown = this.widgetState?.expiresAt ? formatCountdown(this.widgetState.expiresAt) : "";
-      button.textContent = countdown
-        ? `${TEXTS.claimedFab} ${countdown}`
-        : TEXTS.claimedFab;
+      setFabLabel(TEXTS.claimedFab);
       this.startFabPulse();
       return;
     }
@@ -283,12 +320,7 @@ export class WidgetApp {
 
   renderCopy(markup) {
     this.refs.copy.innerHTML = markup;
-
-    this.refs.copy.querySelectorAll("[data-gs-image]").forEach((image) => {
-      image.addEventListener("error", () => {
-        image.closest(".gs-prize-media")?.setAttribute("data-fallback-only", "true");
-      });
-    });
+    this.bindPrizeMedia();
 
     this.refs.copy.querySelector("[data-action='spin']")?.addEventListener("click", () => this.handleSpin());
     this.refs.copy
@@ -310,14 +342,51 @@ export class WidgetApp {
     );
   }
 
+  bindPrizeMedia() {
+    this.refs.copy.querySelectorAll("[data-gs-prize-video]").forEach((node) => {
+      if (node.dataset.bound === "true") {
+        return;
+      }
+
+      node.dataset.bound = "true";
+
+      const fallbackSrc = node.dataset.fallbackSrc;
+      const switchToFallback = () => {
+        if (!fallbackSrc || node.dataset.usingFallback === "true") {
+          return;
+        }
+
+        node.dataset.usingFallback = "true";
+        node.src = fallbackSrc;
+        node.load();
+        node.play().catch(() => {});
+      };
+
+      node.addEventListener("error", switchToFallback);
+      node.play().catch(() => {});
+    });
+  }
+
   getPrizeMedia(prize) {
     const visual = getPrizeVisual(prize);
-    const imageUrl = prize?.image ? this.resolveAssetUrl(prize.image) : null;
+    const prizeVideoUrl = this.resolvePrizeVideoUrl(prize);
+    const fallbackVideoUrl = this.runtimeConfig.safeVideo.mp4Url || this.runtimeConfig.safeVideo.webmUrl || "";
 
     return `
       <div class="gs-prize-card">
         <div class="gs-prize-media" style="--gs-card-accent: ${visual.accent}">
-          ${imageUrl ? `<img data-gs-image src="${escapeHtml(imageUrl)}" alt="${escapeHtml(prize.title)}" />` : ""}
+          <video
+            class="gs-prize-media-video"
+            data-gs-prize-video
+            src="${escapeHtml(prizeVideoUrl || fallbackVideoUrl)}"
+            ${fallbackVideoUrl ? `data-fallback-src="${escapeHtml(fallbackVideoUrl)}"` : ""}
+            aria-label="${escapeHtml(prize.title)}"
+            autoplay
+            muted
+            loop
+            playsinline
+            preload="metadata"
+          ></video>
           <span class="gs-prize-media-badge">${escapeHtml(visual.badge)}</span>
         </div>
         <div class="gs-prize-body">
@@ -590,9 +659,22 @@ export class WidgetApp {
           this.destroy();
         }
       } else if (this.scenario === "authorized-claim") {
-        this.refs.fab.textContent = `${TEXTS.claimedFab} ${countdown}`;
+        this.refs.fab.setAttribute("aria-label", `${TEXTS.claimedFab} ${countdown}`);
+        this.refs.fab.title = `${TEXTS.claimedFab} ${countdown}`;
+        if (this.refs.fabLabel) {
+          this.refs.fabLabel.textContent = `${TEXTS.claimedFab} ${countdown}`;
+        }
       }
     }, 1000);
+  }
+
+  resolvePrizeVideoUrl(prize) {
+    if (!prize?.code) {
+      return "";
+    }
+
+    const basePath = this.runtimeConfig.prizeVideoBaseUrl.replace(/\/$/, "");
+    return `${basePath}/${prize.code}.mp4`;
   }
 
   resolveAssetUrl(assetPath) {

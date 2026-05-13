@@ -24,9 +24,9 @@ export const TEXTS = {
   blockedTitle: "Розыгрыш временно недоступен",
   blockedDescription:
     "Сработала защита от повторных попыток. Если это ошибка, можно проверить данные позже.",
-  guestFab: "🎁 Забрать подарок",
-  pendingFab: "🎁 Забрать подарок",
-  claimedFab: "🎁 Забери приз",
+  guestFab: "Забрать подарок",
+  pendingFab: "Открыть подарок",
+  claimedFab: "Забрать приз",
   readyEmailHint: "Отправим приз на email из профиля и сразу закрепим его за твоим аккаунтом.",
 };
 
@@ -67,10 +67,12 @@ export function getRuntimeConfig() {
     assetsBaseUrl: externalConfig.assetsBaseUrl || baseOrigin,
     registerUrl: externalConfig.registerUrl || "/client/new",
     modalDelayMs: externalConfig.modalDelayMs || MODAL_DELAY_MS,
+    fabLottieUrl: externalConfig.fabLottieUrl || `${baseOrigin}/assets/lottie/fab-gift.json`,
+    prizeVideoBaseUrl: externalConfig.prizeVideoBaseUrl || `${baseOrigin}/assets/prizes`,
     safeVideo: {
       mp4Url: externalConfig.safeVideoMp4 || `${baseOrigin}/assets/safe-open.mp4`,
-      webmUrl: externalConfig.safeVideoWebm || `${baseOrigin}/assets/safe-open.webm`,
-      posterUrl: externalConfig.safeVideoPoster || `${baseOrigin}/assets/safe-poster.webp`,
+      webmUrl: externalConfig.safeVideoWebm || "",
+      posterUrl: externalConfig.safeVideoPoster || "",
     },
     theme: {
       primary: externalConfig.primaryColor || "#7c3aed",
