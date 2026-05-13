@@ -21,10 +21,6 @@ function mountWidget({ runtimeConfig, api, guestId, fingerprintPromise, client, 
   host.id = "gift-safe-widget-host";
 
   const shadowRoot = host.attachShadow({ mode: "open" });
-  const style = document.createElement("style");
-  style.textContent = styles;
-  shadowRoot.append(style);
-
   document.body.append(host);
 
   const app = new WidgetApp({
@@ -40,6 +36,9 @@ function mountWidget({ runtimeConfig, api, guestId, fingerprintPromise, client, 
   });
 
   app.mount();
+  const style = document.createElement("style");
+  style.textContent = styles;
+  shadowRoot.prepend(style);
   window.__giftSafeWidgetInstance = app;
   return app;
 }
