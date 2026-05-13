@@ -357,11 +357,10 @@ export class WidgetApp {
     gsap.killTweensOf(this.refs.fab);
     gsap.fromTo(
       this.refs.fab,
-      { y: 0, scale: 1, boxShadow: "0 14px 30px rgba(15, 23, 42, 0.32)" },
+      { y: 0, scale: 1 },
       {
         y: -4,
-        scale: 1.03,
-        boxShadow: "0 18px 36px rgba(124, 58, 237, 0.45)",
+        scale: 1.04,
         duration: 1.2,
         repeat: -1,
         yoyo: true,
