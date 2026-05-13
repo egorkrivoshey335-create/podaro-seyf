@@ -46,6 +46,7 @@ export class WidgetApp {
     this.isUnlocking = false;
     this.modalOpen = false;
     this.fabAnimation = null;
+    this.autoOpenDismissed = false;
   }
 
   mount() {
@@ -132,6 +133,7 @@ export class WidgetApp {
       fabIcon: this.shadowRoot.querySelector("[data-gs-fab-icon]"),
       fabLabel: this.shadowRoot.querySelector("[data-gs-fab-label]"),
       modal: this.shadowRoot.querySelector(".gs-modal"),
+      backdrop: this.shadowRoot.querySelector(".gs-backdrop"),
       panel: this.shadowRoot.querySelector(".gs-panel"),
       close: this.shadowRoot.querySelector(".gs-close"),
       copy: this.shadowRoot.querySelector("[data-gs-copy]"),
@@ -204,6 +206,10 @@ export class WidgetApp {
   }
 
   scheduleAutoOpen() {
+    if (this.autoOpenDismissed) {
+      return;
+    }
+
     this.autoOpenTimer = window.setTimeout(() => {
       if (!this.modalOpen) {
         this.openModal();
@@ -270,6 +276,8 @@ export class WidgetApp {
       return;
     }
 
+    this.autoOpenDismissed = true;
+    window.clearTimeout(this.autoOpenTimer);
     this.openModal();
   }
 
@@ -278,13 +286,15 @@ export class WidgetApp {
       return;
     }
 
+    window.clearTimeout(this.autoOpenTimer);
     this.modalOpen = true;
     this.refs.modal.hidden = false;
 
+    gsap.set(this.refs.modal, { autoAlpha: 1 });
     gsap.fromTo(
-      this.refs.modal,
+      this.refs.backdrop,
       { autoAlpha: 0 },
-      { autoAlpha: 1, duration: 0.22, ease: "power2.out" },
+      { autoAlpha: 1, duration: 0.28, ease: "power2.out" },
     );
 
     gsap.fromTo(
@@ -299,6 +309,9 @@ export class WidgetApp {
       return;
     }
 
+    this.autoOpenDismissed = true;
+    window.clearTimeout(this.autoOpenTimer);
+
     gsap.to(this.refs.panel, {
       y: 24,
       scale: 0.96,
@@ -307,9 +320,15 @@ export class WidgetApp {
       ease: "power2.in",
     });
 
+    gsap.to(this.refs.backdrop, {
+      autoAlpha: 0,
+      duration: 0.24,
+      ease: "power2.in",
+    });
+
     gsap.to(this.refs.modal, {
       autoAlpha: 0,
-      duration: 0.2,
+      duration: 0.24,
       ease: "power2.in",
       onComplete: () => {
         this.modalOpen = false;

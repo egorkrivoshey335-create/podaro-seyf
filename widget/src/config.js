@@ -75,7 +75,7 @@ export function getRuntimeConfig() {
       posterUrl: externalConfig.safeVideoPoster || "",
     },
     theme: {
-      primary: externalConfig.primaryColor || "#7c3aed",
+      primary: externalConfig.primaryColor || "#e97cac",
       accent: externalConfig.accentColor || "#f59e0b",
       surface: externalConfig.surfaceColor || "#120425",
     },
