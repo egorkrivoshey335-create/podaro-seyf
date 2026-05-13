@@ -1,5 +1,7 @@
 import { gsap } from "gsap";
+import lottie from "lottie-web/build/player/lottie_svg";
 
+import fabAnimationData from "../assets/fab-gift.json";
 import { TEXTS, getPrizeVisual } from "../config.js";
 import { patchWidgetState, writeWidgetState } from "../core/storage.js";
 import { playUnlockSequence, resetSafeScene, revealPrizeState, showPrizeState } from "./safeSequence.js";
@@ -29,7 +31,7 @@ function formatCountdown(expiresAt) {
   return `${hours}:${minutes}:${seconds}`;
 }
 
-function getFabIconMarkup() {
+function getFabFallbackMarkup() {
   return `
     <svg class="gs-fab-gift" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
       <circle class="gs-fab-gift__halo" cx="32" cy="32" r="26" />
@@ -65,6 +67,8 @@ export class WidgetApp {
     this.modalOpen = false;
     this.autoOpenDismissed = false;
     this.hideModalCall = null;
+    this.fabLottie = null;
+    this.fabLottieTimeout = null;
   }
 
   mount() {
@@ -72,17 +76,103 @@ export class WidgetApp {
     this.applyTheme();
     prepareSafeVideo(this.refs.stage, this.runtimeConfig);
     this.refresh();
+    this.initFabLottie();
   }
 
   destroy() {
     window.clearTimeout(this.autoOpenTimer);
     window.clearInterval(this.countdownTimer);
+    window.clearTimeout(this.fabLottieTimeout);
     gsap.killTweensOf(this.refs?.fab);
     gsap.killTweensOf(this.refs?.panel);
     gsap.killTweensOf(this.refs?.backdrop);
     this.hideModalCall?.kill?.();
     this.hideModalCall = null;
+    try {
+      this.fabLottie?.destroy?.();
+    } catch {
+      // ignore lottie teardown errors
+    }
+    this.fabLottie = null;
     this.host.remove();
+  }
+
+  initFabLottie() {
+    if (!this.refs?.fabLottieMount) {
+      return;
+    }
+
+    const mount = this.refs.fabLottieMount;
+    const fallback = this.refs.fabFallback;
+
+    const finalizeFailure = () => {
+      try {
+        this.fabLottie?.destroy?.();
+      } catch {
+        // ignore
+      }
+      this.fabLottie = null;
+      mount.hidden = true;
+      if (fallback) {
+        fallback.hidden = false;
+      }
+    };
+
+    const start = () => {
+      try {
+        const animation = lottie.loadAnimation({
+          container: mount,
+          renderer: "svg",
+          loop: true,
+          autoplay: true,
+          animationData: fabAnimationData,
+          rendererSettings: {
+            preserveAspectRatio: "xMidYMid meet",
+            progressiveLoad: false,
+          },
+        });
+
+        this.fabLottie = animation;
+
+        const handleReady = () => {
+          window.clearTimeout(this.fabLottieTimeout);
+          this.fabLottieTimeout = null;
+          if (mount.querySelector("svg")) {
+            mount.hidden = false;
+            if (fallback) {
+              fallback.hidden = true;
+            }
+          } else {
+            finalizeFailure();
+          }
+        };
+
+        animation.addEventListener("DOMLoaded", handleReady);
+        animation.addEventListener("data_failed", finalizeFailure);
+        animation.addEventListener("error", finalizeFailure);
+
+        this.fabLottieTimeout = window.setTimeout(() => {
+          if (!mount.querySelector("svg")) {
+            console.warn("[gift-safe] Lottie FAB failed to mount in time, falling back to inline SVG");
+            finalizeFailure();
+          } else {
+            mount.hidden = false;
+            if (fallback) {
+              fallback.hidden = true;
+            }
+          }
+        }, 800);
+      } catch (error) {
+        console.warn("[gift-safe] Lottie FAB init error", error);
+        finalizeFailure();
+      }
+    };
+
+    if (typeof window.requestAnimationFrame === "function") {
+      window.requestAnimationFrame(() => window.requestAnimationFrame(start));
+    } else {
+      start();
+    }
   }
 
   applyTheme() {
@@ -102,7 +192,10 @@ export class WidgetApp {
           aria-label="${TEXTS.guestFab}"
           title="${TEXTS.guestFab}"
         >
-          <span class="gs-fab-icon" data-gs-fab-icon aria-hidden="true">${getFabIconMarkup()}</span>
+          <span class="gs-fab-icon" data-gs-fab-icon aria-hidden="true">
+            <span class="gs-fab-lottie" data-gs-fab-lottie hidden></span>
+            <span class="gs-fab-fallback" data-gs-fab-fallback>${getFabFallbackMarkup()}</span>
+          </span>
           <span class="gs-sr-only" data-gs-fab-label>${TEXTS.guestFab}</span>
         </button>
         <div class="gs-modal" hidden>
@@ -150,6 +243,8 @@ export class WidgetApp {
     this.refs = {
       fab: this.shadowRoot.querySelector(".gs-fab"),
       fabIcon: this.shadowRoot.querySelector("[data-gs-fab-icon]"),
+      fabLottieMount: this.shadowRoot.querySelector("[data-gs-fab-lottie]"),
+      fabFallback: this.shadowRoot.querySelector("[data-gs-fab-fallback]"),
       fabLabel: this.shadowRoot.querySelector("[data-gs-fab-label]"),
       modal: this.shadowRoot.querySelector(".gs-modal"),
       backdrop: this.shadowRoot.querySelector(".gs-backdrop"),

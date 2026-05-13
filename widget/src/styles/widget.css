@@ -45,10 +45,23 @@
 }
 
 .gs-fab-icon {
-  width: 42px;
-  height: 42px;
+  position: relative;
+  width: 48px;
+  height: 48px;
   display: block;
   pointer-events: none;
+}
+
+.gs-fab-lottie,
+.gs-fab-fallback {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+
+.gs-fab-lottie[hidden],
+.gs-fab-fallback[hidden] {
+  display: none !important;
 }
 
 .gs-fab-icon svg {
