@@ -1,9 +1,13 @@
-import "dotenv/config";
+import dotenv from "dotenv";
 import bcrypt from "bcrypt";
 import { PrismaPg } from "@prisma/adapter-pg";
 import prismaClientPkg from "@prisma/client";
+import { fileURLToPath } from "node:url";
+import { dirname, resolve } from "node:path";
 
 const { PrismaClient, PrizeType } = prismaClientPkg;
+const __dirname = dirname(fileURLToPath(import.meta.url));
+dotenv.config({ path: resolve(__dirname, "../../.env") });
 
 const prisma = new PrismaClient({
   adapter: new PrismaPg({
