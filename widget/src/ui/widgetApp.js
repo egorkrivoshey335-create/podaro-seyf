@@ -143,7 +143,6 @@ export class WidgetApp {
     this.refs.fab.addEventListener("click", () => this.openFromButton());
     this.shadowRoot.querySelector(".gs-backdrop").addEventListener("click", () => this.closeModal());
     this.refs.close.addEventListener("click", () => this.closeModal());
-    this.ensureFabAnimation();
   }
 
   ensureFabAnimation() {
@@ -157,6 +156,10 @@ export class WidgetApp {
       loop: true,
       autoplay: true,
       path: this.runtimeConfig.fabLottieUrl,
+    });
+
+    this.fabAnimation.addEventListener?.("DOMLoaded", () => {
+      this.fabAnimation?.resize?.();
     });
   }
 
@@ -206,12 +209,12 @@ export class WidgetApp {
   }
 
   scheduleAutoOpen() {
-    if (this.autoOpenDismissed) {
+    if (this.autoOpenDismissed || window.__giftSafeAutoOpenDismissed) {
       return;
     }
 
     this.autoOpenTimer = window.setTimeout(() => {
-      if (!this.modalOpen) {
+      if (!this.modalOpen && !this.autoOpenDismissed && !window.__giftSafeAutoOpenDismissed) {
         this.openModal();
       }
     }, this.runtimeConfig.modalDelayMs);
@@ -231,6 +234,8 @@ export class WidgetApp {
       button.hidden = false;
       button.className = "gs-fab";
       setFabLabel(TEXTS.guestFab);
+      this.ensureFabAnimation();
+      this.fabAnimation?.resize?.();
       this.startFabPulse();
       return;
     }
@@ -239,6 +244,8 @@ export class WidgetApp {
       button.hidden = false;
       button.className = "gs-fab";
       setFabLabel(TEXTS.pendingFab);
+      this.ensureFabAnimation();
+      this.fabAnimation?.resize?.();
       this.startFabPulse();
       return;
     }
@@ -247,6 +254,8 @@ export class WidgetApp {
       button.hidden = false;
       button.className = "gs-fab gs-fab--accent";
       setFabLabel(TEXTS.claimedFab);
+      this.ensureFabAnimation();
+      this.fabAnimation?.resize?.();
       this.startFabPulse();
       return;
     }
@@ -277,6 +286,7 @@ export class WidgetApp {
     }
 
     this.autoOpenDismissed = true;
+    window.__giftSafeAutoOpenDismissed = true;
     window.clearTimeout(this.autoOpenTimer);
     this.openModal();
   }
@@ -310,6 +320,7 @@ export class WidgetApp {
     }
 
     this.autoOpenDismissed = true;
+    window.__giftSafeAutoOpenDismissed = true;
     window.clearTimeout(this.autoOpenTimer);
 
     gsap.to(this.refs.panel, {
@@ -322,18 +333,12 @@ export class WidgetApp {
 
     gsap.to(this.refs.backdrop, {
       autoAlpha: 0,
-      duration: 0.24,
+      duration: 0.38,
       ease: "power2.in",
     });
-
-    gsap.to(this.refs.modal, {
-      autoAlpha: 0,
-      duration: 0.24,
-      ease: "power2.in",
-      onComplete: () => {
-        this.modalOpen = false;
-        this.refs.modal.hidden = true;
-      },
+    gsap.delayedCall(0.38, () => {
+      this.modalOpen = false;
+      this.refs.modal.hidden = true;
     });
   }
 
