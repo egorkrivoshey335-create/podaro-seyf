@@ -77,8 +77,8 @@ function DetailRow({ label, value }) {
 
 function App() {
   const [token, setToken] = useState(() => localStorage.getItem(TOKEN_KEY) || "");
-  const [login, setLogin] = useState("admin");
-  const [password, setPassword] = useState("admin123");
+  const [login, setLogin] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(() => Boolean(localStorage.getItem(TOKEN_KEY)));
   const [stats, setStats] = useState(null);

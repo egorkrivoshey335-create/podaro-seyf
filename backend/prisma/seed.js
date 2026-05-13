@@ -1,3 +1,4 @@
+import "dotenv/config";
 import bcrypt from "bcrypt";
 import { PrismaPg } from "@prisma/adapter-pg";
 import prismaClientPkg from "@prisma/client";
@@ -180,21 +181,52 @@ async function main() {
     },
   });
 
-  const passwordHash = await bcrypt.hash(
-    process.env.ADMIN_PASSWORD || "admin123",
-    Number(process.env.BCRYPT_ROUNDS || 10),
-  );
+  const targetLogin = process.env.ADMIN_LOGIN || "admin";
+  const passwordHash = await bcrypt.hash(process.env.ADMIN_PASSWORD || "admin123", Number(process.env.BCRYPT_ROUNDS || 10));
 
-  await prisma.admin.upsert({
-    where: { login: process.env.ADMIN_LOGIN || "admin" },
-    update: {
-      passwordHash,
-    },
-    create: {
-      login: process.env.ADMIN_LOGIN || "admin",
-      passwordHash,
-    },
+  const existingTargetAdmin = await prisma.admin.findUnique({
+    where: { login: targetLogin },
   });
+
+  if (existingTargetAdmin) {
+    await prisma.admin.update({
+      where: { login: targetLogin },
+      data: {
+        passwordHash,
+      },
+    });
+  } else {
+    const defaultAdmin = targetLogin !== "admin"
+      ? await prisma.admin.findUnique({
+          where: { login: "admin" },
+        })
+      : null;
+
+    if (defaultAdmin) {
+      await prisma.admin.update({
+        where: { id: defaultAdmin.id },
+        data: {
+          login: targetLogin,
+          passwordHash,
+        },
+      });
+    } else {
+      await prisma.admin.create({
+        data: {
+          login: targetLogin,
+          passwordHash,
+        },
+      });
+    }
+  }
+
+  if (targetLogin !== "admin") {
+    await prisma.admin.deleteMany({
+      where: {
+        login: "admin",
+      },
+    });
+  }
 }
 
 main()
