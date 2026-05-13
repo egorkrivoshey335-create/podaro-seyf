@@ -1,0 +1,111 @@
+//var cv_currency_format = "{{money_with_currency_format}}";
+
+      	function set_products_count(count, amount) {
+          	$("#cart_items").html(count);
+            var product = 'товаров';
+            if (count == 1) {
+            	product = 'товар';
+            } else if (count == 2 || count == 3 || count == 4) {
+            	product = 'товара';
+            }
+          	$("#word_product").html(product);
+            $("#cart_amount").html(amount);
+		}
+
+		function updateCartInformer() {
+
+              var cart = null;
+
+              $.ajax({
+                  url: '/cart_items.json',
+                  dataType: 'json',
+                  async: false,
+                  success: function(response){
+                    cart = response;
+                  }
+              });
+
+              var total_price  = 0;
+              var count = 0;
+              var html = ''; // '<div class="cartRow">Корзина пуста</div>';
+              if (cart) {
+                  total_price = InSales.formatMoney(cart.total_price, cv_currency_format);
+                  if (cart.order_lines.length > 0) html = '';
+                  $.each(cart.order_lines, function(index, order_line) {
+              		  html += '<div class="cartRow"><span>' + order_line.quantity + 'x</span><a href="/product?product_id=' + order_line.product_id + '">' + order_line.title + '</a><div class="price">' + InSales.formatMoney(order_line.quantity*order_line.sale_price, cv_currency_format) + '<span class="delete" iid="delete_' + order_line.variant_id + '" title="Удалить товар"></span></div></div>';
+                      count += order_line.quantity;
+                  });
+              }
+
+              $('.cartBlock .inner').html(html);
+              $('.amount').html(total_price);
+              if (count == 0) {
+              	$('.cartRow .empty').show();
+                $('.cartRow .price').hide();
+                $('.cartRow .order').hide();
+                $('.cartWidget .inner').hide('slow');
+                $('.cartWidget .inner').text('0');
+              } else {
+              	$('.cartRow .empty').hide();
+                $('.cartRow .price').show();
+                $('.cartRow .order').show();
+                $('.cartWidget .inner').text(count);
+                $('.cartWidget .inner').show('slow');
+              }
+              cartTriggers();
+        }
+
+		$(function() {
+
+          var search_placeholder = $('#search').val();
+          $('#search').focus(function(){
+          	if ($(this).val() == search_placeholder) $(this).val('');
+          });
+          $('#search').blur(function(){
+          	if ($(this).val() == '') $(this).val(search_placeholder);
+          });
+          $('#search_submit').click(function(e){
+          	e.preventDefault();
+            if ($('#search').val() == search_placeholder
+                || $('#search').val() == '')
+              $('#search').val('');
+            else
+              $(this).parent().submit();
+          });
+
+          if (window.PIE) {
+              /*$('.content-wrapper, .cart, .menu, .main-menu > li:hover, input.addtocart:hover, input.addtocart, input.openproduct:hover, input.openproduct, .category-title, .page-title, .blog-title, .front-title, .aside .categories ul li, .aside .categories .title, .menu, .header .menu .main > a.active, .header .menu .main > a:hover, .header .menu .main span > a:hover, .menu-decor-wrap, .menu-decor, .search, .aside .categories ul li > a .marker, .special, .slider-wrapper, .jcarousel-wrapper, .footer, .product-page, .cart-page, a.readmore, table.cart input.quantity, .cart-page a.checkout, .main-submenu, .header-checkout .menu .main > a.active, .header-checkout .menu .main > a:hover, .header-checkout .menu .main span > a:hover, .header-checkout .main-menu > li, .header-checkout .main-menu > li:hover, .header-checkout .main-menu > li, .header-checkout .main-menu > li:hover, .theme_button').each(function() {
+                  PIE.attach(this);
+              });                                    */
+              $('[class!="query"]').each(function() {
+                  PIE.attach(this);
+              });
+          }
+          var timerId = 0;
+
+          $('li.submenu').mouseover(function(){
+            	$(this).addClass('hover');
+          });
+          $('li.submenu').mouseout(function(){
+            	$(this).removeClass('hover');
+          });
+
+          var updateCart = function(response) {
+              	set_preloaders_message('<div id="add_product_notification"><h3>Товар добавлен в корзину</h3><a onclick="hide_preloader();" class="theme_button closeCartMsg big">Продолжить покупки</a><a href="/cart_items/" class="theme_button big">Перейти в корзину</a></div>');
+
+              	updateCartInformer();
+          }
+
+          $('.closeCartMsg').click(function(){
+              //hide_preloader();
+              //$('#add_product_notification').hide();
+          });
+
+          //initAjaxAddToCartButton('input.addtocart', updateCart);
+          initAjaxAddToCartButton('input.buy', updateCart);
+          updateCartInformer();
+
+          $('input[name="quantity"]').keyup(function(){
+          	if (parseInt($(this).val()) == 0) $(this).val(1);
+          });
+    	});

@@ -1,0 +1,22 @@
+# Зарезервированные имена Windows
+nul
+CON
+PRN
+AUX
+COM1
+COM2
+COM3
+COM4
+LPT1
+LPT2
+LPT3
+
+# Лог-файлы
+*.log
+
+# Зависимости
+node_modules/
+
+# Переменные окружения
+.env
+.env.local

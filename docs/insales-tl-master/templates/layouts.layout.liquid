@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ title }}</title>
+  	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+  	<meta name="keywords" content="{{ keywords }}" />
+  	<meta name="description" content="{{ description }}" />
+ <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+                                                                                                                                    
+   		<link rel="icon" href="https://static-eu.insales.ru/files/1/5264/5174416/original/favicon__1_.ico" type="image/x-icon" />
+  		<link rel="shortcut icon" href="https://static-eu.insales.ru/files/1/5264/5174416/original/favicon__1_.ico" type="image/x-icon" />
+  
+  	<link href="{{ 'reset.css' | asset_url }}" rel="stylesheet" type="text/css">
+  	<link href="{{ 'nivo-default.css' | asset_url }}" rel="stylesheet" type="text/css">
+  	<link href="{{ 'nivo-slider.css' | asset_url }}" rel="stylesheet" type="text/css">
+    <link href="{{ 'jquery.bxslider.css' | asset_url }}" rel="stylesheet" />
+    <link href="{{ 'reviews.css' | asset_url }}" rel="stylesheet" type="text/css">
+  	<link href="{{ 'fonts.css' | asset_url }}" rel="stylesheet" type="text/css">
+    <link href="{{ 'style.css' | asset_url }}" rel="stylesheet" type="text/css">
+  <link href="{{ 'jquery.fancybox.css' | asset_url }}" rel="stylesheet" type="text/css"  media="screen">
+  	{% if template == 'collection' %}
+  		<link rel="canonical" href="{{account.url}}{{collection.url}}"/>
+  	{% elsif template == 'product' %}
+  		<link rel="canonical" href="{{account.url}}{{product.canonical_url}}"/>
+  	{% endif %}
+    <script src="{{ 'jquery-1.9.1.min.js' | asset_url }}"></script>
+  <script>var cv_currency_format = "{{money_with_currency_format}}";</script>
+    <script src="{{ 'jquery.cookie.js' | asset_url }}"></script>
+  	<script src="{{ 'jquery.easing.1.3.js' | asset_url }}"></script>
+    <script src="{{ 'common.js' | asset_url }}"></script>
+  	<script src="{{ 'shop/common.js' | global_asset_url }}"></script>
+  	<script src="{{ 'shop/cart.js' | global_asset_url }}"></script>
+  	<script src="{{ 'jquery.bxslider.min.js' | asset_url }}"></script>
+    <script type="text/javascript" src="{{ 'jquery.fancybox.js' | asset_url }}"></script>
+  	<!--[if lt IE 9]>
+		<script type="text/javascript" src="{{ 'PIE_IE678.js' | asset_url }}"></script>
+	<![endif]-->
+  	<!--[if IE 9]>
+  		<script type="text/javascript" src="{{ 'PIE_IE9.js' | asset_url }}"></script>
+	<![endif]-->
+  	<script type="text/javascript" src="{{ 'theme.js' | asset_url }}"></script>
+  
+<script type="text/javascript">
+function winOpen(){
+var obj=document.getElementById("divWin").style;
+obj.visibility="visible";
+winOpen2(3, 0, obj);
+ };
+ 
+function winOpen2(s, o, obj){
+o+=s;
+if(o<100){
+obj.opacity=o/100;
+obj.filter='alpha(opacity='+o+')';
+setTimeout(function(){winOpen2(s, o, obj);}, 15);}
+else{
+obj.opacity=1;
+obj.filter='alpha(opacity=100)';};
+ };
+ 
+function winCloset(){
+winCloset2(5, 10, document.getElementById("divWin").style);
+ };
+ 
+function winCloset2(s, o, obj){
+o-=s;
+if(o>0){
+obj.opacity=o/100;
+obj.filter='alpha(opacity='+o+')';
+setTimeout(function(){winCloset2(s, o, obj);}, 15);}
+else{
+obj.opacity=0;
+obj.filter='alpha(opacity=0)';
+obj.visibility="hidden";};
+ };
+</script>
+  
+  <script type="text/javascript">
+function validateEmail(email) { 
+    var re = /\S+@\S+\.\S+/;
+    return re.test(email);
+} 
+$(document).ready(function(){
+     var modCallMeBack = $(".form");
+    /* CallMeBack */
+    $("#fast-call_submit", modCallMeBack).bind("click",function(e){
+        e.preventDefault();
+
+        var is_error = false;
+
+        // проверка на дефолт
+        $("input.required", modCallMeBack).each( function(){
+          if(this.value==this.defaultValue){
+            is_error = true;
+            $(this).css("background","rgba(255, 0, 0, 0.2)");
+          }
+          else
+          {
+          $(this).css("background","#fff");
+          }
+        });
+        if  (validateEmail($('#maill').val())) {
+                 $('#maill').css("background","#fff");    
+        }       
+        else
+        {
+        $('#maill').css("background","rgba(255, 0, 0, 0.2)");   
+         is_error = true;
+                                               }
+        if(is_error == true) {
+          $('.form .errors').html('Не все поля заполнены правильно!');
+          return
+        }
+
+      
+      
+        var form = $('#feedback_form',modCallMeBack);
+        var fields = form.serialize();
+        $.ajax({
+            url:      form.attr('action') + '.json',
+            type:     'post',
+            data:     fields,
+            dataType: 'json',
+            complete: function() { },
+            success:  function(response) {
+                if ( response.status == 'ok' ) {
+                                        $('.form .errors').html('Сообщение отправлено!');
+              
+                } else {
+                    $('.form .errors').html('Ошибка!');
+                }
+            }
+        });
+    });
+});
+</script>
+
+  <meta name='wmail-verification' content='e09525cc2fab657ba1e243f88c0e8273' />
+  
+  <script type="text/javascript">!function(){var t=document.createElement("script");t.type="text/javascript",t.async=!0,t.src="https://vk.com/js/api/openapi.js?161",t.onload=function(){VK.Retargeting.Init("VK-RTRG-378382-4weo"),VK.Retargeting.Hit()},document.head.appendChild(t)}();</script><noscript><img src="https://vk.com/rtrg?p=VK-RTRG-378382-4weo" style="position:fixed; left:-999px;" alt=""/></noscript>
+  
+</head>
+
+<body>
+  
+<div id="fb-root"></div>
+<script async defer crossorigin="anonymous" src="https://connect.facebook.net/ru_RU/sdk.js#xfbml=1&version=v3.3&appId=2455364778024060&autoLogAppEvents=1"></script>
+  
+  <noscript><h2 class="attention">Для корректной работы сайта включите JavaScript в настройках браузера.</h2></noscript>
+  
+  <!-- Начало 1-го блока (навигация + поиск)-->
+  
+  <div class="topface">
+ 	<div class="mainWrap">
+      {% unless template == 'cart' %}
+      <a href="/cart_items" class="cartWidget">
+        <div class="inner">0</div>
+     
+      </a>
+      {% endunless %}
+                <nav>
+                  {% for link in linklists.main-menu.links %}<a href="{{ link.url }}" {% if link.current? %}class="active"{% endif %}>{{ link.title }}</a>{% unless forloop.last %}{% endunless %}{% endfor %}
+              	</nav>
+              <form action="/search" method="get" class="searchForm"><input id="search" type="text" class="query" name="q" value="Поиск по сайту..."><input id="search_submit" type="submit" class="submit" value=""></form>
+            </div>
+        </div>
+  
+<!-- Конец 1-го блока (навигация + поиск)-->
+
+        <div class="middleface">
+                                  
+                             <!-- Начало2-го и 3-го блока (шапка и список категорий)-->   
+          
+          <div class="header-wrapper">
+                                  
+            <div class="mainWrap">
+              
+             
+              
+                <header>
+                  <div class="header__info">
+                    <div class="header__info__logo">
+                      <a href="/">
+                        <span>интернет-магазин чулочно-носочных изделий</span>	
+                      </a>
+                    </div>
+                    <div class="header__contact">
+                      
+                      <div class="header__contact__item header__contact__item-phone">
+                        <span>Воронеж</span>
+                        <a href="tel:+7(473)2045399" class="header__contact__num">+7(473)<span>204 53 99</span></a>
+                        <span>Часы работы с 9:00 до 23:00</span>	
+                      </div>
+                      
+                      <div class="header__contact__item">
+                        <span>Сотовый</span>
+                        <a href="tel:+7(905)7520517" class="header__contact__num">+7(905)<span>752 05 17</span></a>
+                        <a href="#" class="header__contact__call-rq" onclick="winOpen();">обратный звонок</a>
+                      </div>
+                    </div>
+                    
+                    <div class="header__link">
+						<a href="/client_account/login">Вход <br> Регистрация</a>                      
+                    </div>
+
+                  </div>
+   <div id="mylogo">
+   <a href="/"></a>
+         </div>
+                  
+                 
+                                  
+   <div id="myenter">
+   <a href="/client_account/login">Вход / Регистрация</a>
+     
+     <a id="mycallbackwin" onclick="winOpen();">Обратный звонок</a>
+<div id="divWin">
+<div id="closetButton" onclick="winCloset();">Х</div>
+  
+  <div class="form">
+ <form id="feedback_form" class="contact" action="/client_account/feedback" method="post" role="form">
+                            <h3>Заказать обратный звонок</h3>
+                                                        
+                            <div>
+                              <label>Ваше имя:</label>
+                                <input type="text" name="feedback[name]" class="required" value="" placeholder="Имя">
+                            </div>
+                                
+                            <div class="email" >
+                                <input id="maill" type="hidden" name="feedback[from]" value="test@test.ru" placeholder="E-mail">
+                            </div>
+                                                        
+                            <div>
+                              <label>Ваш телефон:</label>
+                                <input type="text"  name="feedback[phone]" class="required" placeholder="Телефон" value="">
+                            </div>
+                                
+                            <div>
+                               <label>Ваш комментарий:</label>
+                                <textarea name="feedback[content]">{% if template == 'product' %}Перезвоните мне на счет товара {{ product.title }}  {% else %} Перезвоните мне{% endif %}</textarea>
+                            </div>
+                               
+                            <div class="submit">
+                  <a href="#" class="button" onclick="document.getElementById('fast-call_submit').click(); return false;">Отправить</a>
+                                <input type="hidden" id="fast-call_submit" value="Отправить">
+                            </div><!-- .submit -->
+                           <div class="errorcont"><i class="errors"></i></div>
+              
+                    </form>
+					</div>
+	
+</div>
+     
+          </div>
+                                  
+       <ul class="menu">
+                  {% for col in collections %}
+                  		
+                  <li class="{% if col.subcollections.size > 0 %}submenu{% endif %} {% if col.current? %}active{% endif %}">
+                    <a href="{{ col.url }}">{{ col.title | editable }}</a>
+                        {% if col.subcollections.size > 0 %}
+                          <div class="submenuBottom">
+                            <div class="arrowUp"></div>
+                            <ul>
+                              {% for subcol in col.subcollections %}
+                              <li class="{% if subcol.subcollections.size > 0 %}submenu{% endif %} {% if forloop.index0 == 0 %}first{% endif %} {% if subcol.current? %}active{% endif %}"><a href="{{ subcol.url }}">{{ subcol.title | editable }}</a>
+                                {% if subcol.subcollections.size > 0 %}
+                                  <div class="submenuRight">
+                                      <div class="arrowLeft"></div>
+                                      <ul>
+                                        {% for subcol2 in subcol.subcollections %}
+                                          <li class="{% if subcol2.subcollections.size > 0 %}submenu{% endif %} {% if forloop.index0 == 0 %}first{% endif %} {% if subcol2.current? %}active{% endif %}"><a href="{{ subcol2.url }}">{{ subcol2.title | editable }}</a>
+                                        {% if subcol2.subcollections.size > 0 %}
+                                        <div class="submenuRight">
+                                            <div class="arrowLeft"></div>
+                                            <ul>
+                                              {% for subcol3 in subcol2.subcollections %}
+                                                <li class="{% if forloop.index0 == 0 %}first{% endif %} {% if subcol3.current? %}active{% endif %}"><a href="{{ subcol3.url }}">{{ subcol3.title | editable }}</a></li>
+                                              {% endfor %}
+                                            </ul>
+                                  </div>
+                                {% endif %}
+                                        </li>
+                                        {% endfor %}
+                                      </ul>
+                                  </div>
+                                {% endif %}
+                              </li>
+                              {% endfor %}
+                            </ul>
+                          </div>
+                        {% endif %}
+                        </li>
+                  {% endfor %}
+                 
+                </ul>
+                                          
+                </header>
+              </div>
+          </div>
+       {% if template == 'collection'or template == 'product' %}         
+   <div id="bread">  
+     {% include 'breadcrumbs' %}
+      </div>
+       {%  endif  %} 
+
+<!-- content -->
+          
+            <!-- Начало 4-го блока (слайдер)-->    
+
+          {% if template == 'index' %}
+          <div class="Wslider">
+           <div class="mainWrap slider">
+                <div class="sliderContainer theme-default">
+                    <ul id="slider">
+                      
+                      	  <li><a href="https://it-most36.ru/collection/nabory"><img src="https://static-eu.insales.ru/files/1/7963/3006235/original/1_3.png" alt=""></a></li>
+                     
+                          <li><a href="https://it-most36.ru/collection/dlya-novorozhdennyh"><img src="https://static-eu.insales.ru/files/1/7885/3006157/original/3.png" alt=""></a></li>
+                      
+                          <li><a href="https://it-most36.ru/collection/odezhda"><img src="https://static-eu.insales.ru/files/1/7884/3006156/original/2.png" alt=""></a></li>
+                      
+                          <li><a href="https://it-most36.ru/product/noski-muzhskie-nevidimki"><img src="https://static-eu.insales.ru/files/1/7891/3006163/original/4.png" alt=""></a></li>
+                      
+                    </ul>
+                </div>
+            </div>
+           </div>
+ <!-- Начало 5-го блока (разделитель)-->    
+
+            
+          {% endif %}
+          <div class="content-wrapper">
+            <div class="mainWrap container">
+              
+             <!-- Начало 6-го блока (левый сайдбар, выводится не на всех страницах)-->   
+              
+              {% if template != 'cart' %}
+              	{% include 'left_side' %}
+              {% endif %}
+              
+              <!-- Начало 7-го блока (контент)--> 
+              
+              	<div class="content {% if template == 'cart' %}wide{% endif %}">
+                  {{ content_for_layout }}
+                </div>
+                <div class="clear"></div>
+            </div>
+           </div>
+
+{% if template != 'index' %}
+          <div class="delimiter"></div>
+{% endif %}
+            
+          
+            <!-- Начало 8-го блока (контейнер для спецблоков)--> 
+          
+            <div class="mainWrap center">
+              {% if blogs.blog.articles.size > 0 %}
+                <div class="bottomBlock">
+                  	<h3 class="blue"><a href="{{ blogs.blog.url }}">{{ blogs.blog.title | editable }}</a></h3>
+                  	{% for article in blogs.blog.articles limit:3 %}
+                  		<div class="blogArticleMini">
+                          <a class="title" href="{{ article.url }}">{{ article.title | editable }}</a>
+                        	<p>
+                              <a href="{{ article.url }}"><img src="{{ article.image.thumb_url }}"></a>
+                              {{ article.preview | editable }}
+                        	</p>
+                        	<div class="clear"></div>
+                    	</div>
+                  	{% endfor %}
+              	</div>
+              {% endif %}
+              {% if collections.special1.products.size > 0 %}
+                <div class="bottomBlock">
+                  <h3 class="blue"><a href="{{ collections.special1.url }}">{{ collections.special1.title | editable }}</a></h3>
+                  {% for product in collections.special1.products limit:3 %}
+                    {% include 'product_box_mini' %}
+                  {% endfor %}
+                </div>
+              {% endif %}
+                <div class="bottomBlock">
+                  <h3 class="blue"><a href="{{ collections.special2.url }}">{{ collections.special2.title | editable }}</a></h3>
+                  {% for product in collections.special2.products limit:3 %}
+                  	{% include 'product_box_mini' %}
+                  {% endfor %}
+                </div>
+                <div class="bottomBlock">
+                  <h3 class="blue"><a href="{{ collections.special3.url }}">{{ collections.special3.title | editable }}</a></h3>
+                  {% for product in collections.special3.products limit:3 %}
+                    {% include 'product_box_mini' %}
+                  {% endfor %}
+                </div>
+            </div>
+        </div>
+  
+    <!-- Начало 9-го блока (подвал)--> 
+  
+    <div id="myfooter">                                        
+           <div id="forbottommenu"> 
+             <nav>
+                  {% for link in linklists.main-menu.links %}<a href="{{ link.url }}" {% if link.current? %}class="active"{% endif %}>{{ link.title }}</a>{% unless forloop.last %}{% endunless %}{% endfor %}
+           
+              	</nav>  
+                                                <form action="/search" method="get" class="searchForm"><input id="search2" type="text" class="query" name="q" value="Найти..."><input id="search_submit2" type="submit" class="submit" value=""></form>     
+           </div>
+     				 <div id="forline">
+                                                 
+                  	</div>
+                                                 
+                     <div id="fortel">
+                        <div id="tel">
+                          
+                         </div>
+                        <div id="soc">
+   <script type="text/javascript">(function() {
+  if (window.pluso)if (typeof window.pluso.start == "function") return;
+  if (window.ifpluso==undefined) { window.ifpluso = 1;
+    var d = document, s = d.createElement('script'), g = 'getElementsByTagName';
+    s.type = 'text/javascript'; s.charset='UTF-8'; s.async = true;
+    s.src = ('https:' == window.location.protocol ? 'https' : 'http')  + '://share.pluso.ru/pluso-like.js';
+    var h=d[g]('body')[0];
+    h.appendChild(s);
+  }})();</script>
+<div class="pluso" data-background="#1D4671" data-options="medium,round,line,horizontal,nocounter,theme=03" data-services="vkontakte,odnoklassniki,facebook,google,twitter,print" data-user="285994925"></div>
+                         </div>
+                                                 
+                  	</div>
+                     <div id="forpayments">
+                       <div id="paymentswrap"></div>                          
+                  	</div> 
+              <div id="copyright">
+                <div id="politic">
+                 <a href="http://myshop-59-52.myinsales.ru/page/politika-konfidentsialnosti ">Политика конфиденциальности и оферта на продажу товаров</a> 
+                  
+                  </div>
+                <div id="inform">
+                
+                    <a href="/"> © Интернет-магазин чулочно-носочных изделий и белья "it-Мост",2018</a> 
+                     </div>
+      					</div>
+                                                      
+                                                 
+                                       </div>                                    
+                                                 
+                                                 
+                                                 
+                                                 
+  <script type="text/javascript">
+        $(function(){
+          $('#slider').bxSlider({
+            {% if settings.show_main_image_slider == '1' %}
+              auto: true,
+            {% else %}
+              auto: false,
+            {% endif %}
+            default: {{ settings.show_main_image_timeout }}
+          });
+        });
+    </script>
+   <div class="form_shadow">
+</div>
+<div class="checkoutmsg">
+  <a class="closemsg" href="#">&times;</a>
+  <form id="fast_checkout" class="contact" action="/cart_items" method="post" role="form">
+    <div class="h3">Быстрый заказ</div>
+    <input type="text"  id="check_name" value="" class="required" placeholder="Имя" />
+    <input type="text"  id="check_phone" value="" class="required" placeholder="Телефон" />
+    <input type="text"  id="check_mail" class="required"  placeholder="E-mail" />
+    <input type="hidden"  id="check_var" value="{{ product.variants.first.id }}" />
+    <input type="hidden"  id="check_del" value="851952" />
+    <input type="hidden"  id="check_pay" value="505142" />
+    <textarea   id="check_comment" placeholder="Комментарий"></textarea>  
+    <a href="#" class="bttn">Отправить</a>
+    <div class="notifications">
+    </div>
+  </form>
+</div>
+<script type="text/javascript" src="{{'jquery.maskedinput.js'| asset_url}}"></script>
+<script type="text/javascript">
+(function() {
+  $(function() {
+    var hideForm, validateEmail;
+    $("#check_phone").mask('+7 (999) 999-9999');
+    validateEmail = function(email) {
+      var re;
+      re = /\S+@\S+\.\S+/;
+      return re.test(email);
+    };
+    hideForm = function(e) {
+      e.preventDefault();
+      $('.form_shadow').fadeOut();
+      return $('.checkoutmsg').hide();
+    };
+    $('.fast_check').on('click', function(e) {
+      e.preventDefault();
+      $('.form_shadow').fadeIn();
+      return $('.checkoutmsg').show();
+    });
+    $('.form_shadow').on('click', function(e) {
+      return hideForm(e);
+    });
+    $('.checkoutmsg .closemsg').on('click', function(e) {
+      return hideForm(e);
+    });
+    return $('.checkoutmsg').find('.bttn').on('click', function(e) {
+      var comment, delivery, email, is_error, mail, name, note, payment, phone, r, variant;
+      e.preventDefault();
+      is_error = false;
+      r = $(this).parent('form.contact');
+      note = r.find('.notifications');
+      r.find("input.required, textarea.required").each(function() {
+        if (this.value === this.defaultValue) {
+          is_error = true;
+          $(this).css('background', 'rgba(255, 0, 0, 0.2)');
+          return console.log($(this));
+        } else {
+          return $(this).css('background', '#fff');
+        }
+      });
+      email = r.find("#check_mail");
+      if (validateEmail(email.val())) {
+        email.css('background', '#fff');
+      } else {
+        email.css('background', 'rgba(255, 0, 0, 0.2)');
+        is_error = true;
+      }
+      if (is_error) {
+        note.html('Не все поля заполнены правильно!');
+        note.css('color', 'red');
+        return;
+      }
+      name = $('#check_name').val();
+      phone = $('#check_phone').val();
+      mail = $('#check_mail').val();
+      variant = $('#check_var').val();
+      delivery = $('#check_del').val();
+      payment = $('#check_pay').val();
+      comment = $('#check_comment').val();
+      return $.ajax({
+        url: '/cart_items.json',
+        type: 'post',
+        data: "_method=put&cart[quantity][" + variant + "]=1",
+        success: function() {
+          return $.ajax({
+            url: '/fast_checkout.json',
+            type: 'post',
+            data: "pid_value=1&client[name]=" + name + "&order[comment]=" + comment + "&client[email]=" + mail + "&client[phone]=" + phone + "&order[delivery_variant_id]=" + delivery + "&order[payment_gateway_id]=" + payment,
+            dataType: 'json',
+            success: function(response) {
+              if (response.status === 'ok') {
+                return location.href = response.location;
+              }
+            }
+          });
+        }
+      });
+    });
+  });
+}).call(this);
+</script> 
+  <!-- BEGIN JIVOSITE CODE {literal} -->
+<script type='text/javascript'>
+(function(){ var widget_id = 'gYTFq3TkAs';var d=document;var w=window;function l(){
+  var s = document.createElement('script'); s.type = 'text/javascript'; s.async = true;
+  s.src = '//code.jivosite.com/script/widget/'+widget_id
+    ; var ss = document.getElementsByTagName('script')[0]; ss.parentNode.insertBefore(s, ss);}
+  if(d.readyState=='complete'){l();}else{if(w.attachEvent){w.attachEvent('onload',l);}
+  else{w.addEventListener('load',l,false);}}})();
+</script>
+<!-- {/literal} END JIVOSITE CODE -->
+                
+  </body>
+</html>

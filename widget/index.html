@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gift Safe Widget Preview</title>
+    <style>
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: Inter, system-ui, sans-serif;
+        background:
+          radial-gradient(circle at top left, rgba(124, 58, 237, 0.28), transparent 30%),
+          radial-gradient(circle at bottom right, rgba(245, 158, 11, 0.18), transparent 25%),
+          linear-gradient(180deg, #dbeafe 0%, #bfdbfe 45%, #e2e8f0 100%);
+      }
+
+      .preview-copy {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        max-width: 420px;
+        padding: 16px 18px;
+        border-radius: 20px;
+        background: rgba(255, 255, 255, 0.82);
+        color: #0f172a;
+        box-shadow: 0 24px 40px rgba(15, 23, 42, 0.12);
+      }
+
+      .preview-copy h1,
+      .preview-copy p {
+        margin: 0;
+      }
+
+      .preview-copy h1 {
+        font-size: 22px;
+        margin-bottom: 8px;
+      }
+
+      .preview-copy p {
+        line-height: 1.55;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="preview-copy">
+      <h1>Локальный предпросмотр виджета</h1>
+      <p>На странице эмулируется магазин. Через пару секунд появится плавающая кнопка и модалка сейфа.</p>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

@@ -1,0 +1,25 @@
+{% if search.performed? %}
+
+<div class="category">
+    <h3>Вы искали "<span class="color">{{search.query | escape}}</span>"</h3>
+    <div class="wrapper">
+        {% if search.results == empty %}
+			<p class="note-msg">По запросу "<span class="color">{{search.query | escape}}</span>" ничего не найдено.</p>
+		{% else %}
+          	{% paginate results by 48 %}
+          		{% for product in results %}
+                	{% include 'product_box' %}
+                {% endfor %}
+          	<div class="pagination">
+        		{{ paginate | default_pagination }}
+    		</div>
+          	{% endpaginate %}
+        {% endif %}
+      	<div class="clear"></div>
+    </div>
+</div>
+
+{% endif %}
+
+
+

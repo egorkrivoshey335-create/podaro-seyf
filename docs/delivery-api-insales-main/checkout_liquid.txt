@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html
+  class="{{ default_checkout2_layout_class }}"
+  style="
+    {% include "system_v4_required_styles" %}
+  "
+>
+  <head>
+    {% include "head" %}
+    <!-- Event snippet for Website sale conversion page --> <script> gtag('event', 'conversion', { 'send_to': 'AW-860286390/Gy-ECPL25M8DELbbm5oD', 'transaction_id': '' }); </script>
+  </head>
+  <body class="adaptive" data-multi-lang="{{ language.not_default? }}">
+    {% include "system_no_js_alert" %}
+    <div class="page_layout page_layout-clear">
+      <header>
+        {% for widgetDrop in widget_lists.header-list.widgets %}
+        {% widget widgetDrop %}
+        {% endfor %}
+      </header>
+      <main>
+        <div class="layout">
+          <div class="layout__content">
+            <div class='checkout-v2-wrapper co-section--checkout_content'>
+              <div class='co-section--checkout_order co-section--checkout_order_sided'>
+                <div class='co-section--checkout_header co-checkout-block--padded'>
+                  <div class="decorated-title-wrapper co-checkout-title">
+                    <h1 class='decorated-title co-title co-title--h1'>
+                      {% yield 'title' %}
+                    </h1>
+                  </div>
+                </div>
+                {% yield 'sidebar' %}
+                {% yield %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+      <footer>
+        {% for widgetDrop in widget_lists.footer-list.widgets %}
+        {% widget widgetDrop %}
+        {% endfor %}
+      </footer>
+    </div>
+    <div class="outside-widgets">
+      {% for widgetDrop in widget_lists.outside-list.widgets %}
+      {% widget widgetDrop %}
+      {% endfor %}
+    </div>
+
+    
+  </body>
+  {{ 'checkout2.core' | global_stylesheet_tag }}
+
+  {%- capture css_js_lists -%}header-list, footer-list, sidebar-list, outside-list, {{ template }}-list, {{ template }}-section_top-list, {{ template }}-section_bottom-list{%- endcapture -%}
+
+  {% if sidebar_show %}
+    {% if template contains 'blog' or template contains 'article' %}
+        {% assign css_js_lists = css_js_lists | append: ', sidebar_blog-list' %}
+    {% else %}
+        {% assign css_js_lists = css_js_lists | append: ', sidebar-list' %}
+    {% endif %}
+  {% endif %}
+
+  {% widgets_assets css_js_lists %}
+
+  {% include "styles" %}
+  
+<script>
+(function() {
+  // === Подсказки к полям адреса ===
+  var ADDR_HINT_ID   = 'address-field-hint';
+  var ADDR_HINT_TEXT = 'Укажите улицу, дом, квартиру — без названия города';
+  var RURAL_ADDR_HINT_ID   = 'address-rural-hint';
+  var RURAL_ADDR_HINT_TEXT = ''; // динамически формируется в showRuralAddressHint()
+  var CITY_HINT_ID   = 'locality-field-hint';
+  var CITY_HINT_TEXT = 'Введите только название: Брест, Березовка, Барановичи — без "г.", "д.", "пос." и т.п. Затем выберите из выпадающего списка';
+  var NAME_HINT_ID   = 'middlename-field-hint';
+  var NAME_HINT_TEXT = 'Укажите настоящие ФИО — при получении на пункте выдачи потребуется документ';
+  var DELIVERY_HINT_ID = 'delivery-city-hint';
+  var DELIVERY_HINT_TEXT = 'Укажите населённый пункт и выберите его из списка — после этого появятся сроки и варианты доставки.';
+  var DELIVERY_SECTION_HINT_ID = 'delivery-section-hint';
+  var DELIVERY_SECTION_HINT_TEXT = 'Сроки и варианты доставки отображаются после выбора населённого пункта.';
+  var ADDRESS_REQUIRED_HINT_ID = 'address-required-hint';
+  var ADDRESS_REQUIRED_HINT_TEXT = '⚠️ Для курьерской доставки необходимо указать адрес';
+  var EMAIL_HINT_ID = 'email-field-hint';
+  var EMAIL_HINT_TEXT = 'Email не обязателен. Укажите его, чтобы получить чек и статус заказа.';
+  var LOGIN_LINK_ID = 'checkout-login-link';
+  var LOGIN_STYLE_ID = 'checkout-login-style';
+  var SUBMIT_STYLE_ID = 'checkout-submit-style';
+  var TITLE_STYLE_ID = 'checkout-title-style';
+  var SUBMIT_SMS_NOTICE_ID = 'checkout-submit-sms-notice';
+  var SUBMIT_SMS_NOTICE_STYLE_ID = 'checkout-submit-sms-notice-style';
+  var SUBMIT_SMS_NOTICE_TEXT = 'SMS с подтверждением придет в течение 10-15 минут. Не пришло? Проверьте номер телефона и оформите заказ заново';
+  var EMPTY_LOCALITY_DELIVERY_TEXT = 'Нет вариантов доставки. Укажите населенный пункт, чтобы увидеть доступные способы доставки и оплаты.';
+  var EMPTY_LOCALITY_PAYMENT_TEXT = 'Оплата станет доступна после выбора населенного пункта и варианта доставки.';
+  var HIDE_WARNINGS_STYLE_ID = 'hide-delivery-payment-warnings-style';
+  
+  // Шаблон для обнаружения названия населённого пункта в строке адреса
+  var VILLAGE_IN_ADDRESS_RE = /(?:^|[,;\s])(?:д\.?\s+|дер\.?\s+|деревня\s+|аг\.?\s+|агрогородок\s+|пос\.?\s+|поселок\s+|посёлок\s+|хутор\s+|х\.?\s+)([а-яёА-ЯЁ][а-яёА-ЯЁ\w\-]+)/i;
+
+  function addressContainsSettlement(addressValue) {
+    return VILLAGE_IN_ADDRESS_RE.test(addressValue || '');
+  }
+
+  function showRuralAddressHint(settlementName) {
+    var existing = document.getElementById(RURAL_ADDR_HINT_ID);
+    var addressField = document.getElementById('shipping_address_address');
+    if (!addressField) return;
+
+    var text = settlementName
+      ? '⚠️ В адресе обнаружена деревня. Введите в поле «Населённый пункт» выше название «' + settlementName + '» и выберите его из выпадающего списка — тогда доставка рассчитается правильно.'
+      : '⚠️ В адресе обнаружена деревня/посёлок. Введите её название в поле «Населённый пункт» выше и выберите из выпадающего списка.';
+
+    if (existing) {
+      if (existing.textContent !== text) existing.textContent = text; // только если изменилось
+      return;
+    }
+    var hint = document.createElement('p');
+    hint.id = RURAL_ADDR_HINT_ID;
+    hint.style.cssText = 'margin:6px 0 0 0;padding:10px 12px;background:#fff3cd;border:1px solid #ffc107;border-left:4px solid #e6a817;border-radius:4px;color:#856404;font-size:15px;line-height:1.5;';
+    hint.textContent = text;
+    addressField.parentNode.insertBefore(hint, addressField.nextSibling);
+  }
+
+  function removeRuralAddressHint() {
+    var hint = document.getElementById(RURAL_ADDR_HINT_ID);
+    if (hint && hint.parentNode) hint.parentNode.removeChild(hint);
+  }
+
+  /**
+   * Извлекает чистое название населённого пункта из строки адреса.
+   * «д. Терюха, ул. Лесная, 15»  → «Терюха»
+   * «аг. Жуки, ул. Центральная»  → «Жуки»
+   */
+  function extractSettlementName(address) {
+    var m = VILLAGE_IN_ADDRESS_RE.exec(address || '');
+    if (!m) return null;
+    return m[1].trim();
+  }
+
+  function checkAddressForSettlement() {
+    var addressField = document.getElementById('shipping_address_address');
+    if (!addressField) return;
+    var val = (addressField.value || '').trim();
+    if (addressContainsSettlement(val)) {
+      var name = extractSettlementName(val);
+      showRuralAddressHint(name);
+    } else {
+      removeRuralAddressHint();
+    }
+  }
+
+  function insertHint(fieldId, hintId, hintText) {
+    if (document.getElementById(hintId)) return;
+    var field = document.getElementById(fieldId);
+    if (!field) return;
+    var hint = document.createElement('p');
+    hint.id = hintId;
+    hint.style.cssText = 'margin:4px 0 0 0;font-size:16px;color:#888;line-height:1.4;';
+    hint.textContent = hintText;
+    field.parentNode.insertBefore(hint, field.nextSibling);
+  }
+  
+  function insertAllHints() {
+    insertHint('shipping_address_address',            ADDR_HINT_ID, ADDR_HINT_TEXT);
+    insertHint('shipping_address_full_locality_name', CITY_HINT_ID, CITY_HINT_TEXT);
+  }
+  
+  function insertDeliveryHints() {
+    if (!document.getElementById(DELIVERY_HINT_ID)) {
+      var deliveryCityField = document.getElementById('shipping_address_full_locality_name');
+      if (deliveryCityField) {
+        var hint = document.createElement('p');
+        hint.id = DELIVERY_HINT_ID;
+        hint.style.cssText = 'margin:6px 0 0 0;font-size:15px;color:#6f6f6f;line-height:1.35;';
+        // hint.textContent = DELIVERY_HINT_TEXT;
+        deliveryCityField.parentNode.insertBefore(hint, deliveryCityField.nextSibling);
+      }
+    }
+    if (document.getElementById(DELIVERY_SECTION_HINT_ID)) return;
+    var deliveryTitle = null;
+    var titles = document.querySelectorAll('.co-title--h2, .co-title--h3');
+    for (var i = 0; i < titles.length; i++) {
+      if (/^\s*Доставка\s*$/i.test(titles[i].textContent || '')) {
+        deliveryTitle = titles[i];
+        break;
+      }
+    }
+    if (!deliveryTitle) return;
+    var hintBlock = document.createElement('div');
+    hintBlock.id = DELIVERY_SECTION_HINT_ID;
+    hintBlock.style.cssText = 'margin:8px 0 14px 0;padding:10px 12px;background:#f6faf7;border:1px solid #cfe3d7;border-left:4px solid #2f7d5d;border-radius:6px;color:#245645;font-size:15px;line-height:1.35;';
+    hintBlock.textContent = DELIVERY_SECTION_HINT_TEXT;
+    deliveryTitle.parentNode.insertBefore(hintBlock, deliveryTitle.nextSibling);
+  }
+  
+  function insertNameHint() {
+    if (document.getElementById(NAME_HINT_ID)) return;
+    var field = document.getElementById('client_middlename');
+    if (!field) return;
+    var hint = document.createElement('p');
+    hint.id = NAME_HINT_ID;
+    hint.style.cssText = 'margin:4px 0 0 0;font-size:16px;color:#888;line-height:1.4;';
+    hint.textContent = NAME_HINT_TEXT;
+    var wrapper = field.closest('.co-input');
+    if (wrapper) {
+      wrapper.parentNode.insertBefore(hint, wrapper.nextSibling);
+    } else {
+      field.parentNode.insertBefore(hint, field.nextSibling);
+    }
+  }
+
+  function insertEmailHint() {
+    if (document.getElementById(EMAIL_HINT_ID)) return;
+    var field = document.getElementById('client_email');
+    if (!field) return;
+    var hint = document.createElement('p');
+    hint.id = EMAIL_HINT_ID;
+    hint.style.cssText = 'margin:4px 0 0 0;font-size:14px;color:#6f6f6f;line-height:1.35;';
+    hint.textContent = EMAIL_HINT_TEXT;
+    var wrapper = field.closest('.co-input');
+    if (wrapper) {
+      wrapper.parentNode.insertBefore(hint, wrapper.nextSibling);
+    } else {
+      field.parentNode.insertBefore(hint, field.nextSibling);
+    }
+  }
+
+  function ensureSubmitButtonStyle() {
+    if (document.getElementById(SUBMIT_STYLE_ID)) return;
+    var style = document.createElement('style');
+    style.id = SUBMIT_STYLE_ID;
+    style.textContent = [
+      '.co-button--checkout, .co-button--checkout_submit, .js-button-checkout_submit{font-size:18px;line-height:1.25;padding:14px 22px;}',
+      '@media (max-width: 480px){.co-button--checkout, .co-button--checkout_submit, .js-button-checkout_submit{font-size:17px;padding:14px 18px;}}'
+    ].join('');
+    document.head.appendChild(style);
+  }
+
+  function ensureCheckoutTitleStyle() {
+    if (document.getElementById(TITLE_STYLE_ID)) return;
+    var style = document.createElement('style');
+    style.id = TITLE_STYLE_ID;
+    style.textContent = [
+      '.co-checkout-title{margin:0 auto 14px auto;padding:10px 14px;max-width:820px;background:#f7f4ee;border:1px solid #e1d6c5;border-radius:8px;text-align:center;}',
+      '.co-checkout-title .co-title--h1{font-size:32px;line-height:1.1;}',
+      '@media (max-width: 480px){.co-checkout-title .co-title--h1{font-size:22px;line-height:1.15;}}',
+      '@media (max-width: 360px){.co-checkout-title .co-title--h1{font-size:20px;line-height:1.15;}}'
+    ].join('');
+    document.head.appendChild(style);
+  }
+
+  function hideSystemWarnings() {
+    if (document.getElementById(HIDE_WARNINGS_STYLE_ID)) return;
+    
+    var localityEmpty = isLocalityEmpty();
+    if (!localityEmpty) return;
+    
+    var style = document.createElement('style');
+    style.id = HIDE_WARNINGS_STYLE_ID;
+    style.textContent = [
+      '#deliveries-not-available{color:transparent !important;}',
+      '#payments-not-available{color:transparent !important;}'
+    ].join('');
+    document.head.appendChild(style);
+  }
+
+  function showSystemWarnings() {
+    var style = document.getElementById(HIDE_WARNINGS_STYLE_ID);
+    if (style && style.parentNode) {
+      style.parentNode.removeChild(style);
+    }
+  }
+
+  function updateWarningsVisibility() {
+    var localityEmpty = isLocalityEmpty();
+    if (localityEmpty) {
+      hideSystemWarnings();
+    } else {
+      showSystemWarnings();
+    }
+  }
+
+  function ensureSubmitSmsNotice() {
+    var btn = document.getElementById('create_order') || document.querySelector('.co-button--checkout, .co-button--checkout_submit, .js-button-checkout_submit');
+    if (!btn) return;
+
+    if (!document.getElementById(SUBMIT_SMS_NOTICE_STYLE_ID)) {
+      var style = document.createElement('style');
+      style.id = SUBMIT_SMS_NOTICE_STYLE_ID;
+      style.textContent = [
+        '#' + SUBMIT_SMS_NOTICE_ID + '{margin:10px 0 0 0;font-size:14px;line-height:1.35;color:#6f6f6f;}',
+        '@media (max-width: 480px){#' + SUBMIT_SMS_NOTICE_ID + '{font-size:13px;line-height:1.35;}}'
+      ].join('');
+      document.head.appendChild(style);
+    }
+
+    var notice = document.getElementById(SUBMIT_SMS_NOTICE_ID);
+    if (!notice) {
+      notice = document.createElement('p');
+      notice.id = SUBMIT_SMS_NOTICE_ID;
+      notice.textContent = SUBMIT_SMS_NOTICE_TEXT;
+    }
+
+    if (notice.previousElementSibling !== btn) {
+      btn.parentNode.insertBefore(notice, btn.nextSibling);
+    }
+  }
+
+  function isLocalityEmpty() {
+    var cityField = document.getElementById('shipping_address_full_locality_name');
+    return !cityField || !(cityField.value || '').trim();
+  }
+
+  function rewriteDeliveryAndPaymentWarnings() {
+    var root = document.querySelector('.checkout-v2-wrapper, .co-section--checkout_content') || document.body;
+    if (!root) return;
+
+    var leaves = root.querySelectorAll('p, div, span, li');
+    var localityEmpty = isLocalityEmpty();
+
+    for (var i = 0; i < leaves.length; i++) {
+      var node = leaves[i];
+      if (!node || node.children.length) continue;
+
+      var text = (node.textContent || '').trim();
+      if (!text || text.length > 180) continue;
+
+      if (!localityEmpty) {
+        if (node.dataset && node.dataset.originalStatusText) {
+          node.textContent = node.dataset.originalStatusText;
+          delete node.dataset.originalStatusText;
+        }
+        continue;
+      }
+
+      if (/доставк[аеи]?\s+для\s+пункт[ауы]\s+недоступн/i.test(text)) {
+        if (node.dataset && !node.dataset.originalStatusText) {
+          node.dataset.originalStatusText = text;
+        }
+        node.textContent = EMPTY_LOCALITY_DELIVERY_TEXT;
+        continue;
+      }
+
+      if (/недоступн[а-я]*\s+оплат|оплат[а-я]*\s+недоступн/i.test(text)) {
+        if (node.dataset && !node.dataset.originalStatusText) {
+          node.dataset.originalStatusText = text;
+        }
+        node.textContent = EMPTY_LOCALITY_PAYMENT_TEXT;
+      }
+    }
+  }
+  
+  // === Управление видимостью поля адреса ===
+  function getSelectedDeliveryType() {
+    var radios = document.querySelectorAll('input[name="order[delivery_variant_id]"]');
+    for (var i = 0; i < radios.length; i++) {
+      if (radios[i].checked) {
+        var label = document.querySelector('label[for="' + radios[i].id + '"]');
+        if (!label) continue;
+        var labelText = label.textContent || '';
+        var isCourier = /курьер/i.test(labelText) || /до\s+двери/i.test(labelText);
+        var isPVZ = /пункт/i.test(labelText) || /выдач/i.test(labelText) || /автолайт/i.test(labelText);
+        return isCourier ? 'courier' : (isPVZ ? 'pvz' : 'other');
+      }
+    }
+    return null;
+  }
+  
+  function updateAddressFieldVisibility() {
+    var cityField = document.getElementById('shipping_address_full_locality_name');
+    var addressField = document.getElementById('shipping_address_address');
+    if (!cityField || !addressField) return;
+    
+    var addressWrapper = addressField.closest('.co-input');
+    if (!addressWrapper) return;
+    
+    var cityValue = (cityField.value || '').trim();
+    var deliveryType = getSelectedDeliveryType();
+    var addressValue = (addressField.value || '').trim();
+    
+    // Скрываем поле адреса если: город не заполнен ИЛИ выбран ПВЗ
+    var shouldHide = !cityValue || deliveryType === 'pvz';
+    
+    if (shouldHide) {
+      addressWrapper.style.display = 'none';
+      removeAddressRequiredHint();
+    } else {
+      addressWrapper.style.display = 'block';
+      // Показываем напоминание для курьера, если адрес пустой
+      if (deliveryType === 'courier' && !addressValue) {
+        showAddressRequiredHint();
+      } else {
+        removeAddressRequiredHint();
+      }
+    }
+  }
+  
+  function showAddressRequiredHint() {
+    if (document.getElementById(ADDRESS_REQUIRED_HINT_ID)) return;
+    var addressField = document.getElementById('shipping_address_address');
+    if (!addressField) return;
+    
+    var hint = document.createElement('p');
+    hint.id = ADDRESS_REQUIRED_HINT_ID;
+    hint.style.cssText = 'margin:6px 0 0 0;padding:8px 10px;background:#fff3cd;border:1px solid #ffc107;border-radius:4px;color:#856404;font-size:15px;line-height:1.35;';
+    hint.textContent = ADDRESS_REQUIRED_HINT_TEXT;
+    addressField.parentNode.insertBefore(hint, addressField.nextSibling);
+  }
+  
+  function removeAddressRequiredHint() {
+    var hint = document.getElementById(ADDRESS_REQUIRED_HINT_ID);
+    if (hint && hint.parentNode) {
+      hint.parentNode.removeChild(hint);
+    }
+  }
+  
+  // === Управление видимостью поля "Интервал доставки" ===
+  // InSales рендерит доп. поле адреса как:
+  // <select name="shipping_address[fields_values_attributes][130036313][value]">
+  // Показываем ТОЛЬКО если: выбран курьер И зона = saturday (Минск + областные города)
+  var TIME_INTERVAL_FIELD_ID = '130036313';
+
+  function getTimeIntervalSelect() {
+    return document.querySelector(
+      'select[name="shipping_address[fields_values_attributes][' + TIME_INTERVAL_FIELD_ID + '][value]"]'
+    );
+  }
+
+  function getTimeIntervalWrapper() {
+    var sel = getTimeIntervalSelect();
+    if (!sel) return null;
+    return sel.closest('.co-input, .co-checkout-block, .field-wrapper, .co-field') || sel.parentNode;
+  }
+
+  function getSelectedDeliveryZone() {
+    // Зона зашита в tariff_id формата "courier_door_saturday|district|village"
+    var radios = document.querySelectorAll('input[name="order[delivery_variant_id]"]');
+    for (var i = 0; i < radios.length; i++) {
+      if (!radios[i].checked) continue;
+      var label = document.querySelector('label[for="' + radios[i].id + '"]');
+      var container = (label && label.closest('.co-delivery-variant, .co-radio, .co-checkout-block')) ||
+                      radios[i].closest('.co-delivery-variant, .co-radio, .co-checkout-block') ||
+                      label || radios[i].parentNode;
+      if (!container) continue;
+      var html = container.outerHTML || '';
+      var m = html.match(/courier_door_(saturday|district|village)/i);
+      if (m) return m[1].toLowerCase();
+      return null;
+    }
+    return null;
+  }
+
+  function isCourierDeliverySelected() {
+    var radios = document.querySelectorAll('input[name="order[delivery_variant_id]"]');
+    for (var i = 0; i < radios.length; i++) {
+      if (!radios[i].checked) continue;
+      var label = document.querySelector('label[for="' + radios[i].id + '"]');
+      var text = label ? (label.textContent || '') : '';
+      var html = label ? (label.outerHTML || '') : '';
+      if (/курьер/i.test(text) || /до\s+двери/i.test(text)) return true;
+      if (/courier_door_/i.test(html)) return true;
+      return false;
+    }
+    return false;
+  }
+
+  function updateTimeIntervalVisibility() {
+    var wrapper = getTimeIntervalWrapper();
+    if (!wrapper) return;
+
+    var courier = isCourierDeliverySelected();
+    var zone = getSelectedDeliveryZone();
+    var shouldShow = courier && (zone === 'saturday');
+
+    if (shouldShow) {
+      wrapper.style.display = '';
+    } else {
+      wrapper.style.display = 'none';
+      // Сбрасываем значение, чтобы оно не уехало в заказ
+      var sel = getTimeIntervalSelect();
+      if (sel) sel.value = '';
+    }
+  }
+
+  function attachTimeIntervalListeners() {
+    var radios = document.querySelectorAll('input[name="order[delivery_variant_id]"]');
+    radios.forEach(function(radio) {
+      if (!radio.dataset.intervalListenerAttached) {
+        radio.addEventListener('change', updateTimeIntervalVisibility);
+        radio.dataset.intervalListenerAttached = '1';
+      }
+    });
+
+    var cityField = document.getElementById('shipping_address_full_locality_name');
+    if (cityField && !cityField.dataset.intervalListenerAttached) {
+      cityField.addEventListener('change', function() {
+        // Даём InSales время пересчитать варианты доставки после смены города
+        setTimeout(updateTimeIntervalVisibility, 300);
+      });
+      cityField.dataset.intervalListenerAttached = '1';
+    }
+  }
+
+  function attachAddressVisibilityListeners() {
+    var cityField = document.getElementById('shipping_address_full_locality_name');
+    var addressField = document.getElementById('shipping_address_address');
+    var radios = document.querySelectorAll('input[name="order[delivery_variant_id]"]');
+    
+    if (cityField && !cityField.dataset.addressListenerAttached) {
+      cityField.addEventListener('input', function() {
+        updateAddressFieldVisibility();
+        updateWarningsVisibility();
+      });
+      cityField.addEventListener('change', function() {
+        updateAddressFieldVisibility();
+        updateWarningsVisibility();
+      });
+      cityField.dataset.addressListenerAttached = '1';
+    }
+    
+    if (addressField && !addressField.dataset.addressListenerAttached) {
+      addressField.addEventListener('input', function() {
+        updateAddressFieldVisibility();
+        checkAddressForSettlement();
+      });
+      addressField.addEventListener('change', function() {
+        updateAddressFieldVisibility();
+        checkAddressForSettlement();
+      });
+      addressField.dataset.addressListenerAttached = '1';
+    }
+    
+    radios.forEach(function(radio) {
+      if (!radio.dataset.addressListenerAttached) {
+        radio.addEventListener('change', updateAddressFieldVisibility);
+        radio.dataset.addressListenerAttached = '1';
+      }
+    });
+  }
+ 
+  // === Блок авторизации: свернуть + изменить текст ===
+  function pimpLoginBlock() {
+    var loginBlock = document.querySelector('.co-login-block');
+    if (!loginBlock || loginBlock.dataset.pimped) return;
+    loginBlock.dataset.pimped = '1';
+    var title = loginBlock.querySelector('.co-title--h2');
+    var btn = loginBlock.querySelector('.co-button--checkout-login');
+    var desc = loginBlock.querySelector('.co-input-description');
+    if (desc) desc.style.display = 'none';
+    if (btn) btn.style.display = 'none';
+    if (title && !loginBlock.querySelector('#' + LOGIN_LINK_ID)) {
+      title.textContent = 'Уже делали заказ у нас?';
+      var link = document.createElement('a');
+      link.id = LOGIN_LINK_ID;
+      link.href = '#';
+      link.textContent = 'Войти в личный кабинет';
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        if (btn) btn.click();
+      });
+      title.parentNode.insertBefore(link, title.nextSibling);
+    }
+    if (!document.getElementById(LOGIN_STYLE_ID)) {
+      var style = document.createElement('style');
+      style.id = LOGIN_STYLE_ID;
+      style.textContent = [
+        '.co-login-block .co-title--h2{font-size:18px;font-weight:600;color:#2b2b2b;margin:0 0 6px 0;}',
+        '#' + LOGIN_LINK_ID + '{display:inline-block;margin:0 0 8px 0;color:#005844;text-decoration:underline;font-size:16px;font-weight:600;}',
+        '#' + LOGIN_LINK_ID + ':hover{color:#0b6a53;}',
+        '.co-login-block .co-button--checkout-login{display:none !important;}'
+      ].join('');
+      document.head.appendChild(style);
+    }
+  }
+  
+  // === Перемещение блока авторизации ===
+  function moveLoginBlock() {
+    var loginBlock = document.querySelector('.co-login-block');
+    if (!loginBlock) return false;
+    var container = loginBlock.closest('.co-section--checkout_customer') || loginBlock.parentNode;
+    if (!container) return false;
+    var contactTitle = null;
+    var titles = container.querySelectorAll('.co-title--h2, .co-title--h3');
+    for (var i = 0; i < titles.length; i++) {
+      if (/^\s*Контактные данные\s*$/i.test(titles[i].textContent || '')) {
+        contactTitle = titles[i];
+        break;
+      }
+    }
+    var contactBlock = null;
+    if (contactTitle) {
+      contactBlock = contactTitle.closest('.co-checkout-block') || contactTitle.parentNode;
+    } else {
+      var contactFields = container.querySelector('.co-contact-fields');
+      contactBlock = contactFields ? (contactFields.closest('.co-checkout-block') || contactFields.parentNode) : null;
+    }
+    if (!contactBlock || !contactBlock.parentNode) return false;
+    if (contactBlock.nextSibling === loginBlock) return true;
+    contactBlock.parentNode.insertBefore(loginBlock, contactBlock.nextSibling);
+    return true;
+  }
+  
+  function renameSubmitButton() {
+    var btn = document.querySelector('.co-button--checkout, .co-button--checkout_submit, [data-checkout-submit], button[type="submit"]');
+    if (!btn || btn.dataset.renamed) return;
+    if (btn.textContent && btn.textContent.trim()) {
+      btn.textContent = 'Подтвердить и оформить заказ';
+      btn.dataset.renamed = '1';
+    }
+  }
+  
+  // === Фикс: InSales не снимает disabled с кнопки после пересчёта доставки ===
+  // При смене города InSales ставит disabled на кнопку (AJAX-запрос к API доставки),
+  // но после получения ответа не снимает его — кнопка остаётся заблокированной.
+  // Решение: наблюдаем за #delivery_variants — InSales вставляет в него новые варианты
+  // доставки сразу после завершения пересчёта, и тогда снимаем disabled с кнопки.
+  var _submitBtnUnlockTimer = null;
+  function watchDeliveryPriceUpdate() {
+    var variantsEl = document.getElementById('delivery_variants');
+    if (!variantsEl || variantsEl.dataset.btnWatcherAttached) return;
+    variantsEl.dataset.btnWatcherAttached = '1';
+
+    var obs = new MutationObserver(function(muts) {
+      var hasChildListChange = muts.some(function(m) { return m.type === 'childList' && m.addedNodes.length > 0; });
+      if (!hasChildListChange) return;
+      clearTimeout(_submitBtnUnlockTimer);
+      _submitBtnUnlockTimer = setTimeout(function() {
+        var btn = document.getElementById('create_order') ||
+                  document.querySelector('.js-button-checkout_submit, .co-button--checkout_submit');
+        if (btn && btn.disabled) {
+          btn.disabled = false;
+        }
+      }, 200);
+    });
+    obs.observe(variantsEl, { childList: true, subtree: false });
+  }
+
+  var loginMoved = false;
+  var _runAllBusy = false;
+  function runAll() {
+    if (_runAllBusy) return;
+    _runAllBusy = true;
+    try {
+      insertAllHints();
+      insertNameHint();
+      insertEmailHint();
+      insertDeliveryHints();
+      ensureSubmitButtonStyle();
+      ensureCheckoutTitleStyle();
+      renameSubmitButton();
+      ensureSubmitSmsNotice();
+      updateWarningsVisibility();
+      if (typeof setupPhoneField === 'function') {
+        setupPhoneField();
+      }
+      pimpLoginBlock();
+      if (!loginMoved) {
+        loginMoved = moveLoginBlock();
+      }
+      attachAddressVisibilityListeners();
+      updateAddressFieldVisibility();
+      checkAddressForSettlement();
+      attachTimeIntervalListeners();
+      updateTimeIntervalVisibility();
+      watchDeliveryPriceUpdate();
+    } catch (e) {
+      // Защита от ошибок, чтобы не сломать процесс оформления
+    }
+    setTimeout(function() { _runAllBusy = false; }, 50);
+  }
+  
+  function startObserver() {
+    if (!document.body) return;
+    runAll();
+    var observer = new MutationObserver(runAll);
+    observer.observe(document.body, { childList: true, subtree: true });
+  }
+  
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', startObserver);
+  } else {
+    startObserver();
+  }
+})();
+</script>
+</html>

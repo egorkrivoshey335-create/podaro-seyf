@@ -1,0 +1,19 @@
+{
+  "name": "gift-safe",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "backend",
+    "widget",
+    "admin"
+  ],
+  "scripts": {
+    "dev:backend": "npm --workspace backend run dev",
+    "dev:widget": "npm --workspace widget run dev",
+    "dev:admin": "npm --workspace admin run dev",
+    "build": "npm run build -w backend && npm run build -w widget && npm run build -w admin",
+    "lint": "npm run lint -w backend && npm run lint -w widget && npm run lint -w admin",
+    "test": "npm run test -w backend"
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "description": "Цены для доставки в пункты выдачи (ПВЗ)",
+  "currency": "BYN",
+  "delivery_days": {
+    "min": 1,
+    "max": 2,
+    "description": "1-2 дня"
+  },
+  "weight_pricing": [
+    { "max_weight": 1, "price": 10.20 },
+    { "max_weight": 2, "price": 10.90 },
+    { "max_weight": 3, "price": 11.80 },
+    { "max_weight": 5, "price": 12.80 },
+    { "max_weight": 10, "price": 15.10 },
+    { "max_weight": 15, "price": 18.40 },
+    { "max_weight": 20, "price": 20.90 },
+    { "max_weight": 25, "price": 23.30 },
+    { "max_weight": 30, "price": 26.60 },
+    { "max_weight": 35, "price": 30.00 },
+    { "max_weight": 40, "price": 32.40 },
+    { "max_weight": 45, "price": 34.80 },
+    { "max_weight": 50, "price": 36.30 }
+  ],
+  "oversized_pricing": {
+    "base_price": 36.30,
+    "price_per_kg": 3
+  }
+}

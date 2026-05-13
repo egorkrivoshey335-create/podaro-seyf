@@ -1,0 +1,203 @@
+
+<div class="product-page">
+  {% if collection %}{% if collection.previous_product or collection.next_product %}
+  <div class="product-neighbours">
+    	{% if collection.previous_product %}<a href="{{ collection.previous_product.url }}" class="previous-page">Предыдущий</a>{% endif %}
+    	{% if collection.next_product %}<a href="{{ collection.next_product.url }}" class="next-page">Следующий</a>{% endif %}
+  </div>
+  {% endif %}{% endif %}
+  <h1 class="green">{{ product.title | editable }}</h1>
+    <div class="images">
+      	<a class="big-image-a {% if product.images.size == 1 %}fancybox{% endif %}" href="{{ product.images.first.original_url }}">
+  <img class="big-image" src="{{ product.images.first.medium_url }}" alt="{{ product.title | escape }}" title="{{ product.title | escape }}">
+        </a>
+
+        <div class="preview-images">
+          {% if product.images.size > 1 %}
+            {% for image in product.images %}
+            <a class="fancybox"
+               data-fancybox-group="gallery"
+               data-medium-url="{{ image.medium_url }}"
+               href="{{ image.original_url }}"
+               title="{{ product.title | escape }}"
+          	   style="background-image: url('{{ image.thumb_url }}');">
+               <!--<img src="{{ image.thumb_url }}" alt="{{ product.title | escape }}" title="{{ product.title | escape }}">-->
+            </a>
+            {% endfor %}
+          {% endif %}
+        </div>
+
+	</div>
+	<div class="info">
+
+   
+      	{% if product.properties.size > 0 %}
+        <table class="params">
+           {% for property in product.properties %}
+           <tr>
+             <td class="label">{{property.name}}:</td>
+             <td> {% for characteristic in property.characteristics %}
+               {{characteristic.name}}{% unless forloop.last %},{% endunless %}
+               {% endfor %}
+             </td>
+           </tr>
+           {% endfor %}
+          
+             {% if product.sku != null %}
+              <tr>
+             <td class="label"> Артикул: </td>
+             <td> {{ product.sku }} </td>
+           </tr>
+           {% endif %}
+          
+           <tr>
+             <td>&nbsp;</td>
+           </tr>
+          <!-- <tr>
+             <td id="presence">В наличии </td>
+           </tr>-->
+        </table>
+        {% endif %}
+        <form id="buy_form" action="/cart_items" method="post">
+            {% if product.show_variants? %}
+              <label for="variant-select" class="variantSelectLabel">Выбрать модификацию:</label>
+              <select id="variant-select"></select>
+            {% else %}
+            {% endif %}
+        <div id="presence"><img src="//static-internal.insales.ru/files/1/2697/1682057/original/33.png" width="14" height="20">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;В наличии: ({% assign quant = 0 %}{% for variant in product.variants %}{% assign quant = quant | plus: variant.quantity %}{% endfor %}{{quant}} шт.)</div>
+        <div class="price">
+          {% if product.old_price %}<div id="old-price-field">{{ product.old_price | money }}</div>
+          <br>{% endif %}<span class="current-price"><span id="price-field">{{ product.price | money }}</span></span>
+        </div>
+          	<label id="qlabel" for="quantity">Количество:</label>
+            <input id="quantity" name="quantity" class="quantity" type="text" value="1">
+          	<input type="hidden" id="variant_id" name="variant_id" value="{{ product.variants.first.id }}">
+            <input type="submit" id="buyproduct" class="button" value="Купить">
+          <a href="#"  class="fast_check" >Заказать в 1 клик</a>
+          
+        </form>
+
+      <div class="short-descr">{{ product.short_description | editable }}</div>
+    </div>
+  	<div class="clear"></div>
+  
+  <div id="pd">Поделиться:</div>
+  <script type="text/javascript">(function() {
+  if (window.pluso)if (typeof window.pluso.start == "function") return;
+  if (window.ifpluso==undefined) { window.ifpluso = 1;
+    var d = document, s = d.createElement('script'), g = 'getElementsByTagName';
+    s.type = 'text/javascript'; s.charset='UTF-8'; s.async = true;
+    s.src = ('https:' == window.location.protocol ? 'https' : 'http')  + '://share.pluso.ru/pluso-like.js';
+    var h=d[g]('body')[0];
+    h.appendChild(s);
+  }})();</script>
+<div class="pluso" data-background="transparent" data-options="medium,square,line,horizontal,nocounter,theme=04" data-services="vkontakte,odnoklassniki,facebook,twitter,google,email" data-user="285994925"></div>
+  
+    <h3 class="green">Описание</h3>
+    <div class="description">{{ product.description | editable }}</div>
+    {% if account.reviews_enabled? %}
+  <h3 class="orange">Отзывы <span class="g1">({{product.reviews_count}})</span> </h3>
+      <div class="rewiews">
+        {% include 'reviews_slider' %}
+      </div>
+    {% endif %}
+  	{% if product.related_products.size > 0 %}
+  		<h3 class="orange">Сопутствующие товары</h3>
+    	<div class="related-products">{% for product in product.related_products %}{% include 'product_box' %}{% endfor %}</div>
+  	{% endif %}
+  	{% if product.similar_products.size > 0 %}
+  		<h3 class="orange">Аналогичные товары</h3>
+    	<div class="similar-products">{% for product in product.similar_products %}{% include 'product_box' %}{% endfor %}</div>
+  	{% endif %}
+  <div class="clear"></div>
+</div>
+
+<script type="text/javascript">
+  	$(function(){
+
+      $('.fancybox').fancybox();
+      {% if product.available == false %}
+      	{% if settings.order_button %}
+           $('#buyproduct').addClass('order_button').val('Под заказ');      // set add-to-cart button to unavailable class
+        {% else %}
+           $('#buyproduct').addClass('disabled');      // set add-to-cart button to unavailable class
+           $('#buyproduct').attr('disabled', 'disabled');  // disable add-to-cart button
+
+        {% endif %}
+        $('#presence').html('<img src="https://static-eu.insales.ru/files/1/2014/2459614/original/1486394280_stock_mail-priority-high.png" width="16" height="16">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Нет в наличии');
+
+      {% endif %}
+
+      var selectCallback = function(variant, selector) {
+
+        $('#buyproduct').removeClass('disabled'); // remove unavailable class from add-to-cart button
+        $('#buyproduct').removeAttr('disabled');  // reenable add-to-cart button
+        //$("#sku_title").hide();
+
+        if (variant) {
+
+              if (variant.sku == null) {
+                  $('#sku').hide();
+              } else {
+                  $('#sku-field').html(variant.sku);
+                  $('#sku').show();
+              }
+
+              $('#variant_id').val(variant.id);
+
+              $('#price-field').html(InSales.formatMoney(variant.price, cv_currency_format));
+              $('#old-price-field').html(InSales.formatMoney(variant.old_price, cv_currency_format));
+          }
+          if (variant && variant.available == true) {
+              // selected a valid variant
+              $('#presence').html('<img src="//static-internal.insales.ru/files/1/2697/1682057/original/33.png" width="14" height="20">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;В наличии: {{quant}} шт.');  // update presence field
+              $('#buyproduct')
+                	.removeClass('order_button')
+                	.removeClass('disabled')
+                	.removeAttr('disabled')
+                	.val('Купить');      // set add-to-cart button to unavailable class
+          } else {
+              if(variant){
+                  $('#presence').html("Под заказ"); // update presence field message
+
+                  {% if settings.order_button %}
+                     $('#buyproduct').addClass('order_button').val('Под заказ');      // set add-to-cart button to unavailable class
+                  {% else %}
+                     $('#buyproduct').addClass('disabled');      // set add-to-cart button to unavailable class
+                     $('#buyproduct').attr('disabled', 'disabled');  // disable add-to-cart button
+                  {% endif %}
+
+              } else {
+                   // variant doesn't exist
+                  $('#buyproduct').addClass('disabled');
+                  $('#buyproduct').attr('disabled', 'disabled');
+                  $('#presence').html("Нет в наличии");
+                  $('#sku-field').html('');
+                  $('#sku').hide();
+                  $('#price-field').html('');
+                  $('#old-price-field').html('');
+              }
+          }
+      };
+                new InSales.OptionSelectors('variant-select', { product: {{product | json}}, onVariantSelected: selectCallback});
+
+      {% if product.images.size > 1 %}
+
+        $('.fancybox').hover(function(){
+            var href = $(this).attr('href');
+            var medium_url = $(this).attr('data-medium-url');
+            $('.big-image-a').attr('href', href);
+            $('.big-image-a img').attr('src', medium_url);
+        });
+
+        $('.big-image-a').click(function(){
+          var href = $(this).attr('href');
+          $('.preview-images .fancybox').each(function(i, el){
+            if ($(el).attr('href') == href) $(el).click();
+          });
+          return false;
+        });
+
+      {% endif %}
+    });
+</script>

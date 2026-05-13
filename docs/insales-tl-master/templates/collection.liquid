@@ -1,0 +1,36 @@
+
+<h3 class="green">{{ collection.title | editable }}</h3>
+<div class="collectionDescr">
+  {{ collection.description | editable }}
+</div>
+  {% if collection.products.size > 0 %}
+	
+
+
+          	{% paginate collection.products by 24 %}
+{% if paginate.parts.size > 0 %}<div class="pagination" style="clear: none;">{{ paginate | default_pagination }}</div>{% endif %}
+<div class="products-grid">
+          		{% for product in collection.products %}
+                	{% include 'product_box' %}
+                {% endfor %}
+</div>
+{% if paginate.parts.size > 0 %} <div class="pagination">{{ paginate | default_pagination }}</div>   {% endif %}
+
+                {% if collection.seo_description and paginate.current_page == 1 %}
+                <div class="editor-content0 seo-content0 clear0 style-block0 collectionDescr2" style="background: {{settings.bg_color6}}; padding-bottom: 3px;">{{ collection.seo_description | editable }}</div>
+                {% endif %}
+
+          	{% endpaginate %}
+
+          {% else %}
+          	{% if collection.subcollections.size > 0 %}
+
+          			{% for subcol in collection.subcollections %}
+                		{% include 'collection_box' %}
+                	{% endfor %}
+
+          	{% else %}
+				<span>В категории нет товаров</span>
+          	{% endif %}
+          {% endif %}
+

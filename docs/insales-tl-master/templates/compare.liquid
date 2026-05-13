@@ -1,0 +1,73 @@
+<h1 style="padding-left: 20px; margin-bottom: 20px;">Сравнение выбранных товаров</h1>
+{% if products.size == 0 %}
+   <p class="note-msg">Товары для сравнения не выбраны.</p>
+{% else %}
+
+
+<div id="compare_div">
+    <table id="compare_table" >
+        <thead>
+            <tr>
+              <th></th>
+                {% for product in products %}
+                <th class="thead compare_{{product.id}}">
+                    <a href="#" rel="{{product.id}}" class="del_compare del" processed="true" title="Удалить из сравнения">&times;</a>
+                    <a href="{{ product.url }}" class="compare_image" style="background: url({{ product.first_image.thumb_url }}) center center no-repeat;"></a>
+                  <p class="prod-title"><a href="{{ product.url }}">{{ product.title | editable }}</a></p>
+                </th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tfoot>
+            <tr>
+                <th class="tfoot">
+                    <a href="#" class="compare_show_similar hidden">Показать одинаковые свойства</a>
+                    <a href="#" class="compare_hide_similar">Скрыть одинаковые свойства</a>
+                </th>
+                {% for product in products %}
+                <th class="tfoot compare_{{product.id}}">
+
+                    <div class="price-box">
+                        <p class="special-price nomargin">
+                           <span class="price">
+                                {% if product.price_varies? %}
+                                    {{ product.price_min | money }} - {{ product.price_max | money }}
+                                {% else %}
+                                    {{ product.sale_price | money }}
+                                {% endif %}
+                           </span>
+                        </p>
+                     </div>
+                  <p style="margin: 5px 0 8px;"><a href="#" rel="{{product.id}}" class="del_compare" processed="true" title="Удалить из сравнения">Удалить</a></p>
+                    <form action="{{ cart_url }}" method="post" id="order" class="buy_form">
+                        <input type="hidden" name="variant_id" value="{{ product.variants.first.id }}">
+                       {% if product.available %}
+      {% if product.variants.size > 1 %}
+      <a href="{{product.url}}" class="buy-button rc14">Купить</a>
+      {% else %}
+      <a class="buy-button buy rc14" href="#" onclick="$('.addToCart').submit(false);">Купить</a>
+      {% endif %}
+      {% else %}
+     <i>Нет на складе</i>
+      {% endif %}
+                    </form>
+                </th>
+                {% endfor %}
+            </tr>
+        </tfoot>
+        <tbody>
+            {% for property in properties %}
+                <tr {% unless property.differ? %}class="same"{% endunless %}>
+                    <th>{{ property.title }}</th>
+                    {% for product in products %}
+                        <td align="center" class="compare_{{product.id}}">
+                            {{ product.properties[property.handle].characteristics.first.title }}
+                        </td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+

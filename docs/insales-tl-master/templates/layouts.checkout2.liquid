@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html class='{{default_checkout2_layout_class}}' lang='ru' xml:lang='ru' xmlns='http://www.w3.org/1999/xhtml'>
+<head>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<meta content='noindex, nofollow' name='robots'>
+<meta content='width=device-width, initial-scale=1.0 user-scalable=no' name='viewport'>
+<link href='https://fonts.googleapis.com/css?family=Ubuntu:400,300,500,700&amp;subset=latin,cyrillic' rel='stylesheet' type='text/css'>
+<title>{% yield 'title' %}</title>
+{{ 'checkout2' | global_stylesheet_tag }}
+{% assign custom_checkout_css = 'custom_checkout2.css' | asset_url_if_exists %}
+{% if custom_checkout_css %}
+<link href='{{ custom_checkout_css }}' rel='stylesheet'>
+{% endif %}
+</head>
+<body class='adaptive'>
+<div class='co-section--checkout_content'>
+<div class='co-section--checkout_order co-section--checkout_order_sided'>
+<div class='co-section--checkout_header co-checkout-block--padded'>
+<a class='co-logo' href='/'>
+{% if settings.use_logo_image and settings.logo_image %}
+<img alt='logo' id='logo' src='{{ settings.logo_image | asset_url }}'>
+{% elsif settings.show_shop_name == null or settings.show_shop_name %}
+{{ account.title }}
+{% endif %}
+</a>
+<div class='co-header-phone'>
+{% if account.phone %}{{ account.phone }}{% endif %}
+</div>
+<h1 class='co-checkout-title co-title co-title--h1'>
+{% yield 'title' %}
+</h1>
+{% yield 'breadcrumbs' %}
+</div>
+{% yield 'sidebar' %}
+{% yield %}
+</div>
+</div>
+</body>
+</html>

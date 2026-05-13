@@ -1,0 +1,130 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Guest {
+  id          String   @id
+  fingerprint String?
+  ip          String?
+  userAgent   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  spins       Spin[]
+
+  @@index([fingerprint])
+  @@index([ip, createdAt])
+}
+
+model Spin {
+  id               String     @id @default(cuid())
+  guestId          String     @unique
+  guest            Guest      @relation(fields: [guestId], references: [id])
+  prizeId          String
+  prize            Prize      @relation(fields: [prizeId], references: [id])
+  ip               String?
+  fingerprint      String?
+  userAgent        String?
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+  clientId         String?    @unique
+  clientEmail      String?
+  clientPhone      String?
+  recipientName    String?
+  recipientPhone   String?
+  recipientAddress String?
+  recipientEmail   String?
+  status           SpinStatus @default(WON)
+  claimedAt        DateTime?
+  deliveredAt      DateTime?
+  fulfilledAt      DateTime?
+  expiresAt        DateTime
+  promoCode        String?
+  promoExternalId  String?
+  freeShippingUsedAt DateTime?
+  freeShippingOrderId String?
+  adminNote        String?
+  emailSentAt      DateTime?
+  emailError       String?
+
+  @@index([guestId])
+  @@index([fingerprint])
+  @@index([ip, createdAt])
+  @@index([status])
+}
+
+enum SpinStatus {
+  WON
+  CLAIMED
+  AWAITING_FULFILL
+  FULFILLED
+  EXPIRED
+}
+
+model Prize {
+  id              String    @id @default(cuid())
+  code            String    @unique
+  title           String
+  description     String
+  image           String
+  weight          Int
+  type            PrizeType
+  payload         Json?
+  active          Boolean   @default(true)
+  requiresAddress Boolean   @default(false)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  spins           Spin[]
+}
+
+enum PrizeType {
+  PROMO_CODE
+  FREE_SHIPPING
+  BONUS_POINTS
+  GUIDE
+  PHYSICAL
+  GIFT_BOX
+}
+
+model PromoCodePool {
+  id        String   @id @default(cuid())
+  prizeCode String
+  code      String   @unique
+  used      Boolean  @default(false)
+  usedAt    DateTime?
+  spinId    String?
+  createdAt DateTime @default(now())
+
+  @@index([prizeCode, used])
+}
+
+model Admin {
+  id           String   @id @default(cuid())
+  login        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model AntifraudLog {
+  id          String   @id @default(cuid())
+  reason      String
+  ip          String?
+  fingerprint String?
+  guestId     String?
+  meta        Json?
+  createdAt   DateTime @default(now())
+
+  @@index([reason, createdAt])
+}
+
+model Settings {
+  id            String   @id @default("singleton")
+  active        Boolean  @default(true)
+  prizeTtlHours Int      @default(24)
+  guidePdfUrl   String?
+  updatedAt     DateTime @updatedAt
+}

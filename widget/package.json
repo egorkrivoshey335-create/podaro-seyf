@@ -1,0 +1,19 @@
+{
+  "name": "@gift-safe/widget",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "node --check src/index.js && node --check src/main.js && node --check src/config.js && node --check src/core/api.js && node --check src/core/fingerprint.js && node --check src/core/insales.js && node --check src/core/scenarios.js && node --check src/core/storage.js && node --check src/ui/safeSequence.js && node --check src/ui/safeVideo.js && node --check src/ui/widgetApp.js",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@fingerprintjs/fingerprintjs": "^4.6.2",
+    "gsap": "^3.13.0"
+  },
+  "devDependencies": {
+    "vite": "^8.0.12"
+  }
+}

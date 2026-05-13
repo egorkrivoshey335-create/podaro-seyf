@@ -1,0 +1,7 @@
+<div class="productBox subcol">
+  <a href="{{ subcol.url }}" style="display: block; width: 160px; height: 160px; background: url({{ subcol.image.compact_url }}) center center no-repeat #FFF;">
+     <!--<img src="{{ subcol.image.compact_url }}" title="">-->
+  </a>
+  <a href="{{ subcol.url }}" class="title">{{ subcol.title | editable | truncate: 30 }}</a>
+  <div class="descr">{{ subcol.description | editable | truncate: 120 }}</div>
+</div>

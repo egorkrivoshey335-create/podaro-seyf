@@ -1,0 +1,5 @@
+<h3 class="main-title">Новиники каталога</h3>
+{% for product in collections.frontpage.products %}
+{% include 'product_box' %}
+{% endfor %}
+{{ page.content | editable }}

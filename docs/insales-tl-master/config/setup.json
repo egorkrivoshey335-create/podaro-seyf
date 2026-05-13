@@ -1,0 +1,45 @@
+ {
+        "block_lists": {
+          "news": "Новинки"
+        },
+        "blocks": {
+          "special-banner": "Акции и распродажи",
+          "Банер": "Акции и распродажи",
+          "Tovar-nedeli": "Товар недели",
+          "условия-доставки": "Условия-доставки"
+        },
+        "menus": {
+          "main-menu": "Верхнее",
+          "footer": "Нижнее",
+          "company": "О компании",
+          "services": "Сервис",
+          "solutions": "Решения"
+        },
+        "menu_items": {
+          "footer": {
+            "Обратная связь": "/page/feedback"
+          },
+          "company": {
+            "Корзина": "/cart_items",
+            "Личный кабинет": "/client_account/login"
+          },
+          "services": {
+            "Главная": "/",
+            "Корзина": "/cart_items"
+          },
+          "solutions": {
+            "Личный кабинет": "/client_account/login"
+          }
+        },
+        "collections": {
+          "kolybeli": "Колыбели",
+          "popular": "популярные товары",
+          "frontpage": "Новинки",
+          "special1": "Спецпредложения",
+          "special3": "Распродажа",
+          "avtokresla": "Автокресла",
+          "matrasy": "Матрасы, комплекты в кроватку, текстиль",
+          "special2": "Акции"
+         
+        }
+      }

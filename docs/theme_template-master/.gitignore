@@ -1,0 +1,7 @@
+<<<<<<< HEAD
+/.insup
+/log/insup.log
+=======
+/node_modules
+*.zip
+>>>>>>> template_v1

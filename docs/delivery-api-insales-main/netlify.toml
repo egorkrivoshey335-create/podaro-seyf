@@ -1,0 +1,42 @@
+[build]
+  command = "npm install"
+
+[build.environment]
+  NODE_VERSION = "18"
+
+# Serverless functions directory
+[functions]
+  directory = "netlify/functions"
+
+# Redirects для API endpoints
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/server"
+  status = 200
+
+[[redirects]]
+  from = "/health"
+  to = "/.netlify/functions/server"
+  status = 200
+
+[[redirects]]
+  from = "/pickup-points"
+  to = "/.netlify/functions/server"
+  status = 200
+
+# Главная страница для тестирования
+[[redirects]]
+  from = "/"
+  to = "/index.html"
+  status = 200
+
+# Scheduled function: пингует API каждые 5 минут для предотвращения cold start
+[functions."keepalive"]
+  schedule = "*/5 * * * *"
+
+[dev]
+  command = "npm run dev"
+  port = 3000
+
+[dev.environment]
+  NODE_VERSION = "18"

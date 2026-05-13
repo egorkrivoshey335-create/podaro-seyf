@@ -1,0 +1,29 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+
+import { rollPrize } from "../src/services/prizeRoller.js";
+
+test("rollPrize throws when there are no active prizes", () => {
+  assert.throws(() => rollPrize([]), /No active prizes available/);
+});
+
+test("rollPrize roughly follows configured weights", () => {
+  const prizes = [
+    { code: "a", active: true, weight: 700 },
+    { code: "b", active: true, weight: 300 },
+  ];
+
+  const results = { a: 0, b: 0 };
+  const iterations = 25_000;
+
+  for (let index = 0; index < iterations; index += 1) {
+    const prize = rollPrize(prizes);
+    results[prize.code] += 1;
+  }
+
+  const ratioA = results.a / iterations;
+  const ratioB = results.b / iterations;
+
+  assert.ok(Math.abs(ratioA - 0.7) < 0.03, `Expected ratio for a near 0.7, got ${ratioA}`);
+  assert.ok(Math.abs(ratioB - 0.3) < 0.03, `Expected ratio for b near 0.3, got ${ratioB}`);
+});

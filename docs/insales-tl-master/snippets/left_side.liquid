@@ -1,0 +1,106 @@
+<div class="leftSide">
+
+  {% if collection.subcollections.size > 0 %}
+  	<div class="subcatsBlock">
+      <ul>
+        {% for subcol in collection.subcollections %}
+          <li><a href="{{ subcol.url }}">{{ subcol.title | editable }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+
+  {% if template != 'cart' %}
+    <div class="cartBlock">
+      <h3 class="main-title"><a href="/cart_items">Моя корзина</a></h3>
+      <div class="inner"></div>
+        <div class="cartRow total">
+          <!--<span>Всего товаров - {{ cart.items_count }} на</span>-->
+          <span></span>
+          <span class="empty hidden">Корзина пуста</span>
+        
+          <div class="price">Итого: <strong class="amount">0 {{ cart.items_price | money }}</strong></div>
+            <p id="cartleftprice"><a class="order" href="/cart_items">Перейти в корзину</a></p>
+        </div>
+    </div>
+  {% endif %}
+  
+   {% if collection.products.size > 0 %}
+  
+  	<form id="filter_form" method="get" action="{{collection.url}}">
+        	<p>Сортировать по:
+                  <!--
+                    <select id="sort_by">
+                    	<option value="product name">Названию</option>
+                    </select>-->
+
+                    {% if language.not_default? %} <input type="hidden" name="lang" value="{{ language.locale }}"> {% endif %}
+
+                      <select id="sort_by" name="order"
+                   style="display: none0;" onchange="document.forms.filter_form.submit();">
+                        <option value=""></option>
+                        {{ "price"  | select_option: order, "возрастанию цены" }}
+                        {{ "descending_price"  | select_option: order, "убыванию цены" }}
+                        {{ "title"  | select_option: order, "названию А-Я" }}
+                        {{ "descending_title"  | select_option: order, "названию Я-А" }}
+                      </select>
+                </p>
+
+                <p>Товаров на странице:
+
+                    <select id="results" name="page_size" onchange="$('#filter_form').submit();">
+                        {{ "24" | select_option: page_size, "24" }}
+                        {{ "48" | select_option: page_size, "48" }}
+                        {{ "100" | select_option: page_size, "100" }}
+                    </select>
+
+                </p>
+            
+              <table class="tagFilters">
+                    {% assign filter_on = false %}
+                    {% for property in collection.properties %}
+                <tr>
+                          	<td class="label">{{property.name}}:</td>
+							<td>
+                              {% for characteristic in property.characteristics %}
+                                  
+                                  {% if characteristic.current? %}{% assign filter_on = true %}{% endif %}
+                              	  <input {% if characteristic.products_count == 0 %}disabled="disabled"{% endif %} id="char{{ characteristic.id }}" type="checkbox" onclick="$('#filter_form').submit();"
+                              			 name="characteristics[]" value="{{ characteristic.id }}"
+                              {% if characteristic.current? %}checked{% endif %}><label for="char{{ characteristic.id }}" class="tag {% if characteristic.current? %}strong{% endif %}">{{characteristic.name}} ({{characteristic.products_count}})</label><br>
+                              {% endfor %}
+                            </td>
+                		</tr>
+                    {% endfor%}
+               
+              </table>
+    {% if filter_on %}<p><a href="{{ collection.url }}">Сбросить фильтр</a></p>{% endif %}
+			</form>
+					{% endif %}
+  
+  {% if block_lists.ourblocks.blocks.size > 0 %}
+
+    {% for block in block_lists.ourblocks.blocks %}
+  
+  
+  {% if block.id == 1549784 %} <h3 class="red"> {% endif %}
+  {% if block.id == 1549807 %} <h3 class="orange"> {% endif %}
+  {% if block.id == 1549816 %} <h3 class="purple"> {% endif %}
+  
+
+   {{ block.title | editable }} {{ block.id }} </h3>
+      <div class="specialBlock">{{ block.content | editable }}</div>
+  	{% endfor %}
+  {% endif %}
+<script type="text/javascript" src="//vk.com/js/api/openapi.js?154"></script>
+<h3>Мы В Контакте</h3>
+<!-- VK Widget -->
+<div id="vk_groups"></div>
+<script type="text/javascript">
+VK.Widgets.Group("vk_groups", {mode: 3}, 166301594);
+</script>
+  
+ <h3>Мы В Facebook</h3> 
+<div class="fb-page" data-href="https://www.facebook.com/Irinaitmost" data-tabs="" data-width="210" data-height="" data-small-header="false" data-adapt-container-width="true" data-hide-cover="false" data-show-facepile="true"><blockquote cite="https://www.facebook.com/Irinaitmost" class="fb-xfbml-parse-ignore"><a href="https://www.facebook.com/Irinaitmost">Наборы носков</a></blockquote></div>
+  
+</div>

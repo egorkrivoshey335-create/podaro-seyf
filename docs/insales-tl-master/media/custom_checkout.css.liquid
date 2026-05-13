@@ -1,0 +1,242 @@
+
+{% comment %}
+{% if settings.use_pt_sans_narrow %}
+	@import url(https://fonts.googleapis.com/css?family=PT+Sans:400,700&subset=latin,cyrillic,cyrillic-ext);
+/*@import url(https://fonts.googleapis.com/css?family=PT+Sans+Narrow:400,700&subset=cyrillic);*/
+{% endif %}
+{% endcomment %}
+
+/* Высота изображения логотипа не должна превышать 90px */
+{% if settings.use_logo_image %}
+#logo_bg {
+  display:block;
+  background-image:url({{settings.logo_image | asset_url }});
+  width:355px; height: 90px;}
+{% else %}
+#logo_bg {display: none;}
+{% endif %}
+/* цвет фона контента */
+body {
+  {% if settings.use_bg_image %}
+  background-image: url({{settings.bg_image | asset_url }});
+  background-position: {{ settings.bg_image_y_position }} {{ settings.bg_image_x_position }};
+  background-repeat: {{ settings.bg_image_repeat }};
+  background-attachment: {{ settings.bg_image_attachment }};
+  {% endif %}
+  background-color: {{settings.bg_color}};
+
+  {% if settings.use_pt_sans_narrow %}
+  font-family: "PT Sans Narrow", Helvetica, Arial, sans-serif;
+  {% else %}
+  font-family: {{ settings.regular_font }};
+  {% endif %}
+
+  font-size: {{ settings.font_size }};
+}
+
+.body {
+  background-color: {{ settings.bg_content_color }};
+  border: 1px solid {{ settings.border_color }};
+}
+
+.phone {
+  font-size: 24px;
+  color: {{ settings.header_text_color }};
+}
+/* фон шапки */
+.header-bg {
+  /*background: {{settings.bg_color}};*/
+  {% unless settings.header_bg_transparent %}
+  background-color: {{ settings.header_bg_color }};
+  {% else %}
+  background-color: transparent;
+  {% endunless %}
+}
+.header-blur {display: none;}
+
+/* цвет ссылки и текста в шапке */
+
+.header {
+	margin: 0px auto 20px;
+	width: 980px;
+    padding: 0;
+}
+
+/* цвет заголовка раздела */
+/*.page-title {color: {{settings.text_color3}};}*/
+
+/* цвет текста */
+body {
+  color:{{ settings.text_color}};
+}
+
+/* цвет ссылки */
+a {
+  color:{{settings.link_color}};
+}
+
+/* цвет заголовков блоков */
+/*.set-title {color:{{settings.text_color3}};}*/
+
+/* фон заголовков блоков и меню кабинета клиента */
+.userbar, .set-meta, .set-title  {background: {{settings.bg_color2}};}
+
+/* цвет основных границ */
+.userbar, .set-list, .set-list-item .img, .set-sidebar, .set-meta, .set-title, .set-block, .set, .table tfoot th, .table tfoot td, input.textfield, textarea, select {
+  	border-color:{{settings.border_color}};
+}
+
+input.textfield, textarea, select {
+	background-color: {{ settings.form_background_color }};
+  	color: {{ settings.form_color }};
+}
+
+/* фон кнопки */
+.button {
+  	background: url(button_bg.png) left top repeat-x #61B2B6; /*{{settings.addbtn_color_2}};*/
+	color: {{settings.button_text_color}};
+	text-transform: uppercase;
+	font-weight: bold!important;
+	font-size: 12px!important;
+	padding: 0 18px 2px 18px;
+	border-radius: 5px 5px 5px 5px;
+  -moz-border-radius: 5px 5px 5px 5px;
+  -webkit-border-top-left-radius: 5px;
+  -webkit-border-top-right-radius: 5px;
+  -webkit-border-bottom-right-radius: 5px;
+  -webkit-border-bottom-left-radius: 5px;
+	border: 0;
+	margin: 0;
+	font-family: {{settings.regular_font}};
+	height: 30px;
+  	line-height: 28px;
+  	cursor: pointer;
+  	text-shadow: none;
+  	box-shadow: none;
+  	-webkit-box-shadow: none;
+  	-moz-box-shadow: none;
+}
+
+#logo { display:none; }
+
+.copyright {
+    margin: 15px 0;
+    font-size: 13px;
+    font-weight: 400;
+    color: #656565;
+}
+
+.copyright a {
+    text-decoration: none;
+    color: {{ settings.link_color }};
+}
+
+.copyright a:hover {
+    color: {{ settings.link_color }};
+}
+
+.footer-checkout ul li {
+    display: inline-block;
+    margin-right: 10px;
+}
+
+.footer-checkout ul li a {
+    color: #656565;
+    font-size: 12px;
+    line-height: 25px;
+    text-decoration: none;
+    font-weight: bold;
+    background: url('bullet.png') 0 -22px no-repeat;
+    padding-left: 10px;
+}
+
+.footer-checkout ul li a:hover {
+    color: {{ settings.link_color }};
+    background: url('bullet.png') 0 5px no-repeat;
+}
+
+
+.wrapper-checkout {
+    width: 960px;
+    margin: 0 auto;
+}
+
+.hidden {
+  	display: none;
+}
+
+body {
+    color: #666666;
+    font-family: 'PT Sans', sans-serif;
+}
+
+a {
+    text-decoration: none;
+    color: #000000;
+}
+
+a:hover {
+    color: #BFD76D;
+}
+
+h3 {
+  font-weight: normal ! important;
+}
+
+h2 {
+    display: block;
+    color: #666666;
+    margin: 5px 0px;
+    font: normal normal 700 14px/18px 'PT Sans', sans-serif;
+}
+
+h1 {
+    display: block;
+    color: #000000;
+    font: 24px "Lobster";
+    margin: 0px 0px 15px;
+    padding-bottom: 5px;
+    padding-left: 0px;
+    background: url("border-title.png") bottom repeat-x;
+    width: 100%;
+}
+
+.wrapper {
+	margin: 0px auto 20px;
+}
+header, .cellar, .bottomface, ul.menu, .topface nav span, .searchForm {
+
+display:none ! important;
+
+}
+.topface nav{
+ width: 700px !important;
+}
+.topface {
+  margin-bottom:30px;
+  
+  }
+.button {
+  height: 30px ! important;
+}
+label{
+  	font-weight: bold;
+ 	font-size: 14px;
+  
+}
+
+input.big {
+margin-top: 20px ! important;
+}
+
+td.name label{
+	font-weight:bold;
+ 	font-size:15px;
+  
+}
+
+td.name label small{
+	font-weight:normal;
+ 	font-size:14px;
+  
+}

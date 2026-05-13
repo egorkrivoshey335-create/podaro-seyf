@@ -1,0 +1,103 @@
+<div class="cart-page">
+  <h3 class="title">Корзина</h3>
+  {% if cart.items != empty %}
+  	<form action="/cart_items" id="cartform" method="post">
+      <input type="hidden" value="put" name="_method">
+      <table class="cart">
+        <thead>
+          <th class="left">Название</th>
+          <th>Артикул</th>
+          <th>Цена</th>
+          <th>Количество</th>
+          <th class="right">Сумма</th>
+        </thead>
+        <tbody>
+          {% for item in cart.items %}
+          <tr id="cart_order_line_{{ item.id }}">
+            <td class="left">
+              <a href="{{ item.product.url }}"
+                 title="{{ item.product.title }}"
+                 class="product">{{ item.product.title | escape }}{% if item.variant.title != '' %} ({{ item.variant.title }}){% endif %}</a>
+            </td>
+            <td>{{ item.variant.sku }}</td>
+            <td class="money">{{ item.sale_price | money }}</td>
+            <td>
+              <a
+                 href="{{ item.url }}"
+                 title="Удалить товар"
+                 class="delete"
+                 iid="delete_{{ item.id }}"></a>
+              <input type="text"
+              		name="cart[quantity][{{ item.id }}]"
+              		value="{{ item.quantity }}"
+              		class="quantity"
+              		price="{{ item.sale_price }}">
+            </td>
+            <td class="right total-price money">{{ item.total_price | money }}</td>
+          </tr>
+          {% endfor %}
+          <tr></tr>
+          <tr>
+            <td colspan="5" class="right">
+              <div class="discounts-list">
+              {% for discount in cart.discounts %}
+            			<div class="item">{{ discount.description }}: &minus;<span class="price ergr">{{ discount.amount | money }}.</span></div>
+         	  {% endfor %}
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td colspan="4" class="right">Итого: </td>
+            <td class="right"><strong><span class="total_amount">{{ cart.items_price | money }}</span></strong></td>
+          </tr>
+          <tr>
+            <td colspan="5">
+
+				<!--<div class="discounts-list">
+		 			{% for discount in cart.discounts %}
+            			<div class="item">Скидка {{ discount.description }}: &minus;<span class="price err">{{ discount.amount | money }}</span></div>
+         			{% endfor %}
+        		</div> 	-->
+				<br clear="all">
+
+              	{% if cart.enable_coupon? %}
+    				<div class="coupon fl">
+     					<lable>Купон на скидку</lable>
+     					<input type="text" class="txt" value="{{ cart.coupon }}"  name="cart[coupon]" />&nbsp;<input type="button" onclick="this.form.submit(false)" class="button" value="Применить" />
+      					{% if cart.invalid_coupon? %}
+      						<p class="error">Указан несуществующий купон, убедитесь что он введен верно.</p>
+      					{% endif %}
+    				</div>
+				{% endif %}
+            </td>
+          </tr>
+          <tr>
+            <td colspan="5" class="right">
+              <input type="submit" name="make_order" id="create_order" class="checkout button" value="Оформить заказ" />
+            </td>
+          <tr>
+
+        </tbody>
+      </table>
+
+  </form>
+  <span class="cart-is-empty hidden">В корзине нет товаров</span>
+  {% else %}
+  <span class="cart-is-empty">В корзине нет товаров</span>
+  {% endif %}
+  <div class="clear"></div>
+</div>
+
+<script>
+  	$(document).ready(function(){
+
+    	$('#cartform').bind('keypress', function(e) {
+      		if (e.keyCode==13) {
+        		$(this).submit();
+        		return false;
+      		}
+    	});
+
+      	cartTriggers();
+    });
+</script>

@@ -1,0 +1,41 @@
+{% include 'breadcrumbs' %}
+<div class="blog">
+	<h1 class="blogTitle">{{ blog.title | editable }}</h1>
+
+    {% paginate articles by 4 %}
+    	{% for article in articles %}
+        {% comment %}
+        	<!--
+          <div class="article">
+            	<a href="{{ article.url }}" class="articleTitle">{{ article.title | editable }}</a>
+                <div class="blogCreated">Опубликовано {{ article.created_at | date: "%d.%m.%Y" }}, автор {{ article.author | editable }}</div>
+                <table><tr>
+                  	<td><a href="{{ article.url }}"><img src="{{ article.image.thumb_url }}"></a></td>
+                    <td><div class="text">{{ article.preview | editable }}</div>
+                <a class="readmore" href="{{ article.url }}#cut">Подробнее...</a>
+                {% if blog.comments_enabled? %}
+                	<a href="{{article.url}}#comments" class="comments">комментарии ({{ article.comments_count }})</a>
+                {% endif %}</td>
+                  </tr></table>
+            </div>
+            -->
+          {% endcomment %}
+  			<div class="article">
+            	<a href="{{ article.url }}" class="articleTitle">{{ article.title | editable }}</a>
+                <div class="blogCreated">Опубликовано {{ article.created_at | date: "%d.%m.%Y" }}, автор {{ article.author | editable }}</div>
+                <a class="articleImg" href="{{ article.url }}"><img src="{{ article.image.thumb_url }}"></a>
+                <div class="articleText">{{ article.preview | editable }}
+              		{% if blog.comments_enabled? %}<a href="{{article.url}}#comments" class="comments">комментарии ({{ article.comments_count }})</a>{% endif %}
+              	</div>
+              	<a class="articleReadmore button" href="{{ article.url }}#cut">Подробнее...</a>
+            </div>
+  			<!--<div class="clear"></div>-->
+        {% endfor %}
+
+        {% if paginate.pages > 1 %}
+    		<div class="pagination">
+        		{{ paginate | default_pagination }}
+    		</div>
+    	{% endif %}
+	{% endpaginate %}
+</div>

@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang='ru' xml:lang='ru' xmlns='http://www.w3.org/1999/xhtml'>
+<head>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<meta content='noindex, nofollow' name='robots'>
+<title>{% yield 'title' %}</title>
+<link href="{{ 'reset.css' | asset_url }}" rel="stylesheet" type="text/css">
+<link href="{{ 'fonts.css' | asset_url }}" rel="stylesheet" type="text/css">
+{{ 'checkout' | global_stylesheet_tag }}
+{% assign customer_checkout_css = 'custom_checkout.css' | asset_url %}
+{% if customer_checkout_css %}
+<link href='{{ customer_checkout_css }}' rel='stylesheet'>
+{% endif %}
+<link href="{{ 'style.css' | asset_url }}" rel="stylesheet" type="text/css">
+{{ 'checkout' | global_javascript_tag }}
+
+ <!--<link href="{{ 'styles.css' | asset_url }}" rel="stylesheet" type="text/css">-->
+  	<!--[if lt IE 9]>
+		<script type="text/javascript" src="{{ 'PIE_IE678.js' | asset_url }}"></script>
+	<![endif]-->
+  	<!--[if IE 9]>
+  		<script type="text/javascript" src="{{ 'PIE_IE9.js' | asset_url }}"></script>
+	<![endif]-->
+   <script>var cv_currency_format = "{{money_with_currency_format}}";</script>
+  <script type="text/javascript" src="{{ 'shop/common.js' | global_asset_url }}"></script>
+	<script type="text/javascript" src="{{ 'theme.js' | asset_url }}"></script>
+  <script type="text/javascript" src="{{ 'common.js' | asset_url }}"></script>
+</head>
+<body>
+
+<noscript><h2 class="attention">Для корректной работы сайта включите JavaScript в настройках браузера.</h2></noscript>
+		<div class="topface">
+            <div class="mainWrap">
+                <nav>
+                  {% for link in linklists.main-menu.links %}<a href="{{ link.url }}">{{ link.title }}</a>{% unless forloop.last %}<span>/</span>{% endunless %}{% endfor %}
+              	</nav>
+              <form action="/search" method="get" class="searchForm"><input id="search" type="text" class="query" name="q" value="Найти..."><input id="search_submit" type="submit" class="submit" value=""></form>
+            </div>
+        </div>
+        <div class="middleface">
+            <div class="mainWrap">
+                <header>
+
+                  {% if settings.show_shop_name %}
+      				<a class="accountTitle" href="/" title="{{ account.title }}">{{ account.title | editable }}</a>
+      			  {% else %}
+        			{% if settings.use_logo_image %}
+           				<a class="logo" href="/"><img src="{{ 'loaded_logo.png' | asset_url }}" title=""></a>
+        			{% endif %}
+      			  {% endif %}
+
+                  {% if settings.show_phone %}
+                    <div class="phone">
+                      	{{ settings.phone_header_descr_1 }}
+                        <span>{{ account.phone | editable }}</span>
+                      	{{ settings.phone_header_descr_2 }}
+                    </div>
+                  {% endif %}
+                </header>
+                <ul class="menu">
+                  {% for col in collections %}
+                  		{% if forloop.index0 > 0 %}<li class="delim">/</li>{% endif %}
+                  <li class="{% if col.subcollections.size > 0 %}submenu{% endif %} {% if col.current? %}active{% endif %}">
+                    <a href="{{ col.url }}">{{ col.title | editable }}</a>
+                        {% if col.subcollections.size > 0 %}
+                          <div class="submenuBottom">
+                            <div class="arrowUp"></div>
+                            <ul>
+                              {% for subcol in col.subcollections %}
+                              <li class="{% if subcol.subcollections.size > 0 %}submenu{% endif %} {% if forloop.index0 == 0 %}first{% endif %}"><a href="{{ subcol.url }}">{{ subcol.title | editable }}</a>
+                                {% if subcol.subcollections.size > 0 %}
+                                  <div class="submenuRight">
+                                      <div class="arrowLeft"></div>
+                                      <ul>
+                                        {% for subcol2 in subcol.subcollections %}
+                                          <li class="{% if subcol2.subcollections.size > 0 %}submenu{% endif %} {% if forloop.index0 == 0 %}first{% endif %}"><a href="{{ subcol2.url }}">{{ subcol2.title | editable }}</a>
+                                        {% if subcol2.subcollections.size > 0 %}
+                                        <div class="submenuRight">
+                                            <div class="arrowLeft"></div>
+                                            <ul>
+                                              {% for subcol3 in subcol2.subcollections %}
+                                                <li class="{% if forloop.index0 == 0 %}first{% endif %}"><a href="{{ subcol3.url }}">{{ subcol3.title | editable }}</a></li>
+                                              {% endfor %}
+                                            </ul>
+                                  </div>
+                                {% endif %}
+                                        </li>
+                                        {% endfor %}
+                                      </ul>
+                                  </div>
+                                {% endif %}
+                              </li>
+                              {% endfor %}
+                            </ul>
+                          </div>
+                        {% endif %}
+                        </li>
+                  {% endfor %}
+                  <li class="account">{% if client %}<a href="/client_account/orders">Личный кабинет</a>{% else %}<a href="/client_account/login">Вход</a>{% endif %}</li>
+                </ul>
+            </div>
+  		</div>
+
+<div class="mainWrap">
+
+<div class='wrapper body fc'>
+{% if client %}
+ {% if linklists.account-menu %}
+<div class='userbar fc'></div>
+<div class='links fl'>
+{% for link in linklists.account-menu %}
+<a href='/'>
+<span class='b'>Вернуться в магазин</span>
+</a>
+|
+{% endfor %}
+</div>
+<div class='profile fr'>
+{{ client.full_name }}
+<b></b>
+(<a href='/client_account/exit'>Выход</a>)
+</div>
+ {% else %}
+<div class='userbar fc'>
+<div class='links fl'><a href='/'>
+<span class='b'>Вернуться в магазин</span>
+</a>|<a href='/client_account/contacts'>
+<span>Контактные данные</span>
+</a>|<a href='/client_account/addresses'>
+<span>Адрес доставки</span>
+</a>|<a href='/client_account/orders'>
+<span class='b'>Заказы и скидки</span>
+</a>|<a href='/client_account/feedback'>
+<span>Обратная связь</span>
+</a></div>
+<div class='profile fr'>
+{{ client.full_name }}
+<b></b>
+(<a href='/client_account/exit'>Выход</a>)
+</div>
+</div>
+ {% endif %}
+{% endif %}
+<div class='page-title'>{% yield 'title' %}</div>
+{% yield 'flash_messages' %}
+<div id='top_info'>{% yield 'top_info' %}</div>
+{% yield %}
+{% yield 'sidebar' %}
+</div>
+  </div>
+ <div class="bottomface left">
+            <div class="mainWrap">
+
+              	{% if settings.show_phone %}
+                <div class="phone">
+                  <h3>{{ settings.phone_footer_descr }}</h3>
+                  <p>{{ account.phone | editable }}</p>
+                </div>
+              	{% endif %}
+
+              	{% if linklists.footer.links.size > 0 %}
+                  <div class="footMenu">
+                    <div class="title">{{ linklists.footer.title }}</div>
+                    <ul>
+                      {% for link in linklists.footer.links %}
+                      <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+                      {% endfor %}
+                    </ul>
+                  </div>
+              	{% endif %}
+              	{% if linklists.company.links.size > 0 %}
+                  <div class="footMenu">
+                    <div class="title">{{ linklists.company.title }}</div>
+                    <ul>
+                      {% for link in linklists.company.links %}
+                      <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+                      {% endfor %}
+                    </ul>
+                  </div>
+              	{% endif %}
+                {% if linklists.services.links.size > 0 %}
+                  <div class="footMenu">
+                    <div class="title">{{ linklists.services.title }}</div>
+                    <ul>
+                      {% for link in linklists.services.links %}
+                      <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+                      {% endfor %}
+                    </ul>
+                  </div>
+              	{% endif %}
+                {% if linklists.solutions.links.size > 0 %}
+                  <div class="footMenu">
+                    <div class="title">{{ linklists.solutions.title }}</div>
+                    <ul>
+                      {% for link in linklists.solutions.links %}
+                      <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+                      {% endfor %}
+                    </ul>
+                  </div>
+              	{% endif %}
+            </div>
+        </div>
+        <div class="cellar">
+            <div class="mainWrap">Copyright © {{ 'now' | date: "%Y" }} <a href="/">{{ account.title | editable }}</a></div>
+        </div>
+
+</body>
+</html>

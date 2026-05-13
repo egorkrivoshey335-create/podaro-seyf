@@ -1,0 +1,49 @@
+ <div class="breadcrumbs">
+  <a href="/">Главная</a>&nbsp;&raquo;
+  {% if current_collections.size > 0 %}
+    <!-- если находимся в глубине каталога то выводим хлебные крошки без корня -->
+    {% for collection in current_collections %}
+      {% if collection.level > 0 %}
+   		{% if forloop.last and template == 'collection' %}
+   			<span>{{ collection.title | editable }}</span>
+   		{% else %}
+        <a href="{{ collection.url }}">{{ collection.title | editable }}</a>&nbsp;&raquo;
+   		{% endif %}
+      {% endif %}
+    {% endfor %}
+  {% else %}
+
+    <!-- если товар вне каталога то ищем из какой коллекции этот товар -->
+    {% if product.collections.size > 0 %}
+
+      <!-- определяем самую глубокую категорию, в которой находится товар -->
+      {% assign deep_collection = product.collections.first %}
+      {% for collection in product.collections %}
+        {% if deep_collection.level < collection.level %}
+          {% assign deep_collection = collection %}
+        {% endif %}
+      {% endfor %}
+
+      <!-- выводим хлебные крошки, без корневой категории -->
+      {% for collection in deep_collection.current_collections %}
+        {% if collection.level > 0 %}
+          <a href="{{ collection.url }}">{{ collection.title | editable }}</a>&nbsp;&raquo;
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+  {% endif %}
+  {% case template %}
+  {% when "cart" %}
+  	<span>Корзина</span>
+  {% when 'page' %}
+    <span>{{ page.title | editable }}</span>
+  {% when 'product' %}
+    <span>{{ product.title | editable }}</span>
+  {% when 'blog' %}
+    <span>{{ blog.title | editable }}</span>
+  {% when 'article' %}
+  	<a href="{{ blog.url }}">{{ blog.title | editable }}</a>&nbsp;&raquo;&nbsp;<span>{{ article.title | editable }}</span>
+  {% when 'search' %}
+  	<span>Поиск</span>
+  {% endcase %}
+</div>

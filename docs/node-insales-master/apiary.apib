@@ -1,0 +1,2979 @@
+HOST: http://insales.ru/
+
+--- insales.ru test API ---
+
+--
+Аккаунт
+--
+
+Получение информации о аккаунте
+GET /admin/account.json
+< 200
+< Content-Type: application/json; charset=utf-8
+< API-Usage-Limit: 2/500
+{
+  "blocked": false,
+  "city": "Москва",
+  "contact_phone": null,
+  "country": "RU",
+  "enable_cart_discounts": false,
+  "enable_client_discounts": false,
+  "enable_group_discounts": false,
+  "enable_order_discounts": false,
+  "hide_items_out_of_stock": false,
+  "id": 12345,
+  "inviter_id": null,
+  "notification_email": null,
+  "organization": null,
+  "paid_till": "2009-03-02",
+  "sms_notification_phone": null,
+  "state": "г Москва",
+  "subdomain": "shop-test",
+  "email": "mail@mail.ru",
+  "icq": null,
+  "phone": "+71234567890",
+  "title": "Название магазина",
+  "minimum_items_price": null,
+  "stock_currency_exchange_rate": "30.0",
+  "client_cookies_whitelist": null,
+  "main_host": "shop-test.myinsales.ru",
+  "main_host_protocol": "http",
+  "next_order_number": 1006,
+  "time_zone": "Moscow",
+  "owner": {
+    "created_at": "2013-02-18 00:20:01 +0400",
+    "email": "mail@mail.ru",
+    "id": 12345,
+    "name": "Иван"
+  }
+}
+
+--
+Категории на складе
+--
+
+Получение списка категорий
+GET /admin/categories.json
+< 200
+< Content-Type: application/json; charset=utf-8
+< API-Usage-Limit: 2/500
+<?xml version="1.0" encoding="UTF-8"?>
+<categories type="array">
+    <category>
+        <id type="integer">28429</id>
+        <parent-id type="integer" nil="true"/>
+        <title>Склад</title>
+        <position type="integer">1</position>
+        <created-at type="timestamp">2009-10-22 19:41:19 +0400</created-at>
+        <updated-at type="timestamp">2009-11-05 15:00:11 +0300</updated-at>
+    </category>
+    <category>
+        <id type="integer">32142</id>
+        <parent-id type="integer">28429</parent-id>
+        <title>Мужская одежда</title>
+        <position type="integer">2</position>
+        <created-at type="timestamp">2009-11-19 14:06:31 +0300</created-at>
+        <updated-at type="timestamp">2009-11-19 14:06:36 +0300</updated-at>
+    </category>
+    <category>
+        <id type="integer">28479</id>
+        <parent-id type="integer">28429</parent-id>
+        <title>Женская одежда</title>
+        <position type="integer">1</position>
+        <created-at type="timestamp">2009-10-23 19:47:24 +0400</created-at>
+        <updated-at type="timestamp">2009-10-23 19:47:24 +0400</updated-at>
+    </category>
+    <category>
+        <id type="integer">28480</id>
+        <parent-id type="integer">28429</parent-id>
+        <title>Платья</title>
+        <position type="integer">1</position>
+        <created-at type="timestamp">2009-10-23 19:47:24 +0400</created-at>
+        <updated-at type="timestamp">2009-10-23 19:47:24 +0400</updated-at>
+   </category>
+</categories>
+
+Получение информации о категории
+GET /admin/categories/32142.json
+< 200
+< Content-Type: application/json; charset=utf-8
+< API-Usage-Limit: 2/500
+<?xml version="1.0" encoding="UTF-8"?>
+<category>
+    <id type="integer">32142</id>
+    <parent-id type="integer">28429</parent-id>
+    <title>Мужская одежда</title>
+    <position type="integer">2</position>
+    <created-at type="timestamp">2009-11-19 14:06:31 +0300</created-at>
+    <updated-at type="timestamp">2009-11-19 14:06:36 +0300</updated-at>
+</category>
+
+Добавление новой категории
+POST /admin/categories.json
+> Content-Type: application/json
+<?xml version="1.0" encoding="UTF-8"?>
+<category>
+    <parent-id type="integer">28429</parent-id>
+    <title>Мужская одежда</title>
+</category>
+< 200
+< Content-Type: application/xml
+<?xml version="1.0" encoding="UTF-8"?>
+<category>
+    <id type="integer">32142</id>
+    <parent-id type="integer">28429</parent-id>
+    <title>Мужская одежда</title>
+    <position type="integer">2</position>
+    <created-at type="timestamp">2009-11-19 14:06:31 +0300</created-at>
+    <updated-at type="timestamp">2009-11-19 14:06:36 +0300</updated-at>
+</category>
+
+Редактирование категории
+PUT /admin/categories/32142.json
+> Content-Type: application/json
+<?xml version="1.0" encoding="UTF-8"?>
+<category>
+    <id type="integer">32142</id>
+    <title>Одежда</title>
+</category>
+< 200
+< Content-Type: application/xml
+<?xml version="1.0" encoding="UTF-8"?>
+<category>
+    <id type="integer">32142</id>
+    <parent-id type="integer">28429</parent-id>
+    <title>Одежда</title>
+    <position type="integer">2</position>
+    <created-at type="timestamp">2009-11-19 14:06:31 +0300</created-at>
+    <updated-at type="timestamp">2009-11-19 14:06:36 +0300</updated-at>
+</category>
+
+Удаление категории
+DELETE /admin/categories/32142.json
+< 200
+
+--
+Товары
+--
+
+Получение списка товаров
+GET /admin/products.json?category_id=478
+< 200
+< Content-Type: application/json; charset=utf-8
+< API-Usage-Limit: 2/500
+<?xml version="1.0" encoding="UTF-8"?>
+<products type="array">
+    <product>
+        <category-id type="integer">478</category-id>
+        <created-at type="timestamp">2009-06-04 14:22:34 +0400</created-at>
+        <id type="integer">41658</id>
+        <is-hidden type="boolean">false</is-hidden>
+        <updated-at type="timestamp">2010-07-14 13:40:01 +0400</updated-at>
+        <title>Van Gogh Ruled Peach Notebook</title>
+        <description>&lt;p&gt;&lt;span style=&quot;font-family: 'Times New Roman'; font-size: 16px;&quot;&gt; &lt;/span&gt;&lt;/p&gt;</description>
+        <short-description>Алая записная книжка "Ван Гог" в линейку</short-description>
+        <permalink>Van-Gogh-Ruled-Rose-Notebook</permalink>
+        <html-title nil="true"/>
+        <meta-keywords nil="true"/>
+        <meta-description nil="true"/>
+        <characteristics type="array">
+            <characteristic>
+                <id type="integer">328</id>
+                <position type="integer">1</position>
+                <property-id type="integer">106</property-id>
+                <title>в линейку</title>
+                <permalink>rulled</permalink>
+            </characteristic>
+        </characteristics>
+        <properties type="array">
+            <property>
+                <id type="integer">106</id>
+                <position type="integer">1</position>
+                <title>Бумага</title>
+                <permalink>bumaga</permalink>
+            </property>
+        </properties>
+        <option-names type="array"/>
+        <images type="array">
+            <image>
+                <created-at type="timestamp">2009-06-04 14:22:34 +0400</created-at>
+                <id type="integer">24690</id>
+                <position type="integer">1</position>
+                <url>http://static.insales.ru/images/products/24690/thumb/vangogh-red.jpg</url>
+                <title nil="true"/>
+            </image>
+        </images>
+        <variants type="array">
+            <variant>
+                <cost-price type="decimal">487.0</cost-price>
+                <created-at type="timestamp">2009-06-04 14:22:34 +0400</created-at>
+                <id type="integer">48136</id>
+                <old-price type="decimal" nil="true"/>
+                <price type="decimal">740.0</price>
+                <product-id type="integer">41658</product-id>
+                <quantity type="integer" nil="true"/>
+                <sku>QP021MVEN-r</sku>
+                <updated-at type="timestamp">2010-07-16 13:20:04 +0400</updated-at>
+                <title nil="true"/>
+                <option-values type="array"/>
+            </variant>
+        </variants>
+    </product>
+    <product>
+        <category-id type="integer">478</category-id>
+        <created-at type="timestamp">2009-04-10 00:00:05 +0400</created-at>
+        <id type="integer">15757</id>
+        <is-hidden type="boolean">false</is-hidden>
+        <updated-at type="timestamp">2009-12-08 14:58:34 +0300</updated-at>
+        <title>Van Gogh Sketchbook Peach</title>
+        <description nil="true" />
+        <short-description>Персиковая записная книжка "Ван Гог" для рисунков</short-description>
+        <permalink>Van-Gogh-Sketchbook-Peach</permalink>
+        <html-title nil="true"/>
+        <meta-keywords nil="true"/>
+        <meta-description nil="true"/>
+        <characteristics type="array">
+            <characteristic>
+                <id type="integer">328</id>
+                <position type="integer">1</position>
+                <property-id type="integer">106</property-id>
+                <title>в линейку</title>
+                <permalink>rulled</permalink>
+            </characteristic>
+        </characteristics>
+        <properties type="array">
+            <property>
+                <id type="integer">106</id>
+                <position type="integer">1</position>
+                <title>Бумага</title>
+                <permalink>bumaga</permalink>
+            </property>
+        </properties>
+        <option-names type="array"/>
+        <images type="array">
+            <image>
+                <created-at type="timestamp">2009-04-10 00:00:05 +0400</created-at>
+                <id type="integer">13886</id>
+                <position type="integer">1</position>
+                <url>http://static.insales.ru/images/products/13886/thumb/vangogh-orange.jpg</url>
+                <title nil="true"/>
+            </image>
+        </images>
+        <variants type="array">
+            <variant>
+                <cost-price type="decimal">487.0</cost-price>
+                <created-at type="timestamp">2009-04-10 00:00:05 +0400</created-at>
+                <id type="integer">16638</id>
+                <old-price type="decimal" nil="true"/>
+                <price type="decimal">740.0</price>
+                <product-id type="integer">15757</product-id>
+                <quantity type="integer">0</quantity>
+                <sku>QP023MVEN-o</sku>
+                <updated-at type="timestamp">2010-07-16 13:20:05 +0400</updated-at>
+                <title nil="true"/>
+                <option-values type="array"/>
+            </variant>
+        </variants>
+    </product>
+</products>
+
+Получение информации о товаре
+GET /admin/products/41658.json
+< 200
+< Content-Type: application/json; charset=utf-8
+< API-Usage-Limit: 2/500
+<?xml version="1.0" encoding="UTF-8"?>
+<product>
+    <category-id type="integer">478</category-id>
+    <created-at type="timestamp">2009-06-04 14:22:34 +0400</created-at>
+    <id type="integer">41658</id>
+    <is-hidden type="boolean">false</is-hidden>
+    <updated-at type="timestamp">2010-07-14 13:40:01 +0400</updated-at>
+    <title>Van Gogh Ruled Peach Notebook</title>
+    <description>&lt;p&gt;&lt;span style=&quot;font-family: 'Times New Roman'; font-size: 16px;&quot;&gt; &lt;/span&gt;&lt;/p&gt;</description>
+    <short-description>Алая записная книжка "Ван Гог" в линейку</short-description>
+    <permalink>Van-Gogh-Ruled-Rose-Notebook</permalink>
+    <html-title nil="true"/>
+    <meta-keywords nil="true"/>
+    <meta-description nil="true"/>
+    <characteristics type="array">
+        <characteristic>
+            <id type="integer">328</id>
+            <position type="integer">1</position>
+            <property-id type="integer">106</property-id>
+            <title>в линейку</title>
+            <permalink>rulled</permalink>
+        </characteristic>
+    </characteristics>
+    <properties type="array">
+        <property>
+            <id type="integer">106</id>
+            <position type="integer">1</position>
+            <title>Бумага</title>
+            <permalink>bumaga</permalink>
+        </property>
+    </properties>
+    <option-names type="array"/>
+    <images type="array">
+        <image>
+            <created-at type="timestamp">2009-06-04 14:22:34 +0400</created-at>
+            <id type="integer">24690</id>
+            <position type="integer">1</position>
+            <url>http://static.insales.ru/images/products/24690/thumb/vangogh-red.jpg</url>
+            <title nil="true"/>
+        </image>
+    </images>
+    <variants type="array">
+        <variant>
+            <cost-price type="decimal">487.0</cost-price>
+            <created-at type="timestamp">2009-06-04 14:22:34 +0400</created-at>
+            <id type="integer">48136</id>
+            <old-price type="decimal" nil="true"/>
+            <price type="decimal">740.0</price>
+            <product-id type="integer">41658</product-id>
+            <quantity type="integer" nil="true"/>
+            <sku>QP021MVEN-r</sku>
+            <updated-at type="timestamp">2010-07-16 13:20:04 +0400</updated-at>
+            <title nil="true"/>
+            <option-values type="array"/>
+        </variant>
+    </variants>
+</product>
+
+--
+Добавление товара
+--
+
+Добавление товара с параметрами
+POST /admin/products.json
+> Content-Type: application/json
+<?xml version="1.0" encoding="UTF-8"?>
+<product>
+    <category-id type="integer">478</category-id>
+    <title>Van Gogh Ruled Peach Notebook</title>
+    <description>&lt;p&gt;&lt;span style=&quot;font-family: 'Times New Roman'; font-size: 16px;&quot;&gt; &lt;/span&gt;&lt;/p&gt;</description>
+    <short-description>Алая записная книжка "Ван Гог" в линейку</short-description>
+    <properties-attributes type="array">
+        <properties-attribute>
+            <title>Бумага</title>
+            <value>в линейку</value>
+        </properties-attribute>
+    </properties-attributes>
+    <variants-attributes type="array">
+        <variant>
+            <sku>QP021MVEN-r</sku>
+            <quantity type="integer" nil="true"/>
+            <price type="decimal">740.0</price>
+            <cost-price type="decimal">487.0</cost-price>
+            <old-price type="decimal" nil="true"/>
+        </variant>
+    </variants-attributes>
+</product>
+< 200
+< Content-Type: application/xml
+<?xml version="1.0" encoding="UTF-8"?>
+<product>
+    <category-id type="integer">478</category-id>
+    <created-at type="timestamp">2009-06-04 14:22:34 +0400</created-at>
+    <id type="integer">41658</id>
+    <is-hidden type="boolean">false</is-hidden>
+    <updated-at type="timestamp">2010-07-14 13:40:01 +0400</updated-at>
+    <title>Van Gogh Ruled Peach Notebook</title>
+    <description>&lt;p&gt;&lt;span style=&quot;font-family: 'Times New Roman'; font-size: 16px;&quot;&gt; &lt;/span&gt;&lt;/p&gt;</description>
+    <short-description>Алая записная книжка "Ван Гог" в линейку</short-description>
+    <permalink>Van-Gogh-Ruled-Rose-Notebook</permalink>
+    <html-title nil="true"/>
+    <meta-keywords nil="true"/>
+    <meta-description nil="true"/>
+    <characteristics type="array">
+        <characteristic>
+            <id type="integer">328</id>
+            <position type="integer">1</position>
+            <property-id type="integer">106</property-id>
+            <title>в линейку</title>
+            <permalink>rulled</permalink>
+        </characteristic>
+    </characteristics>
+    <properties type="array">
+        <property>
+            <id type="integer">106</id>
+            <position type="integer">1</position>
+            <title>Бумага</title>
+            <permalink>bumaga</permalink>
+        </property>
+    </properties>
+    <option-names type="array"/>
+    <images type="array" />
+    <variants type="array">
+        <variant>
+            <cost-price type="decimal">487.0</cost-price>
+            <created-at type="timestamp">2009-06-04 14:22:34 +0400</created-at>
+            <id type="integer">48136</id>
+            <old-price type="decimal" nil="true"/>
+            <price type="decimal">740.0</price>
+            <product-id type="integer">41658</product-id>
+            <quantity type="integer" nil="true"/>
+            <sku>QP021MVEN-r</sku>
+            <updated-at type="timestamp">2010-07-16 13:20:04 +0400</updated-at>
+            <title nil="true"/>
+            <option-values type="array"/>
+        </variant>
+    </variants>
+</product>
+
+Добавление товара со свойствами
+POST /admin/products.json
+> Content-Type: application/json
+<?xml version="1.0" encoding="UTF-8"?>
+<product>
+    <category-id type="integer">478</category-id>
+    <is-hidden type="boolean">false</is-hidden>
+    <title>Модная майка</title>
+    <options type="array">
+        <option>
+            <title>Размер</title>
+            <value>XL</value>
+        </option>
+        <option>
+            <title>Цвет</title>
+            <value>белый</value>
+        </option>
+    </options>
+    <variants-attributes type="array">
+        <variant>
+            <cost-price type="decimal">487.0</cost-price>
+            <old-price type="decimal">1000</old-price>
+            <price type="decimal">740.0</price>
+            <quantity type="integer">10</quantity>
+        </variant>
+    </variants-attributes>
+</product>
+< 200
+< Content-Type: application/json
+<?xml version="1.0" encoding="UTF-8"?>
+<product>
+    <id type="integer">41658</id>
+    <category-id type="integer">478</category-id>
+    <created-at type="timestamp">2009-06-04 14:22:34 +0400</created-at>
+    <is-hidden type="boolean">false</is-hidden>
+    <updated-at type="timestamp">2010-07-14 13:40:01 +0400</updated-at>
+    <title>Майка</title>
+    <description nil="true">
+    <short-description nil="true">
+    <permalink>Majka</permalink>
+    <html-title nil="true"/>
+    <meta-keywords nil="true"/>
+    <meta-description nil="true"/>
+    <characteristics type="array"/>
+    <properties type="array"/>
+    <option-names type="array">
+        <option-name>
+            <id type="integer">1171</id>
+            <position type="integer">1</position>
+            <title>Размер</title>
+        </option-name>
+        <option-name>
+            <id type="integer">1172</id>
+            <position type="integer">2</position>
+            <title>Цвет</title>
+        </option-name>
+    </option-names>
+    <images type="array" />
+    <variants type="array">
+        <variant>
+            <id type="integer">48136</id>
+            <product-id type="integer">41658</product-id>
+            <cost-price type="decimal">487.0</cost-price>
+            <old-price type="decimal">1000</old-price>
+            <price type="decimal">740.0</price>
+            <quantity type="integer">10</quantity>
+            <sku nil="true" />
+            <title>XL/белый</title>
+            <created-at type="timestamp">2009-06-04 14:22:34 +0400</created-at>
+            <updated-at type="timestamp">2010-07-16 13:20:04 +0400</updated-at>
+            <option-values type="array">
+                <option-value>
+                    <id type="integer">5649</id>
+                    <option-name-id type="integer">1171</option-name-id>
+                    <position type="integer">1</position>
+                    <value>XL</value>
+                </option-value>
+                <option-value>
+                    <id type="integer">5650</id>
+                    <option-name-id type="integer">1172</option-name-id>
+                    <position type="integer">1</position>
+                    <value>белый</value>
+                </option-value>
+            </option-values>
+        </variant>
+    </variants>
+</product>
+
+Добавление товара с несколькими модификациями
+PUT /admin/products/478.json
+> Content-Type: application/json
+<?xml version="1.0" encoding="UTF-8"?>
+<product>
+    <id type="integer">478</category-id>
+    <variants-attributes type="array">
+        <variant>
+            <cost-price type="decimal">487.0</cost-price>
+            <old-price type="decimal">1000</old-price>
+            <price type="decimal">740.0</price>
+            <quantity type="integer">10</quantity>
+            <options>
+                <option>
+                    <option-name-id type="integer">202088</option-name-id>
+                    <value>value 1</value>
+                </option>
+            </options>
+        </variant>
+        <variant>
+            <cost-price type="decimal">600.0</cost-price>
+            <old-price type="decimal">1100</old-price>
+            <price type="decimal">800.0</price>
+            <quantity type="integer">2</quantity>
+            <options>
+                <option>
+                    <option-name-id type="integer">202088</option-name-id>
+                    <value>value 2</value>
+                </option>
+            </options>
+        </variant>
+    </variants-attributes>
+</product>
+< 200
+
+--
+Редактирование товара
+--
+
+Изменение наименования товара
+PUT /admin/products/41658.json
+> Content-Type: application/json
+<?xml version="1.0" encoding="UTF-8"?>
+<product>
+    <id type="integer">41658</id>
+    <title>Van Gogh Ruled Peach Notebook</title>
+</product>
+< 200
+
+Изменение параметров товара
+PUT /admin/products/41658.json
+> Content-Type: application/json
+<?xml version="1.0" encoding="UTF-8"?>
+<product>
+    <id type="integer">41658</id>
+    <properties-attributes type="array">
+        <properties-attribute>
+            <title>Бумага</title>
+            <value>в линейку</value>
+        </properties-attribute>
+    </properties-attributes>
+</product>
+< 200
+
+Удаление товара
+DELETE /admin/products/41658.json
+< 200
+
+--
+Изображения товара
+--
+
+Получение всех изображений
+GET /admin/products/2336153/images.json
+< 200
+< Content-Type: application/json; charset=utf-8
+< API-Usage-Limit: 2/500
+<?xml version="1.0" encoding="UTF-8"?>
+<images type="array">
+    <image>
+        <id type="integer">1489191</id>
+        <product-id type="integer">2336153</product-id>
+        <position type="integer">1</position>
+        <original-url>http://static.insales.ru/images/products/1/6439/1489191/yhst-71326348041790_2147_5697670.jpg</original-url>
+        <title nil="true"/>
+        <created-at type="timestamp">2011-04-04 15:48:33 +0400</created-at>
+    </image>
+    <image>
+        <id type="integer">1489187</id>
+        <product-id type="integer">2336153</product-id>
+        <position type="integer">2</position>
+        <original-url>http://static.insales.ru/images/products/1/6435/1489187/yhst-71326348041790_2147_5571401.jpg</original-url>
+        <title nil="true"/>
+        <created-at type="timestamp">2011-04-04 15:48:27 +0400</created-at>
+    </image>
+</images>
+
+Получение изображения
+GET /admin/products/2336153/images/1489191.json
+< 200
+< Content-Type: application/json; charset=utf-8
+< API-Usage-Limit: 2/500
+<?xml version="1.0" encoding="UTF-8"?>
+<image>
+    <id type="integer">1489191</id>
+    <product-id type="integer">2336153</product-id>
+    <position type="integer">1</position>
+    <original-url>http://static.insales.ru/images/products/1/6439/1489191/yhst-71326348041790_2147_5697670.jpg</original-url>
+    <title nil="true"/>
+    <created-at type="timestamp">2011-04-04 15:48:33 +0400</created-at>
+</image>
+
+--
+Добавление изображения
+--
+
+Добавлении изображения выложенного в интернет
+POST /admin/products/2336153/images.json
+> Content-Type: application/json
+<?xml version="1.0" encoding="UTF-8"?>
+<image>
+    <title>ImageTile</title>
+    <filename>myimage.jpg</filename>
+    <src>http://some-hosting.ru/some_image.jpg</src>
+</image>
+< 200
+< Content-Type: application/json; charset=utf-8
+< API-Usage-Limit: 2/500
+<?xml version="1.0" encoding="UTF-8"?>
+<image>
+    <id type="integer">1489191</id>
+    <product-id type="integer">2336153</product-id>
+    <position type="integer">1</position>
+    <original-url>http://static.insales.ru/images/products/1/6439/1489191/some_image.jpg</original-url>
+    <title>ImageTile</title>
+    <created-at type="timestamp">2011-04-04 15:48:33 +0400</created-at>
+</image>
+
+Передача изображения в теле запроса
+POST /admin/products/2336153/images.json
+> Content-Type: application/json
+<?xml version="1.0" encoding="UTF-8"?>
+<image>
+    <title>ImageTile</title>
+    <filename>myimage.jpg</filename>
+    <attachment>
+/9j/4AAQSkZJRgABAQEAAQABAAD/2wBDAAkGBwgHBgkIBwgKCgkLDRYPDQwMDRsUFRAWIB0i
+IiAdHx8kKDQsJCYxJx8fLT0tMTU3Ojo6Iys/RD84QzQ5Ojf/2wBDAQoKCg0MDRoPDxo3JR8l
+Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzf/wAAR
+CABrAJYDAREAAhEBAxEB/8QAHAABAAMBAQEBAQAAAAAAAAAAAAEGBwUEAgMI/8QAPBAAAAUD
+AgQDBAcGBwAAAAAAAAECAwQFBhEHEiExQVETYXEUgZHBIiMyN1KhsQgVFzRidRYzQlR0lOH/
+xAAaAQEAAwEBAQAAAAAAAAAAAAAAAwQFBgIB/8QAJhEBAAICAQQDAAEFAAAAAAAAAAECAwQR
+BRIhMQYTIlEUMkGBsf/aAAwDAQACEQMRAD8A3EAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAEAAAAD4JH0AAAAAAAAAAAAAEZAMgGQDID4cWlCFLWokpSWTMzwR
+EPkzEe32ImZ4iFGreplNhuKZprapziTwayPa2R+vUVcm3WniPLoNL49n2I7sn5hw2NS6ut0j
+XFieGZ/ZIlEePXIhnctEc8NK3xnFEeLzy0WgVdqs05uW0W1R8HEZ4oV2FvFljLXlyu3rW1ss
+0s6eRMrGQDIBkAyAZAMgGQDIBkAyAgAAAABlep9bqFTrDVp0RLji1ESpJN81GfEkmfQiLiYq
+Z5taeyG70vFixV/qMvqPT7oulWGUKq04yWZcWo5cC95iOunEzzZfz/JrRHbhr/t2y01oySIm
+35ZK7+IR/ISzqY5jhRn5Btz74Wum0+NTIiI0Nom20/Ez7n3MT0pWkcVY+fPkzX77zzMvWPaE
+AAAAAAAAAAAAAZpe8yUzqtZ0dmS82y6S/EbQ4ZJXz5l1AaWAAACn2hTGokuu16aRE/Jlul4i
+v9DKDwRfl+gjiOObSuZslr1pij/CgV++q7clV9gt9TzEda9jLbPBx3zM+nyFS+a97cVb+v03
+Br4vsz+0u2ffkZj2pMmQpaS3G23LM1l8jD6s0eSN7QvPbP8Ax09P7/nqqbVJrzhupdV4bTyy
+wtC+iVd+w94c8zPbZB1HpeOMf24Wti45sAAGc6u1ao0yXbCafNfjFIqJIeJpWN6clwPuQDRj
+5gAAAAAAAAMuvz73rJ9F/MBcLruyNbL1LblR3XTqMoo6DbMiJBn1PPTiAr1S1SjfvF6DblFq
+FdcYUaXHYqfqyPsSsHkAoeqtOmVVulVunTKJNcMibTMThKjPpnhj3lgBbbhhrft2pRYacOux
+3CQRdVGRjzeJ7ZT694jNW1vXLDtO6xFoFztSKkRoZNCmVLMv8sz6/lgZ+G8Uv+nX9SwW2Nbj
+G3+HLjTWEvxHm3mlFlK21EZGNGLRPlxl8dqW4tHCvvWHbz1TVUVw1lJU7425LqiLdnOceojn
+FTnuW46jsVx/XFvDv1CbGpsJ6ZOeQxGYRvccXySRCVRZ/wDxaZlmtdDtmt1KOk8e0NMYQfpz
+AdK1tS6PXqmVJfjy6ZUz+zGmo2ms+xH38jAcLW3+dtD+6F+qQGqdQFLurUiiW7O/dxJkVCpc
+jiQ0b1JPsZ9D8uYDlRdXqYiU0xXaPVaOl08JelM/Q9/UBorbrbrKXm3EqaUnclaVZSZc857A
+M/l6rwFz3odv0ep1tTKtq3IbWWyPyMB+tF1SpkyrtUqrU6oUaY8ZJaTNbwlZnyLPQBfgGXX5
+971k+i/mA8v7QUdUuLbsZCtq3pxtpV2MyIsgNKoFFhUCkx6bTWUtMMpIuBcVH1UZ9TMBUta6
+RFqNizpTrSfaIJJeZdx9JPEiMs9jIBYrHmOz7Qo0uQrc67DbNau545h5PDiXZpxTK68uXEWc
+GYvipSE5Qs+5p7+ZCDLgrb01dPquXXr2281Z9Nty7bKcVMhuOeAk8m9FUak4/qT/AOCtOPJj
+/tbVNvT3qxS8eVvsfUoqpJap1bQhuS4e1qQjghZ9jLoYmxbHd+be2bv9J+mJyYvMfwudz0Kn
+3FSXIFX3+xmoluEhzZ9njxPsLTCVxWoljUBpumtVdlLcdJNpRHbUtKSLhzSWDAZ9qfeNs3BK
+oU235ZuVSJNTlwmFIPw855mRZ4kXxAWfWzjLs8+9TT+qQF7vGrKoVsVSpox4keOpTefxYwn8
+wFH0VpdPhW8Vcmvx11apLW64864W9KcnguPLPM/UBcrph0i4aHLps1+K4h1tRIM3E5QvHBRe
+ZGAz7TSXUKvpJWaWwta5kNL0aPg+JkackRfEyAenRe5reiWtHo7spiDU2XFlIZkH4anFGo+O
+T58MFjyAXi5bZo13RY6Km2byGHPEZdZcwpJ+Si6AO6lOxJJLJ4Ii48wGX35971k+i/mAjW/+
+YtP+6p/UgGp9QFS1X+7yuf8AG+ZAPHb1VXRNJ6XUm43tJsQWlG1u25LgR8R4vbsjlPrYYz5Y
+pzxy/Syb+Zuec/DciFEdQgltl4u7xC69OgjxZu+eF3e6ZbVpF4nmFyWSVJMlERkZcSMuGBN4
+ZkTMS/nC5W4zV3zEUfHhJlF4Ph8iVkuXvGZfj7fDudWZnUi2T3w0PWabLVCoFAZfUwisS0tS
+HEng9hbSMvTKs+4ajh7cczwulItShUeC3Eg0uKltssblNEpSj7qM+JmDyz3XWPBiU6hNx48d
+l1yopP6tskmZEXHl6kA9Gt2EvWi4rghNSTuUfIvsgLbqZDcn2HW2GSM1nGNZEXXb9L5AM801
+05tG5rPhVKUxIXKVuQ/skKSRLI+xcuGD94C0fwYsz/aS/wDtKAWS1bUpFoxX2KO2400+slue
+I4asmRY6gPxr1i2zcLinqlSWHHlc3m8oWfmZpxkBnl22bM09p67is2sTWWoq0m/Cfc3IUkzx
+7+fI/iA1a3qmVZoUCpkjZ7Uwh00fhMy4l8QFVuy3KnUdRLYrESOlcKASvaHDWRGnPlzMA1Qt
+uqXC9b6qWylwoc8nnzUsk7U5Ljx5gL51AV6/qXLrNn1SnU9BOSZDO1tJqIiM8l1MBNq0dyJZ
+lOpFVZTvbhpYfbzuLlgyyPkxEx5eqXms90M1remlbpc85NvLVIaSrc0aHNjrfl5+opW17RPN
+HUa/V8GXH2bDzvQdRag17I6VQNsywZG4SSMvM+o+cZvUvcZOmY/1HCx2Ppo5T5rVSrq21OtH
+uajIPJJV0NR9TLsJMWvNZ7rKG/1eMtZx4vEfy72pdnKu6jtIhvlHqUNzxorquW7qRn0zw49y
+IW2Cr0S6NSKeymHULNTPkILb7U1IJKXPM8ZL9AHCuqzL4upUSs1ZpkpbUhCWKaw4kksM81KN
+RnxPJF3+QDSr7tRm77eXTXXfAeSonY72M+G4RcD9OZAPPYrN1sxZUG8CiPpZJKI8lo8m8nBk
+e78uhcwFVVaV1WPV5UyxSYnUqUve5TH1YNB/0mZ/A8/EB6/8Uakyy8KNZMeM4ZY8WRJI0kff
+GSAWSoUCdcVjLpFwPtpqMhj611j7KHSPJGXkR4AUyjVHUe04LVKlW03WmIxbGZLMgiM0FyI+
+p/AB8VqJfuoTTdLnUpmgUhSyVIUt0luLIjzjufpggGqUyEzTafGgxU7WYzSWkEf4UlggHrwA
+YAAAAARgAwAkAARgAwAkAwAYARgBICMAGAEgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAgBIAAAAAAAAAAAAAAAAAAAAAAgB//2Q==
+    </attachment>
+</image>
+< 200
+< Content-Type: application/json; charset=utf-8
+< API-Usage-Limit: 2/500
+<?xml version="1.0" encoding="UTF-8"?>
+<image>
+    <id type="integer">1489191</id>
+    <product-id type="integer">2336153</product-id>
+    <position type="integer">1</position>
+    <original-url>http://static.insales.ru/images/products/1/6439/1489191/myimage.jpg</original-url>
+    <title>ImageTile</title>
+    <created-at type="timestamp">2011-04-04 15:48:33 +0400</created-at>
+</image>
+
+Изменение изображения
+PUT /admin/products/2336153/images/1489191.json
+> Content-Type: application/json
+<?xml version="1.0" encoding="UTF-8"?>
+<image>
+    <position type="integer">5</position>
+    <title>Other ImageTile</title>
+</image>
+< 200
+
+Удаление изображения
+DELETE /admin/products/2336153/images/1489191.json
+< 200
+
+--
+Модификации товара
+--
+
+Получение всех модификаций товара
+GET /admin/products/1157664/variants.json
+< 200
+< Content-Type: application/json; charset=utf-8
+< API-Usage-Limit: 2/500
+<?xml version="1.0" encoding="UTF-8"?>
+<variants type="array">
+    <variant>
+        <id type="integer">1157664</id>
+        <product-id type="integer">182183</product-id>
+        <cost-price type="decimal" nil="true"/>
+        <old-price type="decimal" nil="true"/>
+        <price type="decimal">440.0</price>
+        <quantity type="integer" nil="true"/>
+        <sku nil="true"/>
+        <created-at type="timestamp">2010-07-03 20:04:28 +0400</created-at>
+        <updated-at type="timestamp">2010-07-03 20:04:28 +0400</updated-at>
+        <option-values type="array">
+            <option-value>
+                <id type="integer">8093</id>
+                <option-name-id type="integer">1576</option-name-id>
+                <position type="integer">3</position>
+                <title>Черный</title>
+            </option-value>
+            <option-value>
+                <id type="integer">8092</id>
+                <option-name-id type="integer">1575</option-name-id>
+                <position type="integer">24</position>
+                <title>96</title>
+            </option-value>
+        </option-values>
+    </variant>
+    <variant>
+        <id type="integer">1157665</id>
+        <product-id type="integer">182183</product-id>
+        <cost-price type="decimal" nil="true"/>
+        <old-price type="decimal" nil="true"/>
+        <price type="decimal">440.0</price>
+        <quantity type="integer" nil="true"/>
+        <sku nil="true"/>
+        <created-at type="timestamp">2010-07-03 20:04:39 +0400</created-at>
+        <updated-at type="timestamp">2010-07-03 20:04:39 +0400</updated-at>
+        <option-values type="array">
+            <option-value>
+                <id type="integer">7941</id>
+                <option-name-id type="integer">1576</option-name-id>
+                <position type="integer">2</position>
+                <title>Белый</title>
+            </option-value>
+            <option-value>
+                <id type="integer">8094</id>
+                <option-name-id type="integer">1575</option-name-id>
+                <position type="integer">25</position>
+                <title>100</title>
+            </option-value>
+        </option-values>
+    </variant>
+    <variant>
+        <id type="integer">1157666</id>
+        <product-id type="integer">182183</product-id>
+        <cost-price type="decimal" nil="true"/>
+        <old-price type="decimal" nil="true"/>
+        <price type="decimal">440.0</price>
+        <quantity type="integer" nil="true"/>
+        <sku nil="true"/>
+        <created-at type="timestamp">2010-07-03 20:04:39 +0400</created-at>
+        <updated-at type="timestamp">2010-07-03 20:04:39 +0400</updated-at>
+        <option-values type="array">
+            <option-value>
+                <id type="integer">8093</id>
+                <option-name-id type="integer">1576</option-name-id>
+                <position type="integer">3</position>
+                <title>Черный</title>
+            </option-value>
+            <option-value>
+                <id type="integer">8094</id>
+                <option-name-id type="integer">1575</option-name-id>
+                <position type="integer">25</position>
+                <title>100</title>
+            </option-value>
+        </option-values>
+    </variant>
+</variants>
+
+Получение модификации
+GET /admin/products/182183/variants/1157664.json
+< 200
+< Content-Type: application/json; charset=utf-8
+< API-Usage-Limit: 2/500
+<?xml version="1.0" encoding="UTF-8"?>
+<variant>
+    <id type="integer">1157664</id>
+    <product-id type="integer">182183</product-id>
+    <cost-price type="decimal" nil="true"/>
+    <old-price type="decimal" nil="true"/>
+    <price type="decimal">440.0</price>
+    <quantity type="integer" nil="true"/>
+    <sku nil="true"/>
+    <created-at type="timestamp">2010-07-03 20:04:28 +0400</created-at>
+    <updated-at type="timestamp">2010-07-03 20:04:28 +0400</updated-at>
+    <option-values type="array">
+        <option-value>
+            <id type="integer">8093</id>
+            <option-name-id type="integer">1576</option-name-id>
+            <position type="integer">3</position>
+            <title>Черный</title>
+        </option-value>
+        <option-value>
+            <id type="integer">8092</id>
+            <option-name-id type="integer">1575</option-name-id>
+            <position type="integer">24</position>
+            <title>96</title>
+        </option-value>
+    </option-values>
+</variant>
+
+Добавление модификации
+POST /admin/products/182183/variants.json
+> Content-Type: application/json
+<?xml version="1.0" encoding="UTF-8"?>
+<variant>
+    <price type="decimal">440.0</price>
+    <options type="array">
+        <option>
+            <option-name-id type="integer">1576</option-name-id>
+            <value>Черный</value>
+        </option>
+        <option>
+            <option-name-id type="integer">1575</option-name-id>
+            <value>96</value>
+        </option>
+    </options>
+</variant>
+< 200
+< Content-Type: application/json; charset=utf-8
+< API-Usage-Limit: 2/500
+<?xml version="1.0" encoding="UTF-8"?>
+<variant>
+    <id type="integer">1157664</id>
+    <product-id type="integer">182183</product-id>
+    <cost-price type="decimal" nil="true"/>
+    <old-price type="decimal" nil="true"/>
+    <price type="decimal">440.0</price>
+    <quantity type="integer" nil="true"/>
+    <sku nil="true"/>
+    <created-at type="timestamp">2010-07-03 20:04:28 +0400</created-at>
+    <updated-at type="timestamp">2010-07-03 20:04:28 +0400</updated-at>
+    <option-values type="array">
+        <option-value>
+            <id type="integer">8093</id>
+            <option-name-id type="integer">1576</option-name-id>
+            <position type="integer">3</position>
+            <title>Черный</title>
+        </option-value>
+        <option-value>
+            <id type="integer">8092</id>
+            <option-name-id type="integer">1575</option-name-id>
+            <position type="integer">24</position>
+            <title>96</title>
+        </option-value>
+    </option-values>
+</variant>
+
+Изменение модификации
+PUT /admin/products/182183/variants/1157664.json
+> Content-Type: application/json
+<?xml version="1.0" encoding="UTF-8"?>
+<variant>
+    <id type="integer">1157664</id>
+    <price type="decimal">440.0</price>
+</variant>
+< 200
+< Content-Type: application/xml
+<?xml version="1.0" encoding="UTF-8"?>
+<variant>
+    <id type="integer">1157664</id>
+    <product-id type="integer">182183</product-id>
+    <cost-price type="decimal" nil="true"/>
+    <old-price type="decimal" nil="true"/>
+    <price type="decimal">440.0</price>
+    <quantity type="integer" nil="true"/>
+    <sku nil="true"/>
+    <created-at type="timestamp">2010-07-03 20:04:28 +0400</created-at>
+    <updated-at type="timestamp">2010-07-03 20:04:28 +0400</updated-at>
+    <option-values type="array">
+        <option-value>
+            <id type="integer">8093</id>
+            <option-name-id type="integer">1576</option-name-id>
+            <position type="integer">3</position>
+            <title>Черный</title>
+        </option-value>
+        <option-value>
+            <id type="integer">8092</id>
+            <option-name-id type="integer">1575</option-name-id>
+            <position type="integer">24</position>
+            <title>96</title>
+        </option-value>
+    </option-values>
+</variant>
+
+Удаление модификации
+DELETE /admin/products/182183/variants/1157664.json
+< 200
+
+Групповое обновление модификаций
+PUT /admin/products/variants_group_update.json
+> Content-Type: application/json
+<?xml version="1.0" encoding="UTF-8"?>
+<variants type="array">
+  <variant>
+    <id type="integer">1</id>
+    <price type="decimal">110.0</price>
+    <quantity type="integer">2</quantity>
+  </variant>
+  <variant>
+    <id type="integer">2</id>
+    <price type="decimal">200.0</price>
+    <quantity type="integer">3</quantity>
+  </variant>
+</variants>
+< 200
+< Content-Type: application/json; charset=utf-8
+< API-Usage-Limit: 2/500
+<?xml version="1.0" encoding="UTF-8"?>
+<objects type="array">
+  <object>
+    <id type="integer">1</id>
+    <status>ok</status>
+  </object>
+  <object>
+    <id type="integer">2</id>
+    <status>ok</status>
+  </object>
+</objects>
+
+--
+Свойства товара
+--
+
+Получение списка свойств
+GET /admin/option_names.json
+< 200
+< Content-Type: application/json; charset=utf-8
+< API-Usage-Limit: 2/500
+<?xml version="1.0" encoding="UTF-8"?>
+<option-names type="array">
+    <option-name>
+        <id type="integer">1093</id>
+        <title>Модификация</title>
+        <position type="integer">1</position>
+    </option-name>
+    <option-name>
+        <id type="integer">1575</id>
+        <title>Размер</title>
+        <position type="integer">2</position>
+    </option-name>
+    <option-name>
+        <id type="integer">1576</id>
+        <title>Цвет</title>
+        <position type="integer">3</position>
+    </option-name>
+    <option-name>
+        <id type="integer">1786</id>
+        <title>Чашечка</title>
+        <position type="integer">4</position>
+    </option-name>
+    <option-name>
+        <id type="integer">4331</id>
+        <title>Ден</title>
+        <position type="integer">5</position>
+    </option-name>
+    <option-name>
+        <id type="integer">10091</id>
+        <title>Рост</title>
+        <position type="integer">6</position>
+    </option-name>
+</option-names>
+
+Получение информации о свойстве
+GET /admin/option_names/1575.json
+< 200
+< Content-Type: application/json; charset=utf-8
+< API-Usage-Limit: 2/500
+<?xml version="1.0" encoding="UTF-8"?>
+<option-name>
+    <id type="integer">1575</id>
+    <title>Размер</title>
+    <position type="integer">2</position>
+</option-name>
+
+Добавление свойства
+POST /admin/option_names.json
+> Content-Type: application/json
+<?xml version="1.0" encoding="UTF-8"?>
+<option-name>
+    <title>Размер</title>
+</option-name>
+< 200
+< Content-Type: application/xml
+<?xml version="1.0" encoding="UTF-8"?>
+<option-name>
+    <id type="integer">1575</id>
+    <title>Размер</title>
+    <position type="integer">2</position>
+</option-name>
+
+Изменение свойства
+PUT /admin/option_names/1575.json
+> Content-Type: application/json
+<?xml version="1.0" encoding="UTF-8"?>
+<option-name>
+    <position type="integer">7</position>
+</option-name>
+< 200
+< Content-Type: application/json; charset=utf-8
+< API-Usage-Limit: 2/500
+<?xml version="1.0" encoding="UTF-8"?>
+<option-name>
+    <id type="integer">1575</id>
+    <title>Размер</title>
+    <position type="integer">7</position>
+</option-name>
+
+Удаление свойства
+DELETE /admin/option_names/1575.json
+< 200
+
+--
+Значения свойств
+--
+
+--
+Получение списка значений свойств
+--
+
+Вывод значений для всех свойств
+GET /admin/option_values.json
+< 200
+< Content-Type: application/json; charset=utf-8
+< API-Usage-Limit: 2/500
+<?xml version="1.0" encoding="UTF-8"?>
+<option-values type="array">
+    <option-value>
+        <id type="integer">7942</id>
+        <option-name-id type="integer">1576</option-name-id>
+        <position type="integer">1</position>
+        <title>Бежевый</title>
+    </option-value>
+    <option-value>
+        <id type="integer">7941</id>
+        <option-name-id type="integer">1576</option-name-id>
+        <position type="integer">2</position>
+        <title>Белый</title>
+    </option-value>
+    <option-value>
+        <id type="integer">8093</id>
+        <option-name-id type="integer">1576</option-name-id>
+        <position type="integer">3</position>
+        <title>Чёрный</title>
+    </option-value>
+    <option-value>
+        <id type="integer">24987</id>
+        <option-name-id type="integer">1575</option-name-id>
+        <position type="integer">2</position>
+        <title>40</title>
+    </option-value>
+    <option-value>
+        <id type="integer">7452</id>
+        <option-name-id type="integer">1575</option-name-id>
+        <position type="integer">3</position>
+        <title>42</title>
+    </option-value>
+</option-values>
+
+Вывод значения для определённого свойства
+GET /admin/option_names/1576/option_values.json
+< 200
+< Content-Type: application/json; charset=utf-8
+< API-Usage-Limit: 2/500
+<?xml version="1.0" encoding="UTF-8"?>
+<option-values type="array">
+    <option-value>
+        <id type="integer">7942</id>
+        <option-name-id type="integer">1576</option-name-id>
+        <position type="integer">1</position>
+        <title>Бежевый</title>
+    </option-value>
+    <option-value>
+        <id type="integer">7941</id>
+        <option-name-id type="integer">1576</option-name-id>
+        <position type="integer">2</position>
+        <title>Белый</title>
+    </option-value>
+    <option-value>
+        <id type="integer">8093</id>
+        <option-name-id type="integer">1576</option-name-id>
+        <position type="integer">3</position>
+        <title>Чёрный</title>
+    </option-value>
+</option-values>
+
+Получение информации о значении свойства
+GET /admin/option_names/1576/option_values/7942.json
+< 200
+< Content-Type: application/json; charset=utf-8
+< API-Usage-Limit: 2/500
+<?xml version="1.0" encoding="UTF-8"?>
+<option-value>
+    <id type="integer">7942</id>
+    <option-name-id type="integer">1576</option-name-id>
+    <position type="integer">1</position>
+    <title>Бежевый</title>
+</option-value>
+
+Добавление значения свойства
+POST /admin/option_names/1576/option_values.json
+> Content-Type: application/json
+<?xml version="1.0" encoding="UTF-8"?>
+<option-value>
+    <title>Бежевый</title>
+</option-value>
+< 200
+< Content-Type: application/xml
+<?xml version="1.0" encoding="UTF-8"?>
+<option-value>
+    <id type="integer">7942</id>
+    <option-name-id type="integer">1576</option-name-id>
+    <position type="integer">1</position>
+    <title>Бежевый</title>
+</option-value>
+
+Изменение значения свойства
+PUT /admin/option_names/1576/option_values/7942.json
+> Content-Type: application/json
+<?xml version="1.0" encoding="UTF-8"?>
+<option-value>
+    <position type="integer">7</position>
+</option-value>
+< 200
+< Content-Type: application/json; charset=utf-8
+< API-Usage-Limit: 2/500
+<?xml version="1.0" encoding="UTF-8"?>
+<option-value>
+    <id type="integer">7942</id>
+    <option-name-id type="integer">1576</option-name-id>
+    <position type="integer">7</position>
+    <title>Бежевый</title>
+</option-value>
+
+Удаление значения свойства
+DELETE /admin/option_names/1576/option_values/7942.json
+< 200
+
+--
+Дополнительные поля товара
+--
+
+Получение списка дополнительных полей
+GET /admin/product_fields.json
+< 200
+< Content-Type: application/json; charset=utf-8
+< API-Usage-Limit: 2/500
+<?xml version="1.0" encoding="UTF-8"?>
+<objects type="array">
+  <product-field>
+    <application-id type="integer" nil="true"/>
+    <handle>color</handle>
+    <id type="integer">3</id>
+    <is-hidden type="boolean">false</is-hidden>
+    <position type="integer">1</position>
+    <title>Цвет</title>
+    <type>ProductField::TextArea</type>
+  </product-field>
+  <product-field>
+    <application-id type="integer" nil="true"/>
+    <handle>description</handle>
+    <id type="integer">8</id>
+    <is-hidden type="boolean">false</is-hidden>
+    <position type="integer" nil="true"/>
+    <title>доп. описание</title>
+    <type>ProductField::TextField</type>
+  </product-field>
+</objects>
+
+Получение информации о дополнительном поле
+GET /admin/product_fields/8.json
+< 200
+< Content-Type: application/json; charset=utf-8
+< API-Usage-Limit: 2/500
+<?xml version="1.0" encoding="UTF-8"?>
+<product-field>
+  <application-id type="integer" nil="true"/>
+  <handle>description</handle>
+  <id type="integer">8</id>
+  <is-hidden type="boolean">false</is-hidden>
+  <position type="integer" nil="true"/>
+  <title>доп. описание</title>
+  <type>ProductField::TextField</type>
+</product-field>
+
+Добавление дополнительного поля
+POST /admin/product_fields.json
+> Content-Type: application/json
+<?xml version="1.0" encoding="UTF-8"?>
+<product-field>
+  <title>Размер</title>
+  <handle>size</handle>
+  <type>ProductField::TextField</type>
+</product-field>
+< 200
+< Content-Type: application/xml
+<?xml version="1.0" encoding="UTF-8"?>
+<product-field>
+  <application-id type="integer">2</application-id>
+  <handle>size</handle>
+  <id type="integer">9</id>
+  <is-hidden type="boolean" nil="true"/>
+  <position type="integer" nil="true"/>
+  <title>Размер</title>
+  <type>ProductField::TextField</type>
+</product-field>
+
+Изменение дополнительного поля
+PUT /admin/product_fields/9.json
+> Content-Type: application/json
+<?xml version="1.0" encoding="UTF-8"?>
+<product-field>
+  <position>2</position>
+</product-field>
+< 200
+< Content-Type: application/json; charset=utf-8
+< API-Usage-Limit: 2/500
+<?xml version="1.0" encoding="UTF-8"?>
+<product-field>
+  <application-id type="integer">2</application-id>
+  <handle>size</handle>
+  <id type="integer">9</id>
+  <is-hidden type="boolean" nil="true"/>
+  <position type="integer">2</position>
+  <title>Размер</title>
+  <type>ProductField::TextField</type>
+</product-field>
+
+Удаление дополнительного поля
+DELETE /admin/product_fields/9.json
+< 200
+
+--
+Значения дополнительных полей товара
+--
+
+Получение списка значений дополнительных полей товара
+GET /admin/products/1/product_field_values.json
+< 200
+< Content-Type: application/json; charset=utf-8
+< API-Usage-Limit: 2/500
+<?xml version="1.0" encoding="UTF-8"?>
+<product-field-values type="array">
+  <product-field-value>
+    <id type="integer">851</id>
+    <product-field-id type="integer">9</product-field-id>
+    <value>three</value>
+  </product-field-value>
+  <product-field-value>
+    <id type="integer">850</id>
+    <product-field-id type="integer">8</product-field-id>
+    <value>two</value>
+  </product-field-value>
+</product-field-values>
+
+Получение информации о значении дополнительного поля товара
+GET /admin/products/1/product_field_values/9.json
+< 200
+< Content-Type: application/json; charset=utf-8
+< API-Usage-Limit: 2/500
+<?xml version="1.0" encoding="UTF-8"?>
+  <product-field-value>
+    <id type="integer">851</id>
+    <product-field-id type="integer">9</product-field-id>
+    <value>three</value>
+  </product-field-value>
+
+Добавление значения дополнительного поля товара
+POST /admin/products/1/product_field_values.json
+> Content-Type: application/json
+<?xml version="1.0" encoding="UTF-8"?>
+<product-field-value>
+  <product-field-id>8</product-field-id>
+  <value>seek and destroy</value>
+</product-field-value>
+< 200
+< Content-Type: application/json; charset=utf-8
+< API-Usage-Limit: 2/500
+<?xml version="1.0" encoding="UTF-8"?>
+<product-field-value>
+  <id type="integer">853</id>
+  <product-field-id type="integer">8</product-field-id>
+  <value>seek and destroy</value>
+</product-field-value>
+
+Изменение значения дополнительного поля товара
+PUT /admin/products/1/product_field_values/8.json
+> Content-Type: application/json
+<?xml version="1.0" encoding="UTF-8"?>
+<product-field-value>
+  <value>updated value</value>
+</product-field-value>
+< 200
+< Content-Type: application/json; charset=utf-8
+< API-Usage-Limit: 2/500
+<?xml version="1.0" encoding="UTF-8"?>
+<product-field-value>
+  <id type="integer">853</id>
+  <product-field-id type="integer">8</product-field-id>
+  <value>updated value</value>
+</product-field-value>
+
+Удаление значения дополнительного поля товара
+DELETE /admin/products/1/product_field_values/8.json
+< 200
+
+--
+Сопутствующие товары
+--
+
+Получение списка сопутствующих товаров
+GET /admin/products/1/supplementaries.json
+< 200
+< Content-Type: application/json; charset=utf-8
+< API-Usage-Limit: 2/500
+<?xml version="1.0" encoding="UTF-8"?>
+<products type="array">
+  <product>
+    <id type="integer">83983</id>
+  </product>
+  <product>
+    <id type="integer">23423</id>
+  </product>
+</products>
+
+Добавление сопутствующего товара
+POST /admin/products/1/supplementaries.json
+> Content-Type: application/json
+<?xml version="1.0" encoding="UTF-8"?>
+<supplementary_ids>87987</supplementary_ids>
+< 200
+
+Удаление сопутствующего товара
+DELETE /admin/products/1/supplementaries/87987.json
+< 200
+
+--
+Аналогичные товары
+--
+
+Получение списка аналогичных товаров
+GET /admin/products/1/similars.json
+< 200
+< Content-Type: application/json; charset=utf-8
+< API-Usage-Limit: 2/500
+<?xml version="1.0" encoding="UTF-8"?>
+<products type="array">
+  <product>
+    <id type="integer">83983</id>
+  </product>
+  <product>
+    <id type="integer">23423</id>
+  </product>
+</products>
+
+Добавление аналогичного товара
+POST /admin/products/1/similars.json
+> Content-Type: application/json
+<?xml version="1.0" encoding="UTF-8"?>
+<similar_ids>87987</similar_ids>
+< 200
+
+Удаление аналогичного товара
+DELETE /admin/products/1/similars/87987.json
+< 200
+
+--
+Категории на сайте
+--
+
+Получение списка категорий
+GET /admin/collections.json
+< 200
+< Content-Type: application/json; charset=utf-8
+< API-Usage-Limit: 2/500
+<?xml version="1.0" encoding="UTF-8"?>
+<collections type="array">
+    <collection>
+        <id type="integer">119233</id>
+        <is-hidden type="boolean">false</is-hidden>
+        <parent-id type="integer">2628</parent-id>
+        <to-torg-mail type="boolean">false</to-torg-mail>
+        <to-yandex-market type="boolean">true</to-yandex-market>
+        <title>Ежедневники  Moleskine 2011</title>
+        <description nil="true"></description>
+        <html-title nil="true"></html-title>
+        <meta-description nil="true"></meta-description>
+        <meta-keywords nil="true"></meta-keywords>
+        <permalink>Ежедневники-Moleskine-2011</permalink>
+        <url>/collection/Ежедневники-Moleskine-2011</url>
+    </collection>
+    <collection>
+        <id type="integer">72</id>
+        <is-hidden type="boolean">false</is-hidden>
+        <parent-id type="integer">2628</parent-id>
+        <to-torg-mail type="boolean" nil="true"></to-torg-mail>
+        <to-yandex-market type="boolean">true</to-yandex-market>
+        <title>Moleskine Reporter</title>
+        <description nil="true"></description>
+        <html-title nil="true"></html-title>
+        <meta-description>Moleskine Reporter</meta-description>
+        <meta-keywords>Moleskine Reporter</meta-keywords>
+        <permalink>moleskine-reporter</permalink>
+        <url>/collection/moleskine-reporter</url>
+    </collection>
+    <collection>
+        <id type="integer">12149</id>
+        <is-hidden type="boolean">true</is-hidden>
+        <parent-id type="integer">2628</parent-id>
+        <to-torg-mail type="boolean" nil="true"></to-torg-mail>
+        <to-yandex-market type="boolean">true</to-yandex-market>
+        <title>Artistic Collection</title>
+        <description nil="true"></description>
+        <html-title nil="true"></html-title>
+        <meta-description nil="true"></meta-description>
+        <meta-keywords nil="true"></meta-keywords>
+        <permalink>moleskine-artistic-collection</permalink>
+        <url>/collection/moleskine-artistic-collection</url>
+    </collection>
+    <collection>
+        <id type="integer">7830</id>
+        <is-hidden type="boolean">false</is-hidden>
+        <parent-id type="integer">2628</parent-id>
+        <to-torg-mail type="boolean" nil="true"></to-torg-mail>
+        <to-yandex-market type="boolean">true</to-yandex-market>
+        <title>Moleskine XLarge 19х25</title>
+        <description nil="true"></description>
+        <html-title nil="true"></html-title>
+        <meta-description nil="true"></meta-description>
+        <meta-keywords nil="true"></meta-keywords>
+        <permalink>xlarge-notebook</permalink>
+        <url>/collection/xlarge-notebook</url>
+    </collection>
+</collections>
+
+Получение информации о категории
+GET /admin/collections/7830.json
+< 200
+< Content-Type: application/json; charset=utf-8
+< API-Usage-Limit: 2/500
+<collection>
+    <id type="integer">7830</id>
+    <is-hidden type="boolean">false</is-hidden>
+    <parent-id type="integer">2628</parent-id>
+    <to-torg-mail type="boolean" nil="true"></to-torg-mail>
+    <to-yandex-market type="boolean">true</to-yandex-market>
+    <title>Moleskine XLarge 19х25</title>
+    <description nil="true"></description>
+    <html-title nil="true"></html-title>
+    <meta-description nil="true"></meta-description>
+    <meta-keywords nil="true"></meta-keywords>
+    <permalink>xlarge-notebook</permalink>
+    <url>/collection/xlarge-notebook</url>
+</collection>
+
+Добавление новой категории
+POST /admin/collections.json
+> Content-Type: application/json
+<collection>
+    <parent-id type="integer">2628</parent-id>
+    <title>Moleskine XLarge 19х25</title>
+</collection>
+< 200
+< Content-Type: application/json; charset=utf-8
+< API-Usage-Limit: 2/500
+<collection>
+    <id type="integer">7830</id>
+    <is-hidden type="boolean">false</is-hidden>
+    <parent-id type="integer">2628</parent-id>
+    <to-torg-mail type="boolean" nil="true"></to-torg-mail>
+    <to-yandex-market type="boolean" nil="true"></to-yandex-market>
+    <title>Moleskine XLarge 19х25</title>
+    <description nil="true"></description>
+    <html-title nil="true"></html-title>
+    <meta-description nil="true"></meta-description>
+    <meta-keywords nil="true"></meta-keywords>
+    <permalink>xlarge-notebook</permalink>
+    <url>/collection/xlarge-notebook</url>
+</collection>
+
+Редактирование категории
+PUT /admin/collections/7830.json
+> Content-Type: application/json
+<collection>
+    <is-hidden type="boolean">true</is-hidden>
+</collection>
+< 200
+< Content-Type: application/json; charset=utf-8
+< API-Usage-Limit: 2/500
+<collection>
+    <id type="integer">7830</id>
+    <is-hidden type="boolean">true</is-hidden>
+    <parent-id type="integer">2628</parent-id>
+    <to-torg-mail type="boolean" nil="true"></to-torg-mail>
+    <to-yandex-market type="boolean" nil="true"></to-yandex-market>
+    <title>Moleskine XLarge 19х25</title>
+    <description nil="true"></description>
+    <html-title nil="true"></html-title>
+    <meta-description nil="true"></meta-description>
+    <meta-keywords nil="true"></meta-keywords>
+    <permalink>xlarge-notebook</permalink>
+    <url>/collection/xlarge-notebook</url>
+    <sort-type type="integer">3</sort-type>
+</collection>
+
+Удаление категории
+DELETE /admin/collections/7830.json
+< 200
+
+--
+Размещение товаров на сайте
+--
+
+Добавление товара в категорию
+POST /admin/collects.json
+> Content-Type: application/json
+<?xml version="1.0" encoding="UTF-8"?>
+<collect>
+    <collection-id type="integer">12148</collection-id>
+    <product-id type="integer">89973</product-id>
+</collect>
+< 200
+< Content-Type: application/json; charset=utf-8
+< API-Usage-Limit: 2/500
+<?xml version="1.0" encoding="UTF-8"?>
+<collect>
+    <id type="integer">47514</id>
+    <product-id type="integer">89973</product-id>
+    <collection-id type="integer">12148</collection-id>
+    <position type="integer">3</position>
+    <created-at type="timestamp">2009-08-24 21:43:20 +0400</created-at>
+</collect>
+
+Удаление товара из категории
+DELETE /admin/collects/89973.json
+< 200
+
+Получение списка размещений
+GET /admin/collects.json
+< 200
+< Content-Type: application/json; charset=utf-8
+< API-Usage-Limit: 2/500
+<?xml version="1.0" encoding="UTF-8"?>
+<collects type="array">
+    <collect>
+        <collection-id type="integer">108528</collection-id>
+        <created-at type="timestamp">2010-06-07 02:22:12 +0400</created-at>
+        <id type="integer">742440</id>
+        <position type="integer">5</position>
+        <product-id type="integer">806547</product-id>
+    </collect>
+    <collect>
+        <collection-id type="integer">108528</collection-id>
+        <created-at type="timestamp">2010-06-07 02:07:46 +0400</created-at>
+        <id type="integer">742439</id>
+        <position type="integer">2</position>
+        <product-id type="integer">806546</product-id>
+    </collect>
+    <collect>
+        <collection-id type="integer">108528</collection-id>
+        <created-at type="timestamp">2010-06-08 13:09:05 +0400</created-at>
+        <id type="integer">745442</id>
+        <position type="integer">6</position>
+        <product-id type="integer">809688</product-id>
+    </collect>
+    <collect>
+        <collection-id type="integer">108528</collection-id>
+        <created-at type="timestamp">2010-06-08 13:16:30 +0400</created-at>
+        <id type="integer">745449</id>
+        <position type="integer">7</position>
+        <product-id type="integer">809691</product-id>
+    </collect>
+    <collect>
+        <collection-id type="integer">12148</collection-id>
+        <created-at type="timestamp">2009-08-24 21:43:20 +0400</created-at>
+        <id type="integer">47514</id>
+        <position type="integer">3</position>
+        <product-id type="integer">89973</product-id>
+    </collect>
+    <collect>
+        <collection-id type="integer">12149</collection-id>
+        <created-at type="timestamp">2010-06-23 14:28:39 +0400</created-at>
+        <id type="integer">830921</id>
+        <position type="integer">5</position>
+        <product-id type="integer">89973</product-id>
+    </collect>
+</collects>
+
+Получение списка категорий содержащих товар
+GET /admin/collects.json?product_id=89973
+< 200
+< Content-Type: application/json; charset=utf-8
+< API-Usage-Limit: 2/500
+<?xml version="1.0" encoding="UTF-8"?>
+<collects type="array">
+    <collect>
+        <collection-id type="integer">12148</collection-id>
+        <created-at type="timestamp">2009-08-24 21:43:20 +0400</created-at>
+        <id type="integer">47514</id>
+        <position type="integer">3</position>
+        <product-id type="integer">89973</product-id>
+    </collect>
+    <collect>
+        <collection-id type="integer">12149</collection-id>
+        <created-at type="timestamp">2010-06-23 14:28:39 +0400</created-at>
+        <id type="integer">830921</id>
+        <position type="integer">5</position>
+        <product-id type="integer">89973</product-id>
+    </collect>
+</collects>
+
+Получение списка товаров в категории
+GET /admin/collects.json?collection_id=108528
+< 200
+< Content-Type: application/json; charset=utf-8
+< API-Usage-Limit: 2/500
+<?xml version="1.0" encoding="UTF-8"?>
+<collects type="array">
+    <collect>
+        <collection-id type="integer">108528</collection-id>
+        <created-at type="timestamp">2010-06-07 02:22:12 +0400</created-at>
+        <id type="integer">742440</id>
+        <position type="integer">5</position>
+        <product-id type="integer">806547</product-id>
+    </collect>
+    <collect>
+        <collection-id type="integer">108528</collection-id>
+        <created-at type="timestamp">2010-06-07 02:07:46 +0400</created-at>
+        <id type="integer">742439</id>
+        <position type="integer">2</position>
+        <product-id type="integer">806546</product-id>
+    </collect>
+    <collect>
+        <collection-id type="integer">108528</collection-id>
+        <created-at type="timestamp">2010-06-08 13:09:05 +0400</created-at>
+        <id type="integer">745442</id>
+        <position type="integer">6</position>
+        <product-id type="integer">809688</product-id>
+    </collect>
+    <collect>
+        <collection-id type="integer">108528</collection-id>
+        <created-at type="timestamp">2010-06-08 13:16:30 +0400</created-at>
+        <id type="integer">745449</id>
+        <position type="integer">7</position>
+        <product-id type="integer">809691</product-id>
+    </collect>
+</collects>
+
+Ручная сортировка
+PUT /admin/collects/89973.json
+> Content-Type: application/json
+<?xml version="1.0" encoding="UTF-8"?>
+<collect>
+    <position type="integer">10</position>
+</collect>
+< 200
+< Content-Type: application/json; charset=utf-8
+< API-Usage-Limit: 2/500
+<?xml version="1.0" encoding="UTF-8"?>
+<collect>
+    <id type="integer">47514</id>
+    <product-id type="integer">89973</product-id>
+    <collection-id type="integer">12148</collection-id>
+    <position type="integer">10</position>
+    <created-at type="timestamp">2009-08-24 21:43:20 +0400</created-at>
+</collect>
+
+Перемещение товара из одной категории в другую
+PUT /admin/collects/89973.json
+> Content-Type: application/json
+<?xml version="1.0" encoding="UTF-8"?>
+<collect>
+    <collection-id type="integer">12148</collection-id>
+</collect>
+< 200
+< Content-Type: application/json; charset=utf-8
+< API-Usage-Limit: 2/500
+<?xml version="1.0" encoding="UTF-8"?>
+<collect>
+    <id type="integer">47514</id>
+    <product-id type="integer">89973</product-id>
+    <collection-id type="integer">12148</collection-id>
+    <position type="integer">3</position>
+    <created-at type="timestamp">2009-08-24 21:43:20 +0400</created-at>
+</collect>
+
+--
+Заказы
+--
+
+Получение списка заказов
+GET /admin/orders.json
+< 200
+< Content-Type: application/json; charset=utf-8
+< API-Usage-Limit: 2/500
+<?xml version="1.0" encoding="UTF-8"?>
+<orders type="array">
+    <order>
+        <accepted-at type="timestamp" nil="true"/>
+        <comment/>
+        <created-at type="timestamp">2010-08-16 18:39:58 +0400</created-at>
+        <delivered-at type="timestamp">2010-08-19 10:26:16 +0400</delivered-at>
+        <delivery-description>
+            Самовывоз + скидка 2%, тк. до этого делала зказ свыше 2 тысяч
+        </delivery-description>
+        <delivery-price type="decimal">0.0</delivery-price>
+        <financial-status>paid</financial-status>
+        <fulfillment-status>delivered</fulfillment-status>
+        <id type="integer">36289</id>
+        <key>c6a090e74498a8e18d78f2f1424ffa5e</key>
+        <number type="integer">2900</number>
+        <payment-description nil="true"/>
+        <payment-title>Наличными</payment-title>
+        <referer/>
+        <updated-at type="timestamp">2010-08-19 10:26:16 +0400</updated-at>
+        <delivery-date type="date">2011-06-02</delivery-date>
+        <delivery-from-hour type="integer">22</delivery-from-hour>
+        <delivery-to-hour type="integer">23</delivery-to-hour>
+        <shipping-address>
+            <address>Самовывоз</address>
+            <city>Москва</city>
+            <country>RU</country>
+            <name>Самовывоз</name>
+            <phone>Самовывоз</phone>
+            <state>Московская область</state>
+            <zip nil="true"/>
+        </shipping-address>
+        <order-lines type="array">
+            <order-line>
+                <created-at type="timestamp">2010-08-16 18:39:58 +0400</created-at>
+                <id type="integer">94695</id>
+                <quantity type="integer">1</quantity>
+                <sale-price type="decimal">740.0</sale-price>
+                <sku>QP023MVEN-g</sku>
+                <title>Van Gogh Sketchbook Emerald</title>
+                <updated-at type="timestamp">2010-08-16 18:39:58 +0400</updated-at>
+                <variant-id type="integer">16637</variant-id>
+                <weight type="decimal">1.5</weight>
+            </order-line>
+        </order-lines>
+        <discounts type="array">
+            <discount>
+                <created-at type="timestamp">2010-08-19 10:25:51 +0400</created-at>
+                <description>2%</description>
+                <id type="integer">3347</id>
+                <updated-at type="timestamp">2010-08-19 10:25:51 +0400</updated-at>
+                <amount type="integer">15</amount>
+            </discount>
+        </discounts>
+        <client>
+            <client-group-id type="integer" nil="true"/>
+            <created-at type="timestamp">2010-08-16 18:39:58 +0400</created-at>
+            <email nil="true"/>
+            <id type="integer">36854</id>
+            <name>Самовывоз</name>
+            <phone>Самовывоз</phone>
+            <registered type="boolean">false</registered>
+            <subscribe type="boolean">true</subscribe>
+            <updated-at type="timestamp">2010-08-16 18:39:58 +0400</updated-at>
+        </client>
+    </order>
+    <order>
+        <accepted-at type="timestamp" nil="true"/>
+        <comment/>
+        <created-at type="timestamp">2010-08-16 14:39:46 +0400</created-at>
+        <delivered-at type="timestamp">2010-08-19 10:25:11 +0400</delivered-at>
+        <delivery-description>Курьером по Москве (на следующий рабочий день)</delivery-description>
+        <delivery-price type="decimal">200.0</delivery-price>
+        <financial-status>paid</financial-status>
+        <fulfillment-status>delivered</fulfillment-status>
+        <id type="integer">36228</id>
+        <key>93dc91ffaa5d48025c38d4663f2adb93</key>
+        <number type="integer">2899</number>
+        <payment-description nil="true"/>
+        <payment-title>Наличными</payment-title>
+        <referer>
+            http://www.google.ru/search?hl=ru&newwindow=1&q=%D0%B7%D0%B0%D0%BF%D0%B8%D1%81%D0%BD%D0%B0%D1%8F+%D0%BA%D0%BD%D0%B8%D0%B6%D0%BA%D0%B0+%D0%BA%D1%83%D0%BF%D0%B8%D1%82%D1%8C&lr=&aq=f&aqi=&aql=&oq=&gs_rfai=
+        </referer>
+        <updated-at type="timestamp">2010-08-19 10:25:11 +0400</updated-at>
+        <delivery-date type="date">2011-06-02</delivery-date>
+        <delivery-from-hour type="integer">22</delivery-from-hour>
+        <delivery-to-hour type="integer">23</delivery-to-hour>
+        <shipping-address>
+            <address>ул. Ленина д. 12</address>
+            <city>Москва</city>
+            <country>RU</country>
+            <name>Артем Демидчик</name>
+            <phone>8 915 123 45 67</phone>
+            <state>Московская область</state>
+            <zip nil="true"/>
+        </shipping-address>
+        <order-lines type="array">
+            <order-line>
+                <created-at type="timestamp">2010-08-16 16:04:40 +0400</created-at>
+                <id type="integer">94612</id>
+                <quantity type="integer">1</quantity>
+                <sale-price type="decimal">720.0</sale-price>
+                <sku>QP617EN</sku>
+                <title>Moleskine Soft Large Squared Notebook</title>
+                <updated-at type="timestamp">2010-08-16 16:04:40 +0400</updated-at>
+                <variant-id type="integer">16325</variant-id>
+                <weight type="decimal">1.5</weight>
+            </order-line>
+        </order-lines>
+        <discounts type="array"/>
+        <client>
+            <client-group-id type="integer" nil="true"/>
+            <created-at type="timestamp">2010-08-16 14:39:46 +0400</created-at>
+            <email>artem@gmail.com</email>
+            <id type="integer">36794</id>
+            <name>Артем Демидчик</name>
+            <phone>8 915 123 45 67</phone>
+            <registered type="boolean">true</registered>
+            <subscribe type="boolean">true</subscribe>
+            <updated-at type="timestamp">2010-08-16 14:39:46 +0400</updated-at>
+        </client>
+    </order>
+    <order>
+        <accepted-at type="timestamp">2010-08-16 14:31:01 +0400</accepted-at>
+        <comment/>
+        <created-at type="timestamp">2010-08-16 14:14:50 +0400</created-at>
+        <delivered-at type="timestamp" nil="true"/>
+        <delivery-description>
+            Самовывоз (Бронь заказа не более 2 дней, забор  с 10 до 18  часов по рабочим дням, адрес см. на сайте магазина)
+        </delivery-description>
+        <delivery-price type="decimal">0.0</delivery-price>
+        <financial-status>pending</financial-status>
+        <fulfillment-status>approved</fulfillment-status>
+        <id type="integer">36218</id>
+        <key>4ecee989d7e429bf55cead7cdc616adf</key>
+        <number type="integer">2898</number>
+        <payment-description nil="true"/>
+        <payment-title>Наличными</payment-title>
+        <referer>
+            http://yandex.ru/yandsearch?text=%D0%B1%D0%BB%D0%BE%D0%BA%D0%BD%D0%BE%D1%82%D1%8B+moleskine&lr=213
+        </referer>
+        <updated-at type="timestamp">2010-08-20 15:25:02 +0400</updated-at>
+        <delivery-date type="date" nil="true"/>
+        <delivery-from-hour type="integer" nil="true"/>
+        <delivery-to-hour type="integer" nil="true"/>
+        <shipping-address>
+            <address>Рязанский проспект 12</address>
+            <city>Москва</city>
+            <country>RU</country>
+            <name>Слесарев Игорь</name>
+            <phone>+7 903 321-54-76</phone>
+            <state>Московская область</state>
+            <zip nil="true"/>
+        </shipping-address>
+        <order-lines type="array">
+            <order-line>
+                <created-at type="timestamp">2010-08-16 14:14:50 +0400</created-at>
+                <id type="integer">94519</id>
+                <quantity type="integer">1</quantity>
+                <sale-price type="decimal">1590.0</sale-price>
+                <sku>DHB12DC5QEN</sku>
+                <title>Ежедневник "Classic" (2011), A4, черный</title>
+                <updated-at type="timestamp">2010-08-16 14:14:50 +0400</updated-at>
+                <variant-id type="integer">1199651</variant-id>
+                <weight type="decimal">1.5</weight>
+            </order-line>
+        </order-lines>
+        <discounts type="array"/>
+        <client>
+            <client-group-id type="integer" nil="true"/>
+            <created-at type="timestamp">2010-08-16 14:14:50 +0400</created-at>
+            <email>igor@yandex.ru</email>
+            <id type="integer">36784</id>
+            <name>Слесарев Игорь</name>
+            <phone>+7 903 321-54-65</phone>
+            <registered type="boolean">true</registered>
+            <subscribe type="boolean">true</subscribe>
+            <updated-at type="timestamp">2010-08-16 14:14:50 +0400</updated-at>
+        </client>
+    </order>
+</orders>
+
+Получение информации о заказе
+GET /admin/orders/58409.json
+< 200
+< Content-Type: application/json; charset=utf-8
+< API-Usage-Limit: 2/500
+<?xml version="1.0" encoding="UTF-8"?>
+<order>
+    <accepted-at type="timestamp" nil="true"/>
+    <comment/>
+    <created-at type="timestamp">2010-08-16 18:39:58 +0400</created-at>
+    <delivery-variant-id type="integer">58409</delivery-variant-id>
+    <delivered-at type="timestamp">2010-08-19 10:26:16 +0400</delivered-at>
+    <delivery-description>
+        Самовывоз + скидка 2%, тк. до этого делала зказ свыше 2 тысяч
+    </delivery-description>
+    <delivery-price type="decimal">0.0</delivery-price>
+    <financial-status>paid</financial-status>
+    <fulfillment-status>delivered</fulfillment-status>
+    <id type="integer">36289</id>
+    <key>c6a090e74498a8e18d78f2f1424ffa5e</key>
+    <number type="integer">2900</number>
+    <payment-gateway-id type="integer">32541</payment-gateway-id>
+    <payment-description nil="true"/>
+    <payment-title>Наличными</payment-title>
+    <referer/>
+    <updated-at type="timestamp">2010-08-19 10:26:16 +0400</updated-at>
+    <delivery-date type="date">2011-06-02</delivery-date>
+    <delivery-from-hour type="integer">22</delivery-from-hour>
+    <delivery-to-hour type="integer">23</delivery-to-hour>
+    <shipping-address>
+        <address nil="true"/>
+        <city nil="true"/>
+        <country>RU</country>
+        <name nil="true"/>
+        <phone nil="true"/>
+        <state nil="true"/>
+        <zip nil="true"/>
+        <fields-values type="array">
+            <fields_value>
+                <id>58735</id>
+                <type>Выпадающий список</type>
+                <name>Время доставки</name>
+                <value/>
+            </fields_value>
+            <fields_value>
+                <id>58734</id>
+                <type>Российский адрес</type>
+                <name>Адрес по КЛАДР-у</name>
+                <number/>
+                <korp>2</korp>
+                <house>8</house>
+                <flat>307</flat>
+                <manual_index>355000</manual_index>
+                <str/>
+                <adr1>Ставропольский</adr1>
+                <socr1>край</socr1>
+                <adr2/>
+                <socr2/>
+                <adr3>Ставрополь</adr3>
+                <socr3>г</socr3>
+                <adr4/>
+                <socr4/><code>26000001000025900</code>
+                <adr5>М.Морозова</adr5>
+                <socr5>ул</socr5>
+                <address_type>1</address_type>
+                 <index/>
+                <string>г. Ставрополь, ул. М.Морозова</string>
+            </fields_value>
+        </fields-values>
+    </shipping-address>
+    <order-lines type="array">
+        <order-line>
+            <created-at type="timestamp">2010-08-16 18:39:58 +0400</created-at>
+            <id type="integer">94695</id>
+            <quantity type="integer">1</quantity>
+            <sale-price type="decimal">740.0</sale-price>
+            <sku>QP023MVEN-g</sku>
+            <title>Van Gogh Sketchbook Emerald</title>
+            <updated-at type="timestamp">2010-08-16 18:39:58 +0400</updated-at>
+            <variant-id type="integer">16637</variant-id>
+            <weight type="decimal">1.5</weight>
+        </order-line>
+    </order-lines>
+    <discounts type="array">
+        <discount>
+            <created-at type="timestamp">2010-08-19 10:25:51 +0400</created-at>
+            <description>2%</description>
+            <id type="integer">3347</id>
+            <updated-at type="timestamp">2010-08-19 10:25:51 +0400</updated-at>
+            <amount type="integer">15</amount>
+        </discount>
+    </discounts>
+    <client>
+        <client-group-id type="integer" nil="true"/>
+        <fields-values type="array">
+            <fields_value>
+                <id>58749</id>
+                <type>Текстовое поле</type>
+                <name>Дополнительная информация</name>
+                <value/>
+            </fields_value>
+        </fields-values>
+        <created-at type="timestamp">2010-08-16 18:39:58 +0400</created-at>
+        <email nil="true"/>
+        <id type="integer">36854</id>
+        <name>Самовывоз</name>
+        <phone>Самовывоз</phone>
+        <registered type="boolean">false</registered>
+        <subscribe type="boolean">true</subscribe>
+        <updated-at type="timestamp">2010-08-16 18:39:58 +0400</updated-at>
+    </client>
+</order>
+
+Редактирование заказа
+PUT /admin/orders/46443.json
+> Content-Type: application/json
+<order>
+    <id type="integer">46443</id>
+    <order-lines-attributes type="array">
+        <order-line-attributes>
+            <id>123</id>
+            <variant-id>523375</variant-id>
+            <quantity>1</quantity>
+        </order-line-attributes>
+    </order-lines-attributes>
+    <comment>
+</order>
+< 200
+
+Удаление заказа
+DELETE /admin/orders/46443.json
+< 200
+
+Получение списка полей для оформления заказа
+GET /admin/orders/fields.json
+< 200
+< Content-Type: application/json; charset=utf-8
+< API-Usage-Limit: 2/500
+<?xml version="1.0" encoding="UTF-8"?>
+<fields>
+  <client-fields type="array">
+    <client-field>
+      <for-buyer type="boolean">true</for-buyer>
+      <title></title>
+      <office-title>Фамилия</office-title>
+      <active type="boolean">true</active>
+      <system-name>surname</system-name>
+      <obligatory type="boolean">true</obligatory>
+      <position type="integer">0</position>
+      <id type="integer">105202</id>
+    </client-field>
+    <client-field>
+      <for-buyer type="boolean">true</for-buyer>
+      <title>Имя</title>
+      <office-title>Имя</office-title>
+      <active type="boolean">true</active>
+      <system-name>name</system-name>
+      <obligatory type="boolean">true</obligatory>
+      <position type="integer">1</position>
+      <id type="integer">53194</id>
+    </client-field>
+    <client-field>
+      <for-buyer type="boolean">true</for-buyer>
+      <title></title>
+      <office-title>Отчество</office-title>
+      <active type="boolean">true</active>
+      <system-name>middlename</system-name>
+      <obligatory type="boolean">true</obligatory>
+      <position type="integer">2</position>
+      <id type="integer">115839</id>
+    </client-field>
+    <client-field>
+      <for-buyer type="boolean">true</for-buyer>
+      <title nil="true"></title>
+      <office-title>Телефон</office-title>
+      <active type="boolean">true</active>
+      <system-name>phone</system-name>
+      <obligatory type="boolean">true</obligatory>
+      <position type="integer">3</position>
+      <id type="integer">63831</id>
+    </client-field>
+    <client-field>
+      <for-buyer type="boolean">true</for-buyer>
+      <title nil="true"></title>
+      <office-title>E-mail</office-title>
+      <active type="boolean">true</active>
+      <system-name>email</system-name>
+      <obligatory type="boolean">true</obligatory>
+      <position type="integer">4</position>
+      <id type="integer">74468</id>
+    </client-field>
+    <client-field>
+      <for-buyer type="boolean">true</for-buyer>
+      <title nil="true"></title>
+      <office-title>Подтверждение email</office-title>
+      <active type="boolean">true</active>
+      <system-name>email_confirmation</system-name>
+      <obligatory type="boolean">true</obligatory>
+      <position type="integer">5</position>
+      <id type="integer">75165</id>
+    </client-field>
+  </client-fields>
+  <shipping-address-fields type="array">
+    <shipping-address-field>
+      <for-buyer type="boolean">true</for-buyer>
+      <title></title>
+      <office-title>Область</office-title>
+      <active type="boolean">true</active>
+      <system-name>state</system-name>
+      <obligatory type="boolean">false</obligatory>
+      <position type="integer">2</position>
+      <id type="integer">3</id>
+    </shipping-address-field>
+    <shipping-address-field>
+      <for-buyer type="boolean">true</for-buyer>
+      <title></title>
+      <office-title>Город</office-title>
+      <active type="boolean">true</active>
+      <system-name>city</system-name>
+      <obligatory type="boolean">false</obligatory>
+      <position type="integer">3</position>
+      <id type="integer">4</id>
+    </shipping-address-field>
+    <shipping-address-field>
+      <for-buyer type="boolean">true</for-buyer>
+      <title nil="true"></title>
+      <office-title>Адрес</office-title>
+      <active type="boolean">true</active>
+      <system-name>address</system-name>
+      <obligatory type="boolean">false</obligatory>
+      <position type="integer">4</position>
+      <id type="integer">5</id>
+    </shipping-address-field>
+    <shipping-address-field>
+      <for-buyer type="boolean">true</for-buyer>
+      <title></title>
+      <office-title>Почтовый индекс</office-title>
+      <active type="boolean">true</active>
+      <system-name>zip</system-name>
+      <obligatory type="boolean">true</obligatory>
+      <position type="integer">5</position>
+      <id type="integer">6</id>
+    </shipping-address-field>
+    <shipping-address-field>
+      <for-buyer type="boolean">true</for-buyer>
+      <title>Новое поле</title>
+      <office-title>Новое поле</office-title>
+      <active type="boolean">true</active>
+      <system-name nil="true"></system-name>
+      <obligatory type="boolean">false</obligatory>
+      <position type="integer">13</position>
+      <id type="integer">127872</id>
+    </shipping-address-field>
+  </shipping-address-fields>
+</fields>
+
+Получение способов доставки
+POST /admin/delivery_variants.json
+> Content-Type: application/json
+<?xml version="1.0" encoding="UTF-8"?>
+<order>
+  <shipping-address>
+    <address>Moscow sdfsdfsdf</address>
+  </shipping-address>
+  <client>
+    <email>test@test.com</email>
+    <phone>+7 903 223 33 44</phone>
+    <name>vasya</name>
+  </client>
+  <order-lines-attributes type="array">
+      <order-line-attributes>
+          <variant-id>523375</variant-id>
+          <quantity>1</quantity>
+      </order-line-attributes>
+  </order-lines-attributes>
+</order>
+< 200
+< Content-Type: application/json; charset=utf-8
+< API-Usage-Limit: 2/500
+<?xml version="1.0" encoding="UTF-8"?>
+<delivery-variants type="array">
+  <delivery-variant>
+    <description nil="true"></description>
+    <price type="float">500.0</price>
+    <position type="integer">1</position>
+    <id type="integer">12398</id>
+    <title>Электронной почтой</title>
+  </delivery-variant>
+  <delivery-variant>
+    <description>Доставка производится на следующий день.</description>
+    <price type="float">0.0</price>
+    <position type="integer">2</position>
+    <id type="integer">15297</id>
+    <title>Курьером</title>
+  </delivery-variant>
+  <delivery-variant>
+    <description>больше 100 рублей бесплатно</description>
+    <price type="float">0.0</price>
+    <position type="integer">4</position>
+    <id type="integer">15320</id>
+    <title>больше 100 рублей бесплатно</title>
+  </delivery-variant>
+</delivery-variants>
+
+Получение способов оплаты
+POST /admin/payment_gateways.json
+> Content-Type: application/json
+<order>
+    <shipping-address>
+      <address>Moscow sdfsdfsdf</address>
+    </shipping-address>
+    <client>
+      <email>test@test.com</email>
+      <phone>+7 903 223 33 44</phone>
+      <name>vasya</name>
+    </client>
+    <order-lines-attributes type="array">
+        <order-line-attributes>
+            <variant-id>523375</variant-id>
+            <quantity>1</quantity>
+        </order-line-attributes>
+    </order-lines-attributes>
+    <delivery-variant-id type="integer">12398</delivery-variant-id>
+</order>
+< 200
+< Content-Type: application/json; charset=utf-8
+< API-Usage-Limit: 2/500
+<?xml version="1.0" encoding="UTF-8"?>
+<payment-gateways type="array">
+  <payment-gateway>
+    <description></description>
+    <margin-fraction type="float">0.0</margin-fraction>
+    <price type="float">0.0</price>
+    <position type="integer">5</position>
+    <margin type="decimal">0.0</margin>
+    <id type="integer">1797</id>
+    <account-id type="integer">10</account-id>
+    <title>Через систему Web Money</title>
+  </payment-gateway>
+  <payment-gateway>
+    <description></description>
+    <margin-fraction type="float">0.4</margin-fraction>
+    <price type="float">535.2</price>
+    <position type="integer">6</position>
+    <margin type="decimal">40.0</margin>
+    <id type="integer">2958</id>
+    <account-id type="integer">10</account-id>
+    <title>Наложенным платежом</title>
+  </payment-gateway>
+  <payment-gateway>
+    <description></description>
+    <margin-fraction type="float">0.0</margin-fraction>
+    <price type="float">0.0</price>
+    <position type="integer">8</position>
+    <margin type="decimal">0.0</margin>
+    <id type="integer">8190</id>
+    <account-id type="integer">10</account-id>
+    <title>Через систему Robox</title>
+  </payment-gateway>
+  <payment-gateway>
+    <description></description>
+    <margin-fraction type="float">0.0</margin-fraction>
+    <price type="float">0.0</price>
+    <position type="integer">9</position>
+    <margin type="decimal">0.0</margin>
+    <id type="integer">16141</id>
+    <account-id type="integer">10</account-id>
+    <title>Выставление счета для юр. лиц</title>
+  </payment-gateway>
+  <payment-gateway>
+    <description></description>
+    <margin-fraction type="float">0.0</margin-fraction>
+    <price type="float">0.0</price>
+    <position type="integer">10</position>
+    <margin type="decimal">0.0</margin>
+    <id type="integer">16142</id>
+    <account-id type="integer">10</account-id>
+    <title>Пластиковой картой через систему Assist</title>
+  </payment-gateway>
+  <payment-gateway>
+    <description></description>
+    <margin-fraction type="float">0.0</margin-fraction>
+    <price type="float">0.0</price>
+    <position type="integer">12</position>
+    <margin type="decimal">0.0</margin>
+    <id type="integer">16146</id>
+    <account-id type="integer">10</account-id>
+    <title>Платеж через систему RBKMoney</title>
+  </payment-gateway>
+  <payment-gateway>
+    <description></description>
+    <margin-fraction type="float">0.0</margin-fraction>
+    <price type="float">0.0</price>
+    <position type="integer">14</position>
+    <margin type="decimal">0.0</margin>
+    <id type="integer">16163</id>
+    <account-id type="integer">10</account-id>
+    <title>Через Яндекс.Деньги</title>
+  </payment-gateway>
+  <payment-gateway>
+    <description></description>
+    <margin-fraction type="float">0.0</margin-fraction>
+    <price type="float">0.0</price>
+    <position type="integer">15</position>
+    <margin type="decimal">0.0</margin>
+    <id type="integer">16164</id>
+    <account-id type="integer">10</account-id>
+    <title>Через систему Liqpay</title>
+  </payment-gateway>
+  <payment-gateway>
+    <description></description>
+    <margin-fraction type="float">0.0</margin-fraction>
+    <price type="float">0.0</price>
+    <position type="integer">16</position>
+    <margin type="decimal">0.0</margin>
+    <id type="integer">16170</id>
+    <account-id type="integer">10</account-id>
+    <title>В кредит через систему Robox</title>
+  </payment-gateway>
+</payment-gateways>
+
+Создание заказа
+POST /admin/orders.json
+> Content-Type: application/json
+<order>
+    <shipping-address>
+      <address>Moscow sdfsdfsdf</address>
+    </shipping-address>
+    <client>
+      <email>test@test.com</email>
+      <phone>+7 903 223 33 44</phone>
+      <name>vasya</name>
+    </client>
+    <fields-values-attributes type="array">
+      <fields-value-attributes>
+        <value>test</value>
+        <field-id type="integer">12312</field-id>
+      </fields-value-attributes>
+    </fields-values-attributes>
+    <order-lines-attributes type="array">
+        <order-line-attributes>
+            <variant-id>523375</variant-id>
+            <quantity>1</quantity>
+        </order-line-attributes>
+    </order-lines-attributes>
+    <payment-gateway-id type="integer">1797</payment-gateway-id>
+    <delivery-variant-id type="integer">12398</delivery-variant-id>
+</order>
+< 200
+< Content-Type: application/json; charset=utf-8
+< API-Usage-Limit: 2/500
+<?xml version="1.0" encoding="UTF-8"?>
+<order>
+  <accepted-at type="timestamp" nil="true"></accepted-at>
+  <comment nil="true"></comment>
+  <created-at type="timestamp">2011-12-23 11:31:40 +0400</created-at>
+  <delivered-at type="timestamp" nil="true"></delivered-at>
+  <delivery-date type="date" nil="true"></delivery-date>
+  <delivery-description>Электронной почтой</delivery-description>
+  <delivery-from-hour type="integer" nil="true"></delivery-from-hour>
+  <delivery-price type="decimal">500.0</delivery-price>
+  <delivery-to-hour type="integer" nil="true"></delivery-to-hour>
+  <financial-status>pending</financial-status>
+  <fulfillment-status>new</fulfillment-status>
+  <id type="integer">46543</id>
+  <key>0ee38fb18326fb242f4c6ee559bbdc93</key>
+  <number type="integer">1204</number>
+  <payment-description nil="true"></payment-description>
+  <payment-title>Через систему Web Money</payment-title>
+  <referer nil="true"></referer>
+  <updated-at type="timestamp">2011-12-23 11:31:40 +0400</updated-at>
+  <total-price type="decimal">506.0</total-price>
+  <shipping-address>
+    <address>Moscow sdfsdfsdf</address>
+    <city>Москва</city>
+    <country>RU</country>
+    <middlename nil="true"></middlename>
+    <name>vasya</name>
+    <phone>+79032233344</phone>
+    <state>Московская область</state>
+    <surname nil="true"></surname>
+    <zip nil="true"></zip>
+    <fields-values type="array"/>
+  </shipping-address>
+  <order-lines type="array">
+    <order-line>
+      <created-at type="timestamp">2011-12-23 11:31:40 +0400</created-at>
+      <id type="integer">123880</id>
+      <product-id type="integer">379982</product-id>
+      <quantity type="integer">1</quantity>
+      <sale-price type="decimal">6.0</sale-price>
+      <sku nil="true"></sku>
+      <title>DMW30AJ</title>
+      <updated-at type="timestamp">2011-12-23 11:31:40 +0400</updated-at>
+      <variant-id type="integer">517216</variant-id>
+      <weight type="decimal" nil="true"></weight>
+    </order-line>
+  </order-lines>
+  <discounts type="array"/>
+  <client>
+    <client-group-id type="integer" nil="true"></client-group-id>
+    <created-at type="timestamp">2011-12-23 11:31:40 +0400</created-at>
+    <email>test@test.com</email>
+    <id type="integer">46603</id>
+    <middlename nil="true"></middlename>
+    <name>vasya</name>
+    <phone>+7 903 223 33 44</phone>
+    <registered type="boolean">false</registered>
+    <subscribe type="boolean">true</subscribe>
+    <surname nil="true"></surname>
+    <updated-at type="timestamp">2011-12-23 11:31:40 +0400</updated-at>
+  </client>
+</order>
+
+--
+Скидки по купонам
+--
+
+Получение списка купонов
+GET /admin/discount_codes.json
+< 200
+< Content-Type: application/json; charset=utf-8
+< API-Usage-Limit: 2/500
+<?xml version="1.0" encoding="UTF-8"?>
+<discount-codes type="array">
+  <discount-code>
+    <act-once type="boolean">true</act-once>
+    <code>DC1</code>
+    <created-at type="datetime">2011-11-07T13:28:42+04:00</created-at>
+    <description>discount campaign</description>
+    <disabled type="boolean">false</disabled>
+    <discount type="decimal">10.0</discount>
+    <expired-at type="date">2012-06-09</expired-at>
+    <id type="integer">628</id>
+    <type-id type="integer">1</type-id>
+    <updated-at type="datetime">2011-11-07T13:28:42+04:00</updated-at>
+  </discount-code>
+  <discount-code>
+    <act-once type="boolean">true</act-once>
+    <code>DC2</code>
+    <created-at type="datetime">2011-10-24T16:29:42+04:00</created-at>
+    <description>discount campaign</description>
+    <disabled type="boolean">false</disabled>
+    <discount type="decimal">12.0</discount>
+    <expired-at type="date">2012-06-09</expired-at>
+    <id type="integer">626</id>
+    <type-id type="integer">1</type-id>
+    <updated-at type="datetime">2011-11-01T19:49:14+04:00</updated-at>
+  </discount-code>
+  <discount-code>
+    <act-once type="boolean">true</act-once>
+    <code>DC3</code>
+    <created-at type="datetime">2011-10-24T16:29:42+04:00</created-at>
+    <description>discount campaign</description>
+    <disabled type="boolean">false</disabled>
+    <discount type="decimal">13.0</discount>
+    <expired-at type="date">2012-06-09</expired-at>
+    <id type="integer">627</id>
+    <type-id type="integer">2</type-id>
+    <updated-at type="datetime">2011-11-01T19:49:14+04:00</updated-at>
+  </discount-code>
+  <discount-code>
+    <act-once type="boolean">false</act-once>
+    <code>DC4</code>
+    <created-at type="datetime">2011-10-24T16:29:42+04:00</created-at>
+    <description>discount campaign</description>
+    <disabled type="boolean">true</disabled>
+    <discount type="decimal">14.0</discount>
+    <expired-at type="date">2012-06-09</expired-at>
+    <id type="integer">628</id>
+    <type-id type="integer">1</type-id>
+    <updated-at type="datetime">2011-11-01T19:49:14+04:00</updated-at>
+  </discount-code>
+  <discount-code>
+    <act-once type="boolean">true</act-once>
+    <code>DC5</code>
+    <created-at type="datetime">2011-10-24T16:29:42+04:00</created-at>
+    <description>discount campaign</description>
+    <disabled type="boolean">false</disabled>
+    <discount type="decimal">12.0</discount>
+    <expired-at type="date">2012-06-09</expired-at>
+    <id type="integer">629</id>
+    <type-id type="integer">1</type-id>
+    <updated-at type="datetime">2011-11-01T19:49:14+04:00</updated-at>
+  </discount-code>
+</discount-codes>
+
+Получение информации о купоне
+GET /admin/discount_codes/626.json
+< 200
+< Content-Type: application/json; charset=utf-8
+< API-Usage-Limit: 2/500
+<?xml version="1.0" encoding="UTF-8"?>
+<discount-code>
+  <act-once type="boolean">true</act-once>
+  <code>DC2</code>
+  <created-at type="datetime">2011-10-24T16:29:42+04:00</created-at>
+  <description>discount campaign</description>
+  <disabled type="boolean">false</disabled>
+  <discount type="decimal">12.0</discount>
+  <expired-at type="date">2012-06-09</expired-at>
+  <id type="integer">626</id>
+  <type-id type="integer">1</type-id>
+  <updated-at type="datetime">2011-11-01T19:49:14+04:00</updated-at>
+</discount-code>
+
+Добавление купона
+POST /admin/discount_codes.json
+> Content-Type: application/json
+<discount_code>
+  <code>frandom2</code>
+  <act_once>true</act_once>
+  <discount>10</discount>
+  <type_id>1</type_id>
+  <description>API code</description>
+  <disabled>0</disabled>
+  <expired-at>2013-06-09</expired-at>
+</discount_code>
+< 200
+< Content-Type: application/xml
+<?xml version="1.0" encoding="UTF-8"?>
+<discount-code>
+  <act-once type="boolean">true</act-once>
+  <code>frandom2</code>
+  <created-at type="datetime">2011-10-24T16:29:42+04:00</created-at>
+  <description>API code</description>
+  <disabled type="boolean">false</disabled>
+  <discount type="decimal">10.0</discount>
+  <expired-at type="date">2013-06-09</expired-at>
+  <id type="integer">626</id>
+  <type-id type="integer">1</type-id>
+  <updated-at type="datetime">2011-11-01T19:49:14+04:00</updated-at>
+</discount-code>
+
+Редактирование купона
+PUT /admin/discount_codes/1.json
+> Content-Type: application/json
+<discount_code>
+  <code>frandom3</code>
+  <act_once>true</act_once>
+  <discount>15</discount>
+  <type_id>1</type_id>
+  <description>API code</description>
+  <disabled>0</disabled>
+  <expired-at>2013-06-09</expired-at>
+</discount_code>
+< 200
+
+Удаление купона
+DELETE /admin/discount_codes/1.json
+< 200
+
+--
+Способы доставки
+--
+
+Получение списка
+GET /admin/delivery_variants.json
+< 200
+< Content-Type: application/json; charset=utf-8
+< API-Usage-Limit: 2/500
+<?xml version="1.0" encoding="UTF-8"?>
+<objects type="array">
+  <object>
+    <id type="integer">57802</id>
+    <title>Курьером</title>
+    <description>Супер быстрая доставка</description>
+    <position type="integer">1</position>
+    <created-at type="timestamp">2012-02-22 12:56:51 +0400</created-at>
+    <updated-at type="timestamp">2012-05-17 11:55:07 +0400</updated-at>
+    <delivery-locations type="array">
+      <delivery-location>
+        <region>Респ Адыгея</region>
+        <city>Майкоп</city>
+      </delivery-location>
+      <delivery-location>
+        <region>Респ Адыгея</region>
+        <city>Красногвардейский район</city>
+      </delivery-location>
+    </delivery-locations>
+    <type>DeliveryVariant::PriceDepend</type>
+  </object>
+  <object>
+    <id type="integer">57955</id>
+    <title>Курьером</title>
+    <description nil="true"/>
+    <position type="integer">2</position>
+    <created-at type="timestamp">2012-02-24 11:36:46 +0400</created-at>
+    <updated-at type="timestamp">2012-02-24 11:38:26 +0400</updated-at>
+    <delivery-locations type="array"/>
+    <type>DeliveryVariant::Fixed</type>
+  </object>
+</objects>
+
+Получение информации о способе доставки
+GET /admin/delivery_variants/57955.json
+< 200
+< Content-Type: application/json; charset=utf-8
+< API-Usage-Limit: 2/500
+<?xml version="1.0" encoding="UTF-8"?>
+<object>
+  <id type="integer">57955</id>
+  <title>Курьером</title>
+  <description nil="true"/>
+  <position type="integer">2</position>
+  <created-at type="timestamp">2012-02-24 11:36:46 +0400</created-at>
+  <updated-at type="timestamp">2012-02-24 11:38:26 +0400</updated-at>
+  <delivery-locations type="array"/>
+  <type>DeliveryVariant::Fixed</type>
+</object>
+
+Добавление
+POST /admin/delivery_variants.json
+> Content-Type: application/json
+<delivery-variant>
+  <title>Курьером</title>
+  <description>Супер быстрая доставка</description>
+  <delivery-locations-attributes type="array">
+    <delivery-location>
+      <region>Респ Адыгея</region>
+      <city>Майкоп</city>
+    </delivery-location>
+    <delivery-location>
+      <region>Респ Адыгея</region>
+      <city>Красногвардейский район</city>
+    </delivery-location>
+  </delivery-locations-attributes>
+  <type>DeliveryVariant::PriceDepend</type>
+</delivery-variant>
+< 200
+< Content-Type: application/json; charset=utf-8
+< API-Usage-Limit: 2/500
+<?xml version="1.0" encoding="UTF-8"?>
+<object>
+  <id type="integer">57802</id>
+  <title>Курьером</title>
+  <description>Супер быстрая доставка</description>
+  <position type="integer">3</position>
+  <created-at type="timestamp">2012-02-22 12:56:51 +0400</created-at>
+  <updated-at type="timestamp">2012-05-17 11:55:07 +0400</updated-at>
+  <delivery-locations type="array">
+    <delivery-location>
+      <id type="integer">12136</id>
+      <region>Респ Адыгея</region>
+      <city>Майкоп</city>
+    </delivery-location>
+    <delivery-location>
+      <id type="integer">12137</id>
+      <region>Респ Адыгея</region>
+      <city>Красногвардейский район</city>
+    </delivery-location>
+  </delivery-locations>
+  <type>DeliveryVariant::PriceDepend</type>
+</object>
+
+Удаление
+DELETE /admin/delivery_variants/57802.json
+< 200
+
+--
+Дополнительные поля
+--
+
+Получение списка
+GET /admin/fields.json
+< 200
+< Content-Type: application/json; charset=utf-8
+< API-Usage-Limit: 2/500
+<?xml version="1.0" encoding="UTF-8"?>
+<objects type="array">
+  <field>
+    <position type="integer">0</position>
+    <for-buyer type="boolean">true</for-buyer>
+    <example nil="true"></example>
+    <office-title>Страна</office-title>
+    <created-at type="datetime">2010-11-18T00:11:30+03:00</created-at>
+    <updated-at type="datetime">2012-05-30T16:51:19+04:00</updated-at>
+    <obligatory type="boolean">false</obligatory>
+    <id type="integer">1</id>
+    <title nil="true"></title>
+    <destiny type="integer">1</destiny>
+    <system-name>country</system-name>
+  </field>
+  <field>
+    <position type="integer">0</position>
+    <for-buyer type="boolean">true</for-buyer>
+    <example nil="true"></example>
+    <office-title>Фамилия</office-title>
+    <created-at type="datetime" nil="true"></created-at>
+    <updated-at type="datetime">2012-06-18T12:42:15+04:00</updated-at>
+    <obligatory type="boolean">false</obligatory>
+    <id type="integer">136291</id>
+    <title></title>
+    <destiny type="integer">2</destiny>
+    <system-name>surname</system-name>
+  </field>
+  <field>
+    <position type="integer">1</position>
+    <for-buyer type="boolean">true</for-buyer>
+    <example nil="true"></example>
+    <office-title>Номер постамата</office-title>
+    <created-at type="datetime">2012-03-30T16:55:19+04:00</created-at>
+    <updated-at type="datetime">2012-03-30T16:55:19+04:00</updated-at>
+    <obligatory type="boolean">false</obligatory>
+    <id type="integer">511497</id>
+    <title>Номер постамата</title>
+    <destiny type="integer">3</destiny>
+    <system-name nil="true"></system-name>
+  </field>
+  <field>
+    <position type="integer">1</position>
+    <for-buyer type="boolean">true</for-buyer>
+    <example nil="true"></example>
+    <office-title>Имя</office-title>
+    <created-at type="datetime" nil="true"></created-at>
+    <updated-at type="datetime">2012-06-18T12:42:15+04:00</updated-at>
+    <obligatory type="boolean">true</obligatory>
+    <id type="integer">65588</id>
+    <title>Имя</title>
+    <destiny type="integer">2</destiny>
+    <system-name>name</system-name>
+  </field>
+  <field>
+    <position type="integer">1</position>
+    <for-buyer type="boolean">true</for-buyer>
+    <example nil="true"></example>
+    <office-title>Область</office-title>
+    <created-at type="datetime">2010-11-18T00:11:31+03:00</created-at>
+    <updated-at type="datetime">2012-07-10T14:18:34+04:00</updated-at>
+    <obligatory type="boolean">false</obligatory>
+    <id type="integer">2</id>
+    <title></title>
+    <destiny type="integer">1</destiny>
+    <system-name>state</system-name>
+  </field>
+  <field>
+    <position type="integer">2</position>
+    <for-buyer type="boolean">true</for-buyer>
+    <example nil="true"></example>
+    <office-title>Отчество</office-title>
+    <created-at type="datetime" nil="true"></created-at>
+    <updated-at type="datetime">2012-06-18T12:42:15+04:00</updated-at>
+    <obligatory type="boolean">false</obligatory>
+    <id type="integer">150050</id>
+    <title></title>
+    <destiny type="integer">2</destiny>
+    <system-name>middlename</system-name>
+  </field>
+  <field>
+    <position type="integer">2</position>
+    <for-buyer type="boolean">true</for-buyer>
+    <example nil="true"></example>
+    <office-title>Адрес постомата</office-title>
+    <created-at type="datetime">2012-03-30T16:55:19+04:00</created-at>
+    <updated-at type="datetime">2012-03-30T16:55:19+04:00</updated-at>
+    <obligatory type="boolean">false</obligatory>
+    <id type="integer">511498</id>
+    <title>Адрес постомата</title>
+    <destiny type="integer">3</destiny>
+    <system-name nil="true"></system-name>
+  </field>
+  <field>
+    <position type="integer">2</position>
+    <for-buyer type="boolean">true</for-buyer>
+    <example nil="true"></example>
+    <office-title>Город</office-title>
+    <created-at type="datetime">2010-11-18T00:11:31+03:00</created-at>
+    <updated-at type="datetime">2012-07-10T14:18:34+04:00</updated-at>
+    <obligatory type="boolean">false</obligatory>
+    <id type="integer">3</id>
+    <title></title>
+    <destiny type="integer">1</destiny>
+    <system-name>city</system-name>
+  </field>
+  <field>
+    <position type="integer">3</position>
+    <for-buyer type="boolean">true</for-buyer>
+    <example></example>
+    <office-title>ИНН</office-title>
+    <created-at type="datetime">2012-06-18T12:42:06+04:00</created-at>
+    <updated-at type="datetime">2012-06-18T12:42:15+04:00</updated-at>
+    <obligatory type="boolean">false</obligatory>
+    <id type="integer">624245</id>
+    <title>ИНН</title>
+    <destiny type="integer">2</destiny>
+    <system-name nil="true"></system-name>
+  </field>
+  <field>
+    <position type="integer">3</position>
+    <for-buyer type="boolean">true</for-buyer>
+    <example nil="true"></example>
+    <office-title>Адрес</office-title>
+    <created-at type="datetime">2010-11-18T00:11:31+03:00</created-at>
+    <updated-at type="datetime">2012-07-10T14:18:34+04:00</updated-at>
+    <obligatory type="boolean">true</obligatory>
+    <id type="integer">4</id>
+    <title></title>
+    <destiny type="integer">1</destiny>
+    <system-name>address</system-name>
+  </field>
+  <field>
+    <position type="integer">4</position>
+    <for-buyer type="boolean">true</for-buyer>
+    <example nil="true"></example>
+    <office-title>Почтовый индекс</office-title>
+    <created-at type="datetime">2010-11-18T00:11:31+03:00</created-at>
+    <updated-at type="datetime">2012-07-10T14:18:34+04:00</updated-at>
+    <obligatory type="boolean">true</obligatory>
+    <id type="integer">5</id>
+    <title></title>
+    <destiny type="integer">1</destiny>
+    <system-name>zip</system-name>
+  </field>
+  <field>
+    <position type="integer">4</position>
+    <for-buyer type="boolean">true</for-buyer>
+    <example>Например: +7(926)111-11-11</example>
+    <office-title>Телефон</office-title>
+    <created-at type="datetime" nil="true"></created-at>
+    <updated-at type="datetime">2012-06-18T12:42:15+04:00</updated-at>
+    <obligatory type="boolean">true</obligatory>
+    <id type="integer">78672</id>
+    <title></title>
+    <destiny type="integer">2</destiny>
+    <system-name>phone</system-name>
+  </field>
+  <field>
+    <position type="integer">5</position>
+    <for-buyer type="boolean">true</for-buyer>
+    <example nil="true"></example>
+    <office-title>E-mail</office-title>
+    <created-at type="datetime" nil="true"></created-at>
+    <updated-at type="datetime">2012-06-18T12:42:15+04:00</updated-at>
+    <obligatory type="boolean">false</obligatory>
+    <id type="integer">93555</id>
+    <title></title>
+    <destiny type="integer">2</destiny>
+    <system-name>email</system-name>
+  </field>
+  <field>
+    <position type="integer">6</position>
+    <for-buyer type="boolean">true</for-buyer>
+    <example/>
+    <office-title>КЛАДР</office-title>
+    <created-at type="datetime">2012-05-30T16:49:26+04:00</created-at>
+    <updated-at type="datetime">2012-07-09T18:21:43+04:00</updated-at>
+    <obligatory type="boolean">true</obligatory>
+    <id type="integer">605960</id>
+    <title>Адрес</title>
+    <destiny type="integer">1</destiny>
+    <system-name nil="true"></system-name>
+  </field>
+  <field>
+    <position type="integer">6</position>
+    <for-buyer type="boolean">true</for-buyer>
+    <example nil="true"></example>
+    <office-title>Подтверждение email</office-title>
+    <created-at type="datetime" nil="true"></created-at>
+    <updated-at type="datetime">2012-06-18T12:42:15+04:00</updated-at>
+    <obligatory type="boolean">false</obligatory>
+    <id type="integer">105738</id>
+    <title></title>
+    <destiny type="integer">2</destiny>
+    <system-name>email_confirmation</system-name>
+  </field>
+  <field>
+    <position type="integer">7</position>
+    <for-buyer type="boolean">true</for-buyer>
+    <example nil="true"></example>
+    <office-title>Подписка на новости/office-title>
+    <created-at type="datetime">2011-03-10T16:38:06+03:00</created-at>
+    <updated-at type="datetime">2012-06-18T12:42:15+04:00</updated-at>
+    <obligatory type="boolean">false</obligatory>
+    <id type="integer">180611</id>
+    <title>Подписка на новости</title>
+    <destiny type="integer">2</destiny>
+    <system-name>subscribe</system-name>
+  </field>
+  <field>
+    <position type="integer">8</position>
+    <for-buyer type="boolean">true</for-buyer>
+    <example></example>
+    <office-title>Статус покупателя</office-title>
+    <created-at type="datetime">2011-11-14T13:21:13+04:00</created-at>
+    <updated-at type="datetime">2012-06-18T12:42:15+04:00</updated-at>
+    <obligatory type="boolean">false</obligatory>
+    <id type="integer">389591</id>
+    <title>Статус покупателя</title>
+    <destiny type="integer">2</destiny>
+    <system-name nil="true"></system-name>
+  </field>
+</objects>
+
+Получение информации
+GET /admin/fields/389591.json
+< 200
+< Content-Type: application/json; charset=utf-8
+< API-Usage-Limit: 2/500
+<?xml version="1.0" encoding="UTF-8"?>
+<field>
+  <position type="integer">8</position>
+  <for-buyer type="boolean">true</for-buyer>
+  <example></example>
+  <office-title>Статус покупателя</office-title>
+  <created-at type="datetime">2011-11-14T13:21:13+04:00</created-at>
+  <updated-at type="datetime">2012-06-18T12:42:15+04:00</updated-at>
+  <obligatory type="boolean">false</obligatory>
+  <id type="integer">389591</id>
+  <title>Статус покупателя</title>
+  <destiny type="integer">2</destiny>
+  <system-name nil="true"></system-name>
+</field>
+
+Добавление
+POST /admin/fields.json
+> Content-Type: application/json
+<field>
+  <type>Field::TextField</type>
+  <for-buyer type="boolean">true</for-buyer>
+  <office-title>Статус покупателя</office-title>
+  <obligatory type="boolean">false</obligatory>
+  <title>Статус покупателя</title>
+  <destiny type="integer">2</destiny>
+</field>
+< 200
+< Content-Type: application/json; charset=utf-8
+< API-Usage-Limit: 2/500
+<?xml version="1.0" encoding="UTF-8"?>
+<field>
+  <position type="integer">8</position>
+  <for-buyer type="boolean">true</for-buyer>
+  <example></example>
+  <office-title>Статус покупателя</office-title>
+  <created-at type="datetime">2011-11-14T13:21:13+04:00</created-at>
+  <updated-at type="datetime">2012-06-18T12:42:15+04:00</updated-at>
+  <obligatory type="boolean">false</obligatory>
+  <id type="integer">389591</id>
+  <title>Статус покупателя</title>
+  <destiny type="integer">2</destiny>
+  <system-name nil="true"></system-name>
+</field>
+
+DELETE /admin/fields/389591.json
+< 200

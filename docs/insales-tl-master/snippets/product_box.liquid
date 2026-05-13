@@ -1,0 +1,38 @@
+<div class="productBox" style="{% cycle: '', '', '', 'margin-right: 0px;' %}">
+  <a href="{{ product.url }}"
+  	 style="display: block; width: 160px; height: 160px; background: url({{ product.images.first.compact_url }}) center center no-repeat #FFF;">
+  </a>
+  <a href="{{ product.url }}" class="title">{{ product.title | editable }}</a>
+   
+	<form action="/cart_items" method="post" class="buyForm">
+      {% if product.old_price %} <div class="old_price">{{product.old_price | money}}</div>{% endif %}
+      	<div class="price">{{ product.variants.first.price | money }}</div>
+    	<div class="clear"></div>
+      	{% if product.available %}
+    	<!--<input type="button" class="addtocart button buy" value="В корзину">-->
+
+      	  {% if product.variants.size > 1 %}
+          	<input type="button" value="В корзину" class="addtocart button" onclick="document.location.href='{{product.url}}'" />
+          {% else %}
+          	<input type="submit" class="addtocart button buy" value="В корзину" />
+          {% endif %}
+
+      	{% else %}
+      		{% if settings.order_button %}
+              {% if product.variants.size > 1 %}
+          		<input type="button" value="Под заказ" class="addtocart button" onclick="document.location.href='{{product.url}}'" />
+              {% else %}
+          		<input type="submit" class="addtocart button buy" value="Под заказ" />
+              {% endif %}
+            {% else %}
+          	  <input type="submit" disabled="disabled" class="addtocart button disabled" value="В корзину" />
+            {% endif %}
+      	{% endif %}
+      	<div class="quantityBox">
+    		<!--<label for="quantity">Количество:</label>-->
+        	<input name="quantity" id="quantity" class="quantity" value="1">
+        	<input type="hidden" name="variant_id" id="variant_id" value="{{ product.variants.first.id }}">
+    	</div>
+    </form>
+
+</div>

@@ -1,0 +1,13 @@
+site_name: InSales docs
+repo_url: https://github.com/insales/insales-docs-source/
+
+theme:
+  name: 'material'
+
+extra:
+  search:
+    language: 'en, ru'
+
+markdown_extensions:
+  - admonition
+  - codehilite
