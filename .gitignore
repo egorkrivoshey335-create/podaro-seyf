@@ -10,3 +10,7 @@ backend/prisma/dev.db
 backend/prisma/dev.db-journal
 backend/prisma/dev.db-shm
 backend/prisma/dev.db-wal
+backend/dev.db
+backend/dev.db-journal
+backend/dev.db-shm
+backend/dev.db-wal
