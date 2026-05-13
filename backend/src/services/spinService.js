@@ -1,4 +1,4 @@
-import { Prisma, PrizeType, SpinStatus } from "@prisma/client";
+import prismaClientPkg from "@prisma/client";
 
 import { config } from "../config.js";
 import { AppError } from "../lib/errors.js";
@@ -8,6 +8,8 @@ import { insalesApi } from "./insalesApi.js";
 import { sendGuideEmail, sendPhysicalConfirmationEmail, sendPromoCodeEmail } from "./notifier.js";
 import { getPromoStats, reservePromoCode, uploadPromoCodes } from "./promoPool.js";
 import { rollPrize } from "./prizeRoller.js";
+
+const { Prisma, PrizeType, SpinStatus } = prismaClientPkg;
 
 const PUBLIC_PRIZE_FIELDS = {
   code: true,

@@ -1,8 +1,10 @@
 import cron from "node-cron";
-import { SpinStatus } from "@prisma/client";
+import prismaClientPkg from "@prisma/client";
 
 import { logger } from "../lib/logger.js";
 import { insalesApi } from "./insalesApi.js";
+
+const { SpinStatus } = prismaClientPkg;
 
 export function startExpirer(prisma) {
   const task = cron.schedule("*/10 * * * *", async () => {

@@ -1,7 +1,9 @@
-import { PrizeType, SpinStatus } from "@prisma/client";
+import prismaClientPkg from "@prisma/client";
 
 import { AppError } from "../lib/errors.js";
 import { logger } from "../lib/logger.js";
+
+const { PrizeType, SpinStatus } = prismaClientPkg;
 
 function normalizeEmail(value) {
   return typeof value === "string" && value.trim() ? value.trim().toLowerCase() : null;

@@ -1,0 +1,18 @@
+[Unit]
+Description=Podaro Seyf Backend
+After=network.target postgresql.service
+Wants=postgresql.service
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/var/www/podaro-seyf
+EnvironmentFile=/var/www/podaro-seyf/.env
+ExecStart=/usr/bin/npm --workspace backend run start
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

@@ -1,6 +1,8 @@
 import bcrypt from "bcrypt";
 import { PrismaPg } from "@prisma/adapter-pg";
-import { PrismaClient, PrizeType } from "@prisma/client";
+import prismaClientPkg from "@prisma/client";
+
+const { PrismaClient, PrizeType } = prismaClientPkg;
 
 const prisma = new PrismaClient({
   adapter: new PrismaPg({

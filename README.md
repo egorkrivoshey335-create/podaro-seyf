@@ -106,7 +106,10 @@ npm run build -w widget
 npm run build -w admin
 ```
 
-Пример production-конфига для Nginx лежит в `deploy/nginx.gift-safe.conf.example`.
+Примеры production-конфигов лежат в:
+
+- `deploy/nginx.gift-safe.conf.example`
+- `deploy/podaro-seyf.service.example`
 
 ## Как встроить виджет
 

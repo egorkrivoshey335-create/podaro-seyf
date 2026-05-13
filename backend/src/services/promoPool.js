@@ -1,6 +1,8 @@
-import { Prisma } from "@prisma/client";
+import prismaClientPkg from "@prisma/client";
 
 import { AppError } from "../lib/errors.js";
+
+const { Prisma } = prismaClientPkg;
 
 export async function reservePromoCode(prizeCode, spinId, tx) {
   const rows = await tx.$queryRaw(
