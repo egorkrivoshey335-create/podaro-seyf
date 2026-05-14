@@ -9,15 +9,16 @@ export async function getInsalesClient() {
     }
 
     const payload = await response.json();
-    if (!payload?.id) {
+    const client = payload?.client || payload;
+    if (!client?.id) {
       return null;
     }
 
     return {
-      id: String(payload.id),
-      email: payload.email || "",
-      phone: payload.phone || "",
-      name: payload.name || "",
+      id: String(client.id),
+      email: client.email || "",
+      phone: client.phone || "",
+      name: client.name || client.contact_name || "",
     };
   } catch {
     return null;

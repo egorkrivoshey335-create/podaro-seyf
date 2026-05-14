@@ -105,6 +105,8 @@ export function getRuntimeConfig() {
         externalConfig.panelBackgroundImage || `${baseOrigin}/assets/ui/fon.webp`,
       frame:
         externalConfig.frameImage || `${baseOrigin}/assets/ui/ramka.webp`,
+      prizeFrame:
+        externalConfig.prizeFrameImage || `${baseOrigin}/assets/ui/ramka-1.webp`,
       flagLeft:
         externalConfig.flagLeftImage || `${baseOrigin}/assets/ui/flag-left.webp`,
       flagRight:

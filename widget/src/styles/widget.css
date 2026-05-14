@@ -194,13 +194,15 @@
 }
 
 .gs-panel--hero,
-.gs-panel--faq {
+.gs-panel--faq,
+.gs-panel--pending {
   width: min(70vw, 70vh, 920px);
   aspect-ratio: 1;
 }
 
 .gs-panel--hero .gs-panel-grid,
-.gs-panel--faq .gs-panel-grid {
+.gs-panel--faq .gs-panel-grid,
+.gs-panel--pending .gs-panel-grid {
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -510,6 +512,7 @@
   justify-content: flex-start;
 }
 
+.gs-panel--pending .gs-copy,
 .gs-panel--faq .gs-copy {
   width: min(560px, 100%);
   padding: 0;
@@ -521,8 +524,14 @@
   width: min(65%, 430px);
 }
 
+.gs-panel--pending .gs-stage-wrap {
+  top: -9%;
+  width: min(65%, 430px);
+}
+
 .gs-panel--hero .gs-stage,
-.gs-panel--faq .gs-stage {
+.gs-panel--faq .gs-stage,
+.gs-panel--pending .gs-stage {
   border: 0;
   background: transparent;
 }
@@ -537,17 +546,22 @@
 
 .gs-panel--hero .gs-stage-noise,
 .gs-panel--faq .gs-stage-noise,
+.gs-panel--pending .gs-stage-noise,
 .gs-panel--hero .gs-stage-status,
-.gs-panel--faq .gs-stage-status {
+.gs-panel--faq .gs-stage-status,
+.gs-panel--pending .gs-stage-status {
   display: none;
 }
 
 .gs-panel--hero .gs-video-shell,
-.gs-panel--hero .gs-stage-video {
+.gs-panel--hero .gs-stage-video,
+.gs-panel--pending .gs-video-shell,
+.gs-panel--pending .gs-stage-video {
   border-radius: 24px;
 }
 
-.gs-panel--hero .gs-video-shell {
+.gs-panel--hero .gs-video-shell,
+.gs-panel--pending .gs-video-shell {
   background: transparent;
 }
 
@@ -632,6 +646,172 @@
 
 .gs-faq-view > .gs-asset-button {
   align-self: center;
+}
+
+.gs-prize-pending-view {
+  position: relative;
+  width: min(520px, 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin-top: -6px;
+}
+
+.gs-prize-pending-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 18px 20px;
+  border-radius: 26px;
+  background: rgba(14, 18, 40, 0.42);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 20px 42px rgba(2, 6, 23, 0.22);
+  backdrop-filter: blur(18px);
+}
+
+.gs-prize-pending-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.gs-prize-pending-label {
+  color: rgba(255, 255, 255, 0.74);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.gs-prize-pending-title {
+  color: #ffffff;
+  font-family: var(--gs-display-font);
+  font-size: clamp(26px, 3vw, 34px);
+  line-height: 1.08;
+  text-shadow: 0 4px 18px rgba(7, 10, 23, 0.26);
+}
+
+.gs-prize-pending-timer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  min-height: 54px;
+  padding: 14px 16px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.gs-prize-pending-timer strong {
+  color: #ffffff;
+  font-size: 22px;
+  line-height: 1;
+}
+
+.gs-prize-register-row {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.gs-prize-register-row > .gs-asset-button {
+  max-width: 320px;
+}
+
+.gs-prize-help-button {
+  flex: 0 0 auto;
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+  font-family: var(--gs-display-font);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 10px 24px rgba(2, 6, 23, 0.2);
+}
+
+.gs-prize-help-button--corner {
+  position: absolute;
+  top: -10px;
+  right: calc(50% - 170px);
+  z-index: 2;
+}
+
+.gs-prize-hint-overlay[hidden] {
+  display: none !important;
+}
+
+.gs-prize-hint-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+}
+
+.gs-prize-hint-backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: rgba(5, 10, 24, 0.55);
+  backdrop-filter: blur(10px);
+}
+
+.gs-prize-hint-card {
+  position: relative;
+  z-index: 1;
+  width: min(420px, calc(100vw - 32px));
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 22px 22px 18px;
+  border-radius: 24px;
+  background: rgba(14, 18, 40, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 30px 60px rgba(2, 6, 23, 0.32);
+}
+
+.gs-prize-hint-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.gs-prize-hint-card h3 {
+  margin: 0;
+  color: #ffffff;
+  font-family: var(--gs-display-font);
+  font-size: 24px;
+  line-height: 1.08;
+}
+
+.gs-prize-hint-card p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 15px;
+  line-height: 1.55;
 }
 
 .gs-faq-header {
@@ -948,7 +1128,8 @@
 
 @media (max-width: 960px) {
   .gs-panel--hero,
-  .gs-panel--faq {
+  .gs-panel--faq,
+  .gs-panel--pending {
     width: min(92vw, 92vh);
   }
 
@@ -958,6 +1139,10 @@
   }
 
   .gs-panel--hero .gs-stage-wrap {
+    width: min(58%, 360px);
+  }
+
+  .gs-panel--pending .gs-stage-wrap {
     width: min(58%, 360px);
   }
 
@@ -995,13 +1180,15 @@
   }
 
   .gs-panel--hero,
-  .gs-panel--faq {
+  .gs-panel--faq,
+  .gs-panel--pending {
     width: min(92vw, 92vh);
     aspect-ratio: 9 / 16;
   }
 
   .gs-panel--hero .gs-panel-grid,
-  .gs-panel--faq .gs-panel-grid {
+  .gs-panel--faq .gs-panel-grid,
+  .gs-panel--pending .gs-panel-grid {
     gap: 0;
     padding: 76px 16px 20px;
   }
@@ -1012,6 +1199,11 @@
   }
 
   .gs-panel--hero .gs-stage-wrap {
+    width: min(100%, 530px);
+    top: -4%;
+  }
+
+  .gs-panel--pending .gs-stage-wrap {
     width: min(100%, 530px);
     top: -4%;
   }
@@ -1051,6 +1243,33 @@
     margin-top: 50px;
   }
 
+  .gs-prize-pending-view {
+    gap: 14px;
+    margin-top: -2px;
+  }
+
+  .gs-prize-pending-card {
+    padding: 16px;
+    border-radius: 22px;
+  }
+
+  .gs-prize-pending-title {
+    font-size: 22px;
+  }
+
+  .gs-prize-pending-timer {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .gs-prize-register-row > .gs-asset-button {
+    max-width: 260px;
+  }
+
+  .gs-prize-help-button--corner {
+    right: calc(50% - 136px);
+  }
+
   .gs-asset-button span {
     padding-inline: 28px;
   }
@@ -1064,5 +1283,13 @@
   .gs-asset-button {
     width: min(150px, 100%);
     font-size: 14px;
+  }
+
+  .gs-prize-register-row > .gs-asset-button {
+    max-width: 210px;
+  }
+
+  .gs-prize-help-button--corner {
+    right: calc(50% - 110px);
   }
 }

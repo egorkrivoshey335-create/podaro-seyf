@@ -97,6 +97,25 @@ function getFaqMarkup() {
   ).join("");
 }
 
+function getPrizeHintText(prize) {
+  switch (prize?.type) {
+    case "BONUS_POINTS":
+      return "Это бонусные баллы, которые начислятся вам на аккаунт и вы сможете воспользоваться ими при покупке.";
+    case "PROMO_CODE":
+      return "Это персональный промокод. После получения его можно будет применить при оформлении заказа.";
+    case "FREE_SHIPPING":
+      return "Это бесплатная доставка. Она закрепится за вашим аккаунтом и сработает при следующем заказе.";
+    case "GUIDE":
+      return "Это полезный гайд, который придет вам после получения приза.";
+    default:
+      return "Это ваш подарок. После получения мы сразу подскажем, как им воспользоваться.";
+  }
+}
+
+function getRegisterHintText() {
+  return "После регистрации нажми на подарок слева снизу в углу и получи свой приз.";
+}
+
 export class WidgetApp {
   constructor({ host, shadowRoot, runtimeConfig, api, guestId, fingerprintPromise, client, widgetState, scenario }) {
     this.host = host;
@@ -237,6 +256,7 @@ export class WidgetApp {
     );
     this.host.style.setProperty("--gs-ui-panel-bg", `url("${this.runtimeConfig.uiAssets.panelBackground}")`);
     this.host.style.setProperty("--gs-ui-frame", `url("${this.runtimeConfig.uiAssets.frame}")`);
+    this.host.style.setProperty("--gs-ui-prize-frame", `url("${this.runtimeConfig.uiAssets.prizeFrame}")`);
     this.host.style.setProperty("--gs-ui-flag-left", `url("${this.runtimeConfig.uiAssets.flagLeft}")`);
     this.host.style.setProperty("--gs-ui-flag-right", `url("${this.runtimeConfig.uiAssets.flagRight}")`);
     this.host.style.setProperty("--gs-ui-button-primary", `url("${this.runtimeConfig.uiAssets.primaryButton}")`);
@@ -408,6 +428,7 @@ export class WidgetApp {
       close: this.shadowRoot.querySelector(".gs-close"),
       copy: this.shadowRoot.querySelector("[data-gs-copy]"),
       stageWrap: this.shadowRoot.querySelector("[data-gs-stage-wrap]"),
+      stageFrameImage: this.shadowRoot.querySelector(".gs-stage-frame-image"),
       stage: this.shadowRoot.querySelector("[data-gs-stage]"),
     };
 
@@ -420,10 +441,14 @@ export class WidgetApp {
     this.panelMode = mode;
     this.refs.panel.classList.toggle("gs-panel--hero", mode === "hero");
     this.refs.panel.classList.toggle("gs-panel--faq", mode === "faq");
+    this.refs.panel.classList.toggle("gs-panel--pending", mode === "pending");
     this.refs.panel.classList.toggle("gs-panel--default", mode === "default");
 
     this.refs.stageWrap.hidden = mode === "faq";
     this.refs.panelFlags.hidden = mode === "default";
+    this.refs.stageFrameImage.src = mode === "pending"
+      ? this.runtimeConfig.uiAssets.prizeFrame
+      : this.runtimeConfig.uiAssets.frame;
   }
 
   animatePanelChrome() {
@@ -500,8 +525,6 @@ export class WidgetApp {
     }
 
     if (this.scenario === "guest-pending") {
-      this.setPanelMode("default");
-      this.showPrizeStage(this.widgetState.prize, "Приз закреплен за этим браузером.");
       this.renderPrizePending();
       return;
     }
@@ -663,6 +686,7 @@ export class WidgetApp {
     this.refs.copy.innerHTML = markup;
     this.bindPrizeMedia();
     this.setupFaqAccordion();
+    this.bindHintOverlay();
 
     this.refs.copy.querySelector("[data-action='spin']")?.addEventListener("click", () => this.handleSpin());
     this.refs.copy.querySelector("[data-action='faq-open']")?.addEventListener("click", () => this.openFaq());
@@ -730,6 +754,130 @@ export class WidgetApp {
       duration: 0.2,
       ease: "power2.out",
     });
+  }
+
+  bindHintOverlay() {
+    const overlay = this.refs.copy.querySelector("[data-gs-hint-overlay]");
+    if (!overlay) {
+      return;
+    }
+
+    const title = overlay.querySelector("[data-gs-hint-title]");
+    const text = overlay.querySelector("[data-gs-hint-text]");
+    const card = overlay.querySelector("[data-gs-hint-card]");
+
+    this.refs.copy.querySelectorAll("[data-action='hint-open']").forEach((button) => {
+      button.addEventListener("click", () => {
+        if (!title || !text || !card) {
+          return;
+        }
+
+        title.textContent = button.dataset.hintTitle || "";
+        text.textContent = button.dataset.hintText || "";
+        overlay.hidden = false;
+        gsap.killTweensOf([overlay, card]);
+        gsap.set(overlay, { autoAlpha: 1 });
+        gsap.fromTo(card, { autoAlpha: 0, y: 20, scale: 0.96 }, { autoAlpha: 1, y: 0, scale: 1, duration: 0.24, ease: "power2.out" });
+      });
+    });
+
+    overlay.querySelectorAll("[data-action='hint-close']").forEach((button) => {
+      button.addEventListener("click", () => {
+        if (!card) {
+          overlay.hidden = true;
+          return;
+        }
+
+        gsap.killTweensOf([overlay, card]);
+        gsap.to(card, {
+          autoAlpha: 0,
+          y: 12,
+          scale: 0.97,
+          duration: 0.18,
+          ease: "power2.in",
+          onComplete: () => {
+            overlay.hidden = true;
+            gsap.set(card, { clearProps: "all" });
+          },
+        });
+      });
+    });
+  }
+
+  async transitionCopyToNextStep() {
+    const targets = [...this.refs.copy.children];
+    if (!targets.length) {
+      return;
+    }
+
+    gsap.killTweensOf(targets);
+    await new Promise((resolve) => {
+      gsap.to(targets, {
+        autoAlpha: 0,
+        y: -18,
+        duration: 0.24,
+        stagger: 0.03,
+        ease: "power2.in",
+        onComplete: resolve,
+      });
+    });
+  }
+
+  async detectClientAfterSpin() {
+    if (this.client?.id) {
+      return this.client;
+    }
+
+    const liveClient = await getInsalesClient();
+    if (liveClient?.id) {
+      this.client = liveClient;
+      return liveClient;
+    }
+
+    if (this.runtimeConfig.debug.skipRegisterStep) {
+      const debugClient = this.getDebugClient();
+      if (debugClient) {
+        this.client = debugClient;
+        return debugClient;
+      }
+    }
+
+    return null;
+  }
+
+  showPrizeVideoInStage(prize) {
+    const shell = this.refs.stage.querySelector("[data-gs-video-shell]");
+    const video = this.refs.stage.querySelector("[data-gs-video]");
+    if (!shell || !video) {
+      return;
+    }
+
+    const prizeVideoUrl = this.resolvePrizeVideoUrl(prize);
+    const fallbackVideoUrl = this.runtimeConfig.safeVideo.mp4Url || this.runtimeConfig.safeVideo.webmUrl || "";
+    const primaryVideoUrl = prizeVideoUrl || fallbackVideoUrl;
+    if (!primaryVideoUrl) {
+      return;
+    }
+
+    video.poster = "";
+    video.loop = true;
+    video.muted = true;
+    video.volume = 0;
+    video.innerHTML = `
+      <source src="${escapeHtml(primaryVideoUrl)}" type="video/mp4" />
+      ${fallbackVideoUrl && fallbackVideoUrl !== primaryVideoUrl ? `<source src="${escapeHtml(fallbackVideoUrl)}" type="video/mp4" />` : ""}
+    `;
+
+    this.refs.stage.dataset.gsMode = "video";
+    shell.hidden = false;
+
+    try {
+      video.load();
+      video.currentTime = 0;
+      video.play().catch(() => {});
+    } catch {
+      // ignore preview playback issues
+    }
   }
 
   async claimAuthorizedSpin() {
@@ -1019,21 +1167,51 @@ export class WidgetApp {
   }
 
   renderPrizePending() {
-    this.setPanelMode("default");
+    this.setPanelMode("pending");
+    this.showPrizeVideoInStage(this.widgetState.prize);
+    const prizeHintText = getPrizeHintText(this.widgetState.prize);
+    const registerHintText = getRegisterHintText();
     this.renderCopy(`
-      <div class="gs-copy-block">
-        <span class="gs-kicker">Приз уже найден</span>
-        <h2>${TEXTS.prizeTitle}</h2>
-        <p>Ты выиграл «${escapeHtml(this.widgetState.prize.title)}». ${TEXTS.prizeRegisterHint}</p>
+      <div class="gs-prize-pending-view">
+        <div class="gs-prize-pending-card">
+          <div class="gs-prize-pending-head">
+            <span class="gs-prize-pending-label">Твой подарок</span>
+            <button
+              class="gs-prize-help-button"
+              type="button"
+              data-action="hint-open"
+              data-hint-title="Что это за приз?"
+              data-hint-text="${escapeHtml(prizeHintText)}"
+            >?</button>
+          </div>
+          <div class="gs-prize-pending-title">${escapeHtml(this.widgetState.prize.title)}</div>
+          <div class="gs-prize-pending-timer">
+            <span>Подарок ждёт тебя ещё</span>
+            <strong data-gs-countdown>${formatCountdown(this.widgetState.expiresAt)}</strong>
+          </div>
+        </div>
+        <div class="gs-prize-register-row">
+          <button class="gs-asset-button gs-asset-button--primary" type="button" data-action="register">
+            <img class="gs-asset-button-image" src="${escapeHtml(this.runtimeConfig.uiAssets.primaryButton)}" alt="" />
+            <span>${TEXTS.registerButton}</span>
+          </button>
+          <button
+            class="gs-prize-help-button gs-prize-help-button--corner"
+            type="button"
+            data-action="hint-open"
+            data-hint-title="Что делать дальше?"
+            data-hint-text="${escapeHtml(registerHintText)}"
+          >?</button>
+        </div>
+        <div class="gs-prize-hint-overlay" data-gs-hint-overlay hidden>
+          <button class="gs-prize-hint-backdrop" type="button" data-action="hint-close" aria-label="Закрыть подсказку"></button>
+          <div class="gs-prize-hint-card" data-gs-hint-card>
+            <button class="gs-prize-hint-close" type="button" data-action="hint-close" aria-label="Закрыть">×</button>
+            <h3 data-gs-hint-title></h3>
+            <p data-gs-hint-text></p>
+          </div>
+        </div>
       </div>
-      ${this.getPrizeMedia(this.widgetState.prize)}
-      <div class="gs-countdown-box">
-        Приз сгорит через <strong data-gs-countdown>${formatCountdown(this.widgetState.expiresAt)}</strong>
-      </div>
-      <button class="gs-button gs-button--primary" type="button" data-action="register">
-        ${TEXTS.registerButton}
-      </button>
-      <p class="gs-footnote">После регистрации мы сразу покажем форму получения на любой странице сайта.</p>
     `);
   }
 
@@ -1201,7 +1379,9 @@ export class WidgetApp {
         await playUnlockSequence(this.refs.stage, result.prize, "Сейф открыт. Приз закреплен.");
       }
 
-      const effectiveClient = this.client || (this.runtimeConfig.debug.skipRegisterStep ? this.getDebugClient() : null);
+      const effectiveClient = await this.detectClientAfterSpin();
+
+      await this.transitionCopyToNextStep();
 
       if (effectiveClient) {
         this.client = effectiveClient;
