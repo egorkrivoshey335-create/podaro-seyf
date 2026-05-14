@@ -1050,3 +1050,10 @@
     flex-direction: column;
   }
 }
+
+@media (max-width: 360px) {
+  .gs-asset-button {
+    width: min(150px, 100%);
+    font-size: 14px;
+  }
+}
