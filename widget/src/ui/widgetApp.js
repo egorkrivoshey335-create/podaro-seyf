@@ -257,14 +257,6 @@ export class WidgetApp {
         font-style: normal;
         font-display: swap;
       }
-
-      @font-face {
-        font-family: "${family}";
-        src: ${sources.join(", ")};
-        font-weight: 900;
-        font-style: normal;
-        font-display: swap;
-      }
     `;
 
     if (existing) {
@@ -299,13 +291,18 @@ export class WidgetApp {
           <div class="gs-backdrop" data-action="close"></div>
           <section class="gs-panel" role="dialog" aria-modal="true" aria-label="Подарок из сейфа">
             <div class="gs-panel-flags" aria-hidden="true">
-              <div class="gs-flag gs-flag--left"></div>
-              <div class="gs-flag gs-flag--right"></div>
+              <div class="gs-flag gs-flag--left">
+                <img class="gs-flag-image" src="${escapeHtml(this.runtimeConfig.uiAssets.flagLeft)}" alt="" />
+              </div>
+              <div class="gs-flag gs-flag--right">
+                <img class="gs-flag-image" src="${escapeHtml(this.runtimeConfig.uiAssets.flagRight)}" alt="" />
+              </div>
             </div>
             <button class="gs-close" type="button" data-action="close" aria-label="Закрыть">×</button>
             <div class="gs-panel-grid">
               <div class="gs-stage-wrap" data-gs-stage-wrap>
                 <div class="gs-stage-frame">
+                  <img class="gs-stage-frame-image" src="${escapeHtml(this.runtimeConfig.uiAssets.frame)}" alt="" />
                   <div class="gs-stage-window">
                     <div class="gs-stage" data-gs-stage>
                       <div class="gs-stage-noise"></div>
@@ -705,9 +702,11 @@ export class WidgetApp {
     this.renderCopy(`
       <div class="gs-hero-actions">
         <button class="gs-asset-button gs-asset-button--primary" type="button" data-action="spin">
+          <img class="gs-asset-button-image" src="${escapeHtml(this.runtimeConfig.uiAssets.primaryButton)}" alt="" />
           <span>${TEXTS.welcomeButton}</span>
         </button>
         <button class="gs-asset-button gs-asset-button--secondary" type="button" data-action="faq-open">
+          <img class="gs-asset-button-image" src="${escapeHtml(this.runtimeConfig.uiAssets.secondaryButton)}" alt="" />
           <span>${TEXTS.welcomeInfoButton}</span>
         </button>
       </div>
@@ -726,6 +725,7 @@ export class WidgetApp {
           ${getFaqMarkup()}
         </div>
         <button class="gs-asset-button gs-asset-button--secondary" type="button" data-action="faq-back">
+          <img class="gs-asset-button-image" src="${escapeHtml(this.runtimeConfig.uiAssets.secondaryButton)}" alt="" />
           <span>${TEXTS.faqBackButton}</span>
         </button>
       </div>
