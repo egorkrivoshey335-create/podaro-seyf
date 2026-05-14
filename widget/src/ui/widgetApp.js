@@ -713,26 +713,22 @@ export class WidgetApp {
     };
   }
 
-  hideCopyForSpin() {
-    const targets = [...this.refs.copy.children];
-    if (!targets.length) {
-      this.refs.copy.innerHTML = "";
-      return Promise.resolve();
+  setSpinPendingState(isPending) {
+    const actionRow = this.refs.copy.querySelector(".gs-hero-actions");
+    if (!actionRow) {
+      return;
     }
 
-    gsap.killTweensOf(targets);
-    return new Promise((resolve) => {
-      gsap.to(targets, {
-        autoAlpha: 0,
-        y: -18,
-        duration: 0.2,
-        stagger: 0.03,
-        ease: "power2.in",
-        onComplete: () => {
-          this.refs.copy.innerHTML = "";
-          resolve();
-        },
-      });
+    actionRow.classList.toggle("is-busy", isPending);
+    actionRow.querySelectorAll("button").forEach((button) => {
+      button.disabled = isPending;
+    });
+
+    gsap.killTweensOf(actionRow);
+    gsap.to(actionRow, {
+      autoAlpha: isPending ? 0.5 : 1,
+      duration: 0.2,
+      ease: "power2.out",
     });
   }
 
@@ -1162,7 +1158,7 @@ export class WidgetApp {
         this.guestId = resetGuestId();
       }
 
-      await this.hideCopyForSpin();
+      this.setSpinPendingState(true);
 
       const spinRequest = (async () => {
         const fingerprint = await this.fingerprintPromise;
@@ -1231,6 +1227,7 @@ export class WidgetApp {
     } catch (error) {
       this.renderBlocked(error);
     } finally {
+      this.setSpinPendingState(false);
       this.isUnlocking = false;
       this.refs.close.disabled = false;
     }
