@@ -116,6 +116,21 @@ function getRegisterHintText() {
   return "После регистрации нажми на подарок слева снизу в углу и получи свой приз.";
 }
 
+function getDeliveryHintText(prize) {
+  switch (prize?.type) {
+    case "BONUS_POINTS":
+      return "Бонусы начислятся на ваш аккаунт автоматически, и вы сможете воспользоваться ими при покупке.";
+    case "FREE_SHIPPING":
+      return "Бесплатная доставка закрепится за вашим аккаунтом и применится автоматически при следующем заказе.";
+    case "PROMO_CODE":
+      return "После подтверждения промокод будет закреплен за вами и станет доступен для использования.";
+    case "GUIDE":
+      return "После подтверждения мы отправим гайд на email, который привязан к вашему профилю.";
+    default:
+      return "После подтверждения мы подскажем следующий шаг для получения подарка.";
+  }
+}
+
 export class WidgetApp {
   constructor({ host, shadowRoot, runtimeConfig, api, guestId, fingerprintPromise, client, widgetState, scenario }) {
     this.host = host;
@@ -1216,10 +1231,13 @@ export class WidgetApp {
   }
 
   renderDelivery() {
-    this.setPanelMode("default");
+    this.setPanelMode("pending");
+    this.showPrizeVideoInStage(this.widgetState.prize);
     const needsAddress = Boolean(this.widgetState?.prize?.requiresAddress);
     const emailValue = escapeHtml(this.client?.email || this.widgetState?.clientEmail || "");
     const prizeType = this.widgetState?.prize?.type;
+    const prizeHintText = getPrizeHintText(this.widgetState.prize);
+    const deliveryHintText = getDeliveryHintText(this.widgetState.prize);
     const autoEmailHint =
       prizeType === "FREE_SHIPPING"
         ? "После подтверждения бесплатная доставка закрепится за аккаунтом и применится автоматически в следующем заказе."
@@ -1228,66 +1246,97 @@ export class WidgetApp {
           : TEXTS.readyEmailHint;
 
     this.renderCopy(`
-      <div class="gs-copy-block">
-        <span class="gs-kicker">Приз закреплен за профилем</span>
-        <h2>${TEXTS.deliveryTitle}</h2>
-        <p>${TEXTS.deliveryDescription}</p>
-      </div>
-      ${this.getPrizeMedia(this.widgetState.prize)}
-      <div class="gs-countdown-box">
-        На подтверждение осталось <strong data-gs-countdown>${formatCountdown(this.widgetState.expiresAt)}</strong>
-      </div>
-      <form class="gs-form" data-action="deliver">
-        ${
-          needsAddress
-            ? `
-              <label>
-                <span>Имя получателя</span>
-                <input name="recipientName" placeholder="Например, Анна" required />
-              </label>
-              <label>
-                <span>Телефон</span>
-                <input name="recipientPhone" placeholder="+7 999 123 45 67" required />
-              </label>
-              <label>
-                <span>Адрес доставки</span>
-                <textarea name="recipientAddress" rows="3" placeholder="Город, улица, дом, квартира" required></textarea>
-              </label>
-            `
-            : emailValue
+      <div class="gs-prize-pending-view gs-prize-pending-view--delivery">
+        <div class="gs-prize-pending-card">
+          <div class="gs-prize-pending-label">${needsAddress ? "Подарок ждёт отправки" : "Подарок закреплен за профилем"}</div>
+          <div class="gs-prize-pending-title">${escapeHtml(this.widgetState.prize.title)}</div>
+          <div class="gs-prize-pending-timer">
+            <span>На подтверждение осталось</span>
+            <strong data-gs-countdown>${formatCountdown(this.widgetState.expiresAt)}</strong>
+          </div>
+        </div>
+        <form class="gs-form gs-prize-delivery-form" data-action="deliver">
+          ${
+            needsAddress
               ? `
-                <div class="gs-inline-note">
-                  <strong>${emailValue}</strong>
-                  <p>${escapeHtml(autoEmailHint)}</p>
+                <div class="gs-prize-info-note">
+                  <strong>Куда отправить подарок?</strong>
+                  <p>Заполни данные получателя, и мы подготовим отправку приза.</p>
                 </div>
-              `
-              : `
                 <label>
-                  <span>Email для выдачи</span>
-                  <input name="recipientEmail" type="email" value="${emailValue}" placeholder="you@example.com" required />
+                  <span>Имя получателя</span>
+                  <input name="recipientName" placeholder="Например, Анна" required />
+                </label>
+                <label>
+                  <span>Телефон</span>
+                  <input name="recipientPhone" placeholder="+7 999 123 45 67" required />
+                </label>
+                <label>
+                  <span>Адрес доставки</span>
+                  <textarea name="recipientAddress" rows="3" placeholder="Город, улица, дом, квартира" required></textarea>
                 </label>
               `
-        }
-        <button class="gs-button gs-button--primary" type="submit">
-          ${TEXTS.deliveryButton}
-        </button>
-      </form>
+              : emailValue
+                ? `
+                  <div class="gs-prize-info-note">
+                    <strong>${emailValue}</strong>
+                    <p>${escapeHtml(autoEmailHint)}</p>
+                  </div>
+                `
+                : `
+                  <label>
+                    <span>Email для выдачи</span>
+                    <input name="recipientEmail" type="email" value="${emailValue}" placeholder="you@example.com" required />
+                  </label>
+                `
+          }
+          <div class="gs-prize-register-row">
+            <button class="gs-asset-button gs-asset-button--primary" type="submit">
+              <img class="gs-asset-button-image" src="${escapeHtml(this.runtimeConfig.uiAssets.primaryButton)}" alt="" />
+              <span>${TEXTS.deliveryButton}</span>
+            </button>
+            <button
+              class="gs-prize-help-button gs-prize-help-button--corner"
+              type="button"
+              data-action="hint-open"
+              data-hint-title="Что будет дальше?"
+              data-hint-text="${escapeHtml(needsAddress ? deliveryHintText : prizeHintText)}"
+            >?</button>
+          </div>
+        </form>
+        <div class="gs-prize-hint-overlay" data-gs-hint-overlay hidden>
+          <button class="gs-prize-hint-backdrop" type="button" data-action="hint-close" aria-label="Закрыть подсказку"></button>
+          <div class="gs-prize-hint-card" data-gs-hint-card>
+            <button class="gs-prize-hint-close" type="button" data-action="hint-close" aria-label="Закрыть">×</button>
+            <h3 data-gs-hint-title></h3>
+            <p data-gs-hint-text></p>
+          </div>
+        </div>
+      </div>
     `);
   }
 
   renderSuccess(message, promoCode) {
-    this.setPanelMode("default");
+    this.setPanelMode("pending");
+    this.showPrizeVideoInStage(this.widgetState?.prize);
     this.refs.fab.hidden = true;
     this.renderCopy(`
-      <div class="gs-copy-block">
-        <span class="gs-kicker">Финиш</span>
-        <h2>${TEXTS.successTitle}</h2>
-        <p>${escapeHtml(message)}</p>
+      <div class="gs-prize-pending-view gs-prize-pending-view--success">
+        <div class="gs-prize-pending-card">
+          <div class="gs-prize-pending-label">Финиш</div>
+          <div class="gs-prize-pending-title">${TEXTS.successTitle}</div>
+          <div class="gs-prize-info-note gs-prize-info-note--success">
+            <strong>${escapeHtml(message)}</strong>
+            ${promoCode ? `<p>Твой код: ${escapeHtml(promoCode)}</p>` : ""}
+          </div>
+        </div>
+        <div class="gs-prize-register-row">
+          <button class="gs-asset-button gs-asset-button--secondary" type="button" data-action="final-close">
+            <img class="gs-asset-button-image" src="${escapeHtml(this.runtimeConfig.uiAssets.secondaryButton)}" alt="" />
+            <span>Закрыть</span>
+          </button>
+        </div>
       </div>
-      ${promoCode ? `<div class="gs-code-box">${escapeHtml(promoCode)}</div>` : ""}
-      <button class="gs-button gs-button--secondary" type="button" data-action="final-close">
-        Закрыть
-      </button>
     `);
   }
 
