@@ -241,6 +241,9 @@ export class WidgetApp {
       this.runtimeConfig.uiAssets.displayFontWoff
         ? `url("${this.runtimeConfig.uiAssets.displayFontWoff}") format("woff")`
         : "",
+      this.runtimeConfig.uiAssets.displayFontOtf
+        ? `url("${this.runtimeConfig.uiAssets.displayFontOtf}") format("opentype")`
+        : "",
     ].filter(Boolean);
 
     const existing = this.shadowRoot.querySelector("[data-gs-display-font]");
