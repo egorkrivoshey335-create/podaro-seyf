@@ -7,7 +7,9 @@ export const TEXTS = {
   welcomeTitle: "Забери подарок из сейфа",
   welcomeDescription:
     "Внутри уже ждет твой персональный приз. Без пустых попыток, без проигрышей, только приятный бонус за пару кликов.",
-  welcomeButton: "Открыть сейф",
+  welcomeButton: "Забрать подарок",
+  welcomeInfoButton: "Что это ?",
+  faqBackButton: "Назад",
   stageIdle: "Код готов. Нажми и открой сейф.",
   stageLoading: "Подбираем код и готовим подарок...",
   prizeTitle: "Поздравляем, приз уже твой",
@@ -72,6 +74,20 @@ export function getRuntimeConfig() {
       mp4Url: externalConfig.safeVideoMp4 || `${baseOrigin}/assets/safe-open.mp4`,
       webmUrl: externalConfig.safeVideoWebm || "",
       posterUrl: externalConfig.safeVideoPoster || "",
+    },
+    uiAssets: {
+      panelBackground:
+        externalConfig.panelBackgroundImage || `${baseOrigin}/assets/ui/fon.webp`,
+      frame:
+        externalConfig.frameImage || `${baseOrigin}/assets/ui/ramka.webp`,
+      flagLeft:
+        externalConfig.flagLeftImage || `${baseOrigin}/assets/ui/flag-left.webp`,
+      flagRight:
+        externalConfig.flagRightImage || `${baseOrigin}/assets/ui/flag-right.webp`,
+      primaryButton:
+        externalConfig.primaryButtonImage || `${baseOrigin}/assets/ui/knopka-zelenaya.webp`,
+      secondaryButton:
+        externalConfig.secondaryButtonImage || `${baseOrigin}/assets/ui/knopka-sinyaya.webp`,
     },
     theme: {
       primary: externalConfig.primaryColor || "#e97cac",

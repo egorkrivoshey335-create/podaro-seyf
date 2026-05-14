@@ -50,6 +50,45 @@ function getFabFallbackMarkup() {
   `;
 }
 
+const FAQ_ITEMS = [
+  {
+    question: "Что это за игра?",
+    answer:
+      "Это приветственный сейф с гарантированным подарком для нового гостя. Нажимаешь кнопку, открываешь сейф и сразу видишь, какой бонус выпал.",
+  },
+  {
+    question: "Какие подарки можно выиграть?",
+    answer:
+      "Внутри могут быть промокоды, бонусные баллы, бесплатная доставка и отдельные подарки. Конкретный приз зависит от настроек акции.",
+  },
+  {
+    question: "Как получить приз?",
+    answer:
+      "После открытия подарок закрепляется за этим браузером. Дальше виджет подскажет следующий шаг: зарегистрироваться, подтвердить email или заполнить данные для доставки.",
+  },
+  {
+    question: "Сколько времени действует выигрыш?",
+    answer:
+      "Обычно приз хранится 24 часа с момента открытия. Таймер и дальнейшие шаги покажутся в виджете автоматически.",
+  },
+];
+
+function getFaqMarkup() {
+  return FAQ_ITEMS.map(
+    (item, index) => `
+      <details class="gs-faq-item" ${index === 0 ? "open" : ""}>
+        <summary>
+          <span>${escapeHtml(item.question)}</span>
+          <span class="gs-faq-item-icon">+</span>
+        </summary>
+        <div class="gs-faq-item-body">
+          <p>${escapeHtml(item.answer)}</p>
+        </div>
+      </details>
+    `,
+  ).join("");
+}
+
 export class WidgetApp {
   constructor({ host, shadowRoot, runtimeConfig, api, guestId, fingerprintPromise, client, widgetState, scenario }) {
     this.host = host;
@@ -69,6 +108,7 @@ export class WidgetApp {
     this.hideModalCall = null;
     this.fabLottie = null;
     this.fabLottieTimeout = null;
+    this.panelMode = "default";
   }
 
   mount() {
@@ -179,6 +219,12 @@ export class WidgetApp {
     this.host.style.setProperty("--gs-primary", this.runtimeConfig.theme.primary);
     this.host.style.setProperty("--gs-accent", this.runtimeConfig.theme.accent);
     this.host.style.setProperty("--gs-surface", this.runtimeConfig.theme.surface);
+    this.host.style.setProperty("--gs-ui-panel-bg", `url("${this.runtimeConfig.uiAssets.panelBackground}")`);
+    this.host.style.setProperty("--gs-ui-frame", `url("${this.runtimeConfig.uiAssets.frame}")`);
+    this.host.style.setProperty("--gs-ui-flag-left", `url("${this.runtimeConfig.uiAssets.flagLeft}")`);
+    this.host.style.setProperty("--gs-ui-flag-right", `url("${this.runtimeConfig.uiAssets.flagRight}")`);
+    this.host.style.setProperty("--gs-ui-button-primary", `url("${this.runtimeConfig.uiAssets.primaryButton}")`);
+    this.host.style.setProperty("--gs-ui-button-secondary", `url("${this.runtimeConfig.uiAssets.secondaryButton}")`);
   }
 
   renderShell() {
@@ -201,37 +247,47 @@ export class WidgetApp {
         <div class="gs-modal" hidden>
           <div class="gs-backdrop" data-action="close"></div>
           <section class="gs-panel" role="dialog" aria-modal="true" aria-label="Подарок из сейфа">
+            <div class="gs-panel-flags" aria-hidden="true">
+              <div class="gs-flag gs-flag--left"></div>
+              <div class="gs-flag gs-flag--right"></div>
+            </div>
             <button class="gs-close" type="button" data-action="close" aria-label="Закрыть">×</button>
             <div class="gs-panel-grid">
-              <div class="gs-stage" data-gs-stage>
-                <div class="gs-stage-noise"></div>
-                <div class="gs-video-shell" data-gs-video-shell hidden>
-                  <video
-                    class="gs-stage-video"
-                    data-gs-video
-                    playsinline
-                    preload="metadata"
-                    controlslist="nodownload noplaybackrate nofullscreen"
-                    disablepictureinpicture
-                  ></video>
-                </div>
-                <div class="gs-prize-badge" data-gs-prize-badge></div>
-                <div class="gs-stage-scene" data-gs-stage-scene>
-                  <div class="gs-safe-light" data-gs-safe-light></div>
-                  <div class="gs-safe" data-gs-safe>
-                    <div class="gs-safe-body"></div>
-                    <div class="gs-safe-inside"></div>
-                    <div class="gs-safe-door" data-gs-safe-door>
-                      <div class="gs-safe-rings">
-                        <span class="gs-code-digit" data-gs-digit>0</span>
-                        <span class="gs-code-digit" data-gs-digit>0</span>
-                        <span class="gs-code-digit" data-gs-digit>0</span>
+              <div class="gs-stage-wrap" data-gs-stage-wrap>
+                <div class="gs-stage-frame">
+                  <div class="gs-stage-window">
+                    <div class="gs-stage" data-gs-stage>
+                      <div class="gs-stage-noise"></div>
+                      <div class="gs-video-shell" data-gs-video-shell hidden>
+                        <video
+                          class="gs-stage-video"
+                          data-gs-video
+                          playsinline
+                          preload="metadata"
+                          controlslist="nodownload noplaybackrate nofullscreen"
+                          disablepictureinpicture
+                        ></video>
                       </div>
-                      <div class="gs-lock" data-gs-lock></div>
+                      <div class="gs-prize-badge" data-gs-prize-badge></div>
+                      <div class="gs-stage-scene" data-gs-stage-scene>
+                        <div class="gs-safe-light" data-gs-safe-light></div>
+                        <div class="gs-safe" data-gs-safe>
+                          <div class="gs-safe-body"></div>
+                          <div class="gs-safe-inside"></div>
+                          <div class="gs-safe-door" data-gs-safe-door>
+                            <div class="gs-safe-rings">
+                              <span class="gs-code-digit" data-gs-digit>0</span>
+                              <span class="gs-code-digit" data-gs-digit>0</span>
+                              <span class="gs-code-digit" data-gs-digit>0</span>
+                            </div>
+                            <div class="gs-lock" data-gs-lock></div>
+                          </div>
+                        </div>
+                      </div>
+                      <p class="gs-stage-status" data-gs-stage-status>${TEXTS.stageIdle}</p>
                     </div>
                   </div>
                 </div>
-                <p class="gs-stage-status" data-gs-stage-status>${TEXTS.stageIdle}</p>
               </div>
               <div class="gs-copy" data-gs-copy></div>
             </div>
@@ -249,14 +305,74 @@ export class WidgetApp {
       modal: this.shadowRoot.querySelector(".gs-modal"),
       backdrop: this.shadowRoot.querySelector(".gs-backdrop"),
       panel: this.shadowRoot.querySelector(".gs-panel"),
+      panelFlags: this.shadowRoot.querySelector(".gs-panel-flags"),
       close: this.shadowRoot.querySelector(".gs-close"),
       copy: this.shadowRoot.querySelector("[data-gs-copy]"),
+      stageWrap: this.shadowRoot.querySelector("[data-gs-stage-wrap]"),
       stage: this.shadowRoot.querySelector("[data-gs-stage]"),
     };
 
     this.refs.fab.addEventListener("click", () => this.openFromButton());
     this.shadowRoot.querySelector(".gs-backdrop").addEventListener("click", () => this.closeModal());
     this.refs.close.addEventListener("click", () => this.closeModal());
+  }
+
+  setPanelMode(mode) {
+    this.panelMode = mode;
+    this.refs.panel.classList.toggle("gs-panel--hero", mode === "hero");
+    this.refs.panel.classList.toggle("gs-panel--faq", mode === "faq");
+    this.refs.panel.classList.toggle("gs-panel--default", mode === "default");
+
+    this.refs.stageWrap.hidden = mode === "faq";
+    this.refs.panelFlags.hidden = mode === "default";
+  }
+
+  animatePanelChrome() {
+    const targets = [];
+    if (!this.refs.panelFlags.hidden) {
+      targets.push(this.refs.panelFlags);
+    }
+    if (!this.refs.stageWrap.hidden) {
+      targets.push(this.refs.stageWrap);
+    }
+
+    if (!targets.length) {
+      return;
+    }
+
+    gsap.fromTo(
+      targets,
+      { autoAlpha: 0, y: -12 },
+      { autoAlpha: 1, y: 0, duration: 0.32, stagger: 0.06, ease: "power2.out" },
+    );
+  }
+
+  transitionPanel(mode, renderNext) {
+    const targets = [...this.refs.copy.children];
+    if (!this.refs.stageWrap.hidden) {
+      targets.unshift(this.refs.stageWrap);
+    }
+
+    if (!targets.length) {
+      this.setPanelMode(mode);
+      renderNext();
+      this.animatePanelChrome();
+      return;
+    }
+
+    gsap.killTweensOf(targets);
+    gsap.to(targets, {
+      autoAlpha: 0,
+      y: -18,
+      duration: 0.2,
+      stagger: 0.03,
+      ease: "power2.in",
+      onComplete: () => {
+        this.setPanelMode(mode);
+        renderNext();
+        this.animatePanelChrome();
+      },
+    });
   }
 
   resetStage(statusText) {
@@ -275,6 +391,7 @@ export class WidgetApp {
     window.clearTimeout(this.autoOpenTimer);
 
     if (this.scenario === "guest-fresh") {
+      this.setPanelMode("hero");
       if (!showSafeVideoPreview(this.refs.stage, this.runtimeConfig, TEXTS.stageIdle)) {
         this.resetStage(TEXTS.stageIdle);
       }
@@ -284,12 +401,14 @@ export class WidgetApp {
     }
 
     if (this.scenario === "guest-pending") {
+      this.setPanelMode("default");
       this.showPrizeStage(this.widgetState.prize, "Приз закреплен за этим браузером.");
       this.renderPrizePending();
       return;
     }
 
     if (this.scenario === "authorized-claim") {
+      this.setPanelMode("default");
       this.showPrizeStage(this.widgetState.prize, "Приз уже готов к получению.");
       this.renderDelivery();
       this.scheduleAutoOpen();
@@ -297,6 +416,7 @@ export class WidgetApp {
     }
 
     if (this.scenario === "expired") {
+      this.setPanelMode("default");
       this.renderExpired();
       return;
     }
@@ -445,6 +565,8 @@ export class WidgetApp {
     this.bindPrizeMedia();
 
     this.refs.copy.querySelector("[data-action='spin']")?.addEventListener("click", () => this.handleSpin());
+    this.refs.copy.querySelector("[data-action='faq-open']")?.addEventListener("click", () => this.openFaq());
+    this.refs.copy.querySelector("[data-action='faq-back']")?.addEventListener("click", () => this.closeFaq());
     this.refs.copy
       .querySelector("[data-action='register']")
       ?.addEventListener("click", () => window.open(this.runtimeConfig.registerUrl, "_blank", "noopener"));
@@ -462,6 +584,14 @@ export class WidgetApp {
       { y: 18, autoAlpha: 0 },
       { y: 0, autoAlpha: 1, duration: 0.34, stagger: 0.06, ease: "power2.out" },
     );
+  }
+
+  openFaq() {
+    this.transitionPanel("faq", () => this.renderFaq());
+  }
+
+  closeFaq() {
+    this.transitionPanel("hero", () => this.renderWelcome());
   }
 
   bindPrizeMedia() {
@@ -520,26 +650,39 @@ export class WidgetApp {
   }
 
   renderWelcome() {
+    this.setPanelMode("hero");
     this.renderCopy(`
-      <div class="gs-copy-block">
-        <span class="gs-kicker">${TEXTS.welcomeEyebrow}</span>
-        <h2>${TEXTS.welcomeTitle}</h2>
-        <p>${TEXTS.welcomeDescription}</p>
+      <div class="gs-hero-actions">
+        <button class="gs-asset-button gs-asset-button--primary" type="button" data-action="spin">
+          <span>${TEXTS.welcomeButton}</span>
+        </button>
+        <button class="gs-asset-button gs-asset-button--secondary" type="button" data-action="faq-open">
+          <span>${TEXTS.welcomeInfoButton}</span>
+        </button>
       </div>
-      <div class="gs-chip-row">
-        <span>Промокоды</span>
-        <span>Бонусы</span>
-        <span>Физические подарки</span>
-        <span>Бесплатная доставка</span>
+    `);
+  }
+
+  renderFaq() {
+    this.setPanelMode("faq");
+    this.renderCopy(`
+      <div class="gs-faq-view">
+        <div class="gs-faq-header">
+          <h2>Что это за сейф?</h2>
+          <p>Коротко о том, как работает розыгрыш и что ждёт внутри.</p>
+        </div>
+        <div class="gs-faq-list">
+          ${getFaqMarkup()}
+        </div>
+        <button class="gs-asset-button gs-asset-button--secondary" type="button" data-action="faq-back">
+          <span>${TEXTS.faqBackButton}</span>
+        </button>
       </div>
-      <button class="gs-button gs-button--primary" type="button" data-action="spin">
-        ${TEXTS.welcomeButton}
-      </button>
-      <p class="gs-footnote">После открытия подарок закрепится за этим браузером на 24 часа.</p>
     `);
   }
 
   renderPrizePending() {
+    this.setPanelMode("default");
     this.renderCopy(`
       <div class="gs-copy-block">
         <span class="gs-kicker">Приз уже найден</span>
@@ -558,6 +701,7 @@ export class WidgetApp {
   }
 
   renderDelivery() {
+    this.setPanelMode("default");
     const needsAddress = Boolean(this.widgetState?.prize?.requiresAddress);
     const emailValue = escapeHtml(this.client?.email || this.widgetState?.clientEmail || "");
     const prizeType = this.widgetState?.prize?.type;
@@ -617,6 +761,7 @@ export class WidgetApp {
   }
 
   renderSuccess(message, promoCode) {
+    this.setPanelMode("default");
     this.refs.fab.hidden = true;
     this.renderCopy(`
       <div class="gs-copy-block">
@@ -632,6 +777,7 @@ export class WidgetApp {
   }
 
   renderBlocked(error) {
+    this.setPanelMode("default");
     this.resetStage("Защита остановила повторную попытку.");
     this.renderCopy(`
       <div class="gs-copy-block">
@@ -646,6 +792,7 @@ export class WidgetApp {
   }
 
   renderExpired() {
+    this.setPanelMode("default");
     this.refs.fab.hidden = true;
     this.resetStage("Время розыгрыша истекло.");
     this.renderCopy(`
@@ -666,6 +813,7 @@ export class WidgetApp {
     }
 
     this.isUnlocking = true;
+    this.setPanelMode("hero");
     this.refs.close.disabled = true;
     this.renderCopy(`
       <div class="gs-copy-block">
@@ -716,6 +864,7 @@ export class WidgetApp {
       }
 
       this.scenario = "guest-pending";
+      this.setPanelMode("default");
       this.updateButton();
       this.renderPrizePending();
     } catch (error) {
