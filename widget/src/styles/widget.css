@@ -988,7 +988,7 @@
 
   .gs-panel--hero,
   .gs-panel--faq {
-    width: min(70vw, 70vh, 920px);
+    width: min(92vw, 92vh);
     aspect-ratio: 9 / 16;
   }
 
