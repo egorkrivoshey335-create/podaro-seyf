@@ -619,7 +619,7 @@
   display: flex;
   flex-direction: column;
   gap: 18px;
-  margin-top: 28px;
+  margin-top: 15px;
 }
 
 .gs-faq-view > .gs-asset-button {
@@ -677,7 +677,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  padding: 18px 20px;
+  padding: 10px 10px;
   color: #ffffff;
   font-family: var(--gs-display-font);
   font-size: 20px;
@@ -709,7 +709,7 @@
 }
 
 .gs-faq-item-body-inner {
-  padding: 0 20px 18px;
+  padding: 0 20px 15px;
 }
 
 .gs-faq-item-body p {

@@ -89,10 +89,10 @@ export function getRuntimeConfig() {
       secondaryButton:
         externalConfig.secondaryButtonImage || `${baseOrigin}/assets/ui/knopka-sinyaya.webp`,
       displayFontFamily:
-        externalConfig.displayFontFamily || "Rubik Spray Paint",
+        externalConfig.displayFontFamily || "Rubik Bubbles",
       displayFontStylesheetUrl:
         externalConfig.displayFontStylesheetUrl ||
-        "https://fonts.googleapis.com/css2?family=Rubik+Spray+Paint&display=swap",
+        "https://fonts.googleapis.com/css2?family=Rubik+Bubbles&display=swap",
       displayFontWoff2:
         externalConfig.displayFontWoff2 || "",
       displayFontWoff:
