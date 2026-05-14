@@ -219,7 +219,7 @@
 
 .gs-flag {
   position: absolute;
-  top: -4%;
+  top: -7%;
   width: min(40%, 300px);
   pointer-events: none;
 }
@@ -1000,6 +1000,7 @@
 
   .gs-flag {
     width: min(40%, 160px);
+    top: -4%;
   }
 
   .gs-panel--hero .gs-stage-wrap {
