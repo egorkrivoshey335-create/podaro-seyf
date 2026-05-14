@@ -229,7 +229,44 @@ export class WidgetApp {
     this.host.style.setProperty("--gs-ui-flag-right", `url("${this.runtimeConfig.uiAssets.flagRight}")`);
     this.host.style.setProperty("--gs-ui-button-primary", `url("${this.runtimeConfig.uiAssets.primaryButton}")`);
     this.host.style.setProperty("--gs-ui-button-secondary", `url("${this.runtimeConfig.uiAssets.secondaryButton}")`);
+    this.ensureDisplayFontStylesheet();
     this.applyDisplayFontFace();
+  }
+
+  ensureDisplayFontStylesheet() {
+    const href = this.runtimeConfig.uiAssets.displayFontStylesheetUrl;
+    if (!href) {
+      return;
+    }
+
+    if (!document.head) {
+      return;
+    }
+
+    if (!document.head.querySelector('[data-gs-font-preconnect="googleapis"]')) {
+      const googleApis = document.createElement("link");
+      googleApis.rel = "preconnect";
+      googleApis.href = "https://fonts.googleapis.com";
+      googleApis.setAttribute("data-gs-font-preconnect", "googleapis");
+      document.head.append(googleApis);
+    }
+
+    if (!document.head.querySelector('[data-gs-font-preconnect="gstatic"]')) {
+      const gstatic = document.createElement("link");
+      gstatic.rel = "preconnect";
+      gstatic.href = "https://fonts.gstatic.com";
+      gstatic.crossOrigin = "anonymous";
+      gstatic.setAttribute("data-gs-font-preconnect", "gstatic");
+      document.head.append(gstatic);
+    }
+
+    if (!document.head.querySelector(`[data-gs-display-font-link="${href}"]`)) {
+      const stylesheet = document.createElement("link");
+      stylesheet.rel = "stylesheet";
+      stylesheet.href = href;
+      stylesheet.setAttribute("data-gs-display-font-link", href);
+      document.head.append(stylesheet);
+    }
   }
 
   applyDisplayFontFace() {
@@ -629,7 +666,7 @@ export class WidgetApp {
       this.destroy();
     });
 
-    const finalOffsetY = this.panelMode === "hero" ? -9 : 0;
+    const finalOffsetY = this.panelMode === "hero" ? -25 : 0;
     gsap.fromTo(
       this.refs.copy.children,
       { y: finalOffsetY + 18, autoAlpha: 0 },

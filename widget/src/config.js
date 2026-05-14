@@ -89,13 +89,16 @@ export function getRuntimeConfig() {
       secondaryButton:
         externalConfig.secondaryButtonImage || `${baseOrigin}/assets/ui/knopka-sinyaya.webp`,
       displayFontFamily:
-        externalConfig.displayFontFamily || "Arco Cyrillic",
+        externalConfig.displayFontFamily || "Rubik Spray Paint",
+      displayFontStylesheetUrl:
+        externalConfig.displayFontStylesheetUrl ||
+        "https://fonts.googleapis.com/css2?family=Rubik+Spray+Paint&display=swap",
       displayFontWoff2:
         externalConfig.displayFontWoff2 || "",
       displayFontWoff:
         externalConfig.displayFontWoff || "",
       displayFontOtf:
-        externalConfig.displayFontOtf || `${baseOrigin}/assets/fonts/arco-cyrillic.otf`,
+        externalConfig.displayFontOtf || "",
     },
     theme: {
       primary: externalConfig.primaryColor || "#e97cac",
