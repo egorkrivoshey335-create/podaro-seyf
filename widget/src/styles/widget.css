@@ -994,7 +994,7 @@
 
   .gs-panel--hero .gs-panel-grid,
   .gs-panel--faq .gs-panel-grid {
-    gap: 45px;
+    gap: 0;
     padding: 76px 16px 20px;
   }
 
@@ -1003,8 +1003,8 @@
   }
 
   .gs-panel--hero .gs-stage-wrap {
-    width: min(78%, 330px);
-    top: 0%;
+    width: min(100%, 530px);
+    top: -4%;
   }
 
   .gs-panel--default .gs-stage {
@@ -1032,10 +1032,10 @@
   }
 
   .gs-asset-button {
-    width: min(240px, 100%);
+    width: min(200px, 100%);
     max-width: none;
     flex: 0 auto;
-    font-size: 22px;
+    font-size: 18px;
   }
 
   .gs-faq-view > .gs-asset-button {
