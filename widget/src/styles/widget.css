@@ -219,7 +219,7 @@
 
 .gs-flag {
   position: absolute;
-  top: -7%;
+  top: -4%;
   width: min(40%, 300px);
   pointer-events: none;
 }
@@ -988,27 +988,23 @@
 
   .gs-panel--hero,
   .gs-panel--faq {
-    width: min(96vw, 96vh);
+    width: min(70vw, 70vh, 920px);
+    aspect-ratio: 9 / 16;
   }
 
   .gs-panel--hero .gs-panel-grid,
   .gs-panel--faq .gs-panel-grid {
-    gap: 16px;
+    gap: 45px;
     padding: 76px 16px 20px;
   }
 
   .gs-flag {
-    width: min(36%, 124px);
+    width: min(40%, 160px);
   }
 
   .gs-panel--hero .gs-stage-wrap {
     width: min(78%, 330px);
-  }
-
-  .gs-stage-window {
-    top: 31%;
-    left: 18%;
-    right: 18%;
+    top: 0%;
   }
 
   .gs-panel--default .gs-stage {
@@ -1029,8 +1025,8 @@
   }
 
   .gs-fab {
-    left: 12px;
-    bottom: 12px;
+    left: 10px;
+    bottom: 75px;
     width: 72px;
     height: 72px;
   }
@@ -1038,8 +1034,12 @@
   .gs-asset-button {
     width: min(240px, 100%);
     max-width: none;
-    flex: 0 1 auto;
+    flex: 0 auto;
     font-size: 22px;
+  }
+
+  .gs-faq-view > .gs-asset-button {
+    margin-top: 50px;
   }
 
   .gs-asset-button span {

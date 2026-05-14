@@ -674,12 +674,24 @@ export class WidgetApp {
       this.destroy();
     });
 
-    const finalOffsetY = this.panelMode === "hero" ? -25 : 0;
+    const finalOffsetY = this.getHeroActionsOffsetY();
     gsap.fromTo(
       this.refs.copy.children,
       { y: finalOffsetY + 18, autoAlpha: 0 },
       { y: finalOffsetY, autoAlpha: 1, duration: 0.34, stagger: 0.06, ease: "power2.out" },
     );
+  }
+
+  getHeroActionsOffsetY() {
+    if (this.panelMode !== "hero") {
+      return 0;
+    }
+
+    if (window.matchMedia?.("(max-width: 640px)").matches) {
+      return 0;
+    }
+
+    return -25;
   }
 
   setupFaqAccordion() {
