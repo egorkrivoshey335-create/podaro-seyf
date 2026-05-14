@@ -316,7 +316,6 @@ export class WidgetApp {
                           disablepictureinpicture
                         ></video>
                       </div>
-                      <div class="gs-prize-badge" data-gs-prize-badge></div>
                       <div class="gs-stage-scene" data-gs-stage-scene>
                         <div class="gs-safe-light" data-gs-safe-light></div>
                         <div class="gs-safe" data-gs-safe>

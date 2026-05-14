@@ -1,7 +1,5 @@
 import { gsap } from "gsap";
 
-import { getPrizeVisual } from "../config.js";
-
 function getDigits(root) {
   return Array.from(root.querySelectorAll("[data-gs-digit]"));
 }
@@ -12,21 +10,6 @@ function setDigits(root, digits) {
   });
 }
 
-function setBadge(root, prize) {
-  const badge = root.querySelector("[data-gs-prize-badge]");
-  const visual = getPrizeVisual(prize);
-
-  if (!badge) {
-    return;
-  }
-
-  badge.style.setProperty("--gs-badge-accent", visual.accent);
-  badge.innerHTML = `
-    <span class="gs-prize-badge-label">${visual.badge}</span>
-    <span class="gs-prize-badge-title">${prize?.title || "Подарок"}</span>
-  `;
-}
-
 function setStatus(root, statusText) {
   const status = root.querySelector("[data-gs-stage-status]");
   if (status && statusText) {
@@ -35,18 +18,15 @@ function setStatus(root, statusText) {
 }
 
 function applyPrizeState(root, prize, statusText) {
-  setBadge(root, prize);
   setDigits(root, ["7", "2", "4"]);
   setStatus(root, statusText);
 }
 
 export function resetSafeScene(root, statusText) {
   const door = root.querySelector("[data-gs-safe-door]");
-  const badge = root.querySelector("[data-gs-prize-badge]");
   const light = root.querySelector("[data-gs-safe-light]");
 
   gsap.set(door, { rotateY: 0, rotateZ: 0 });
-  gsap.set(badge, { autoAlpha: 0, y: 18, scale: 0.86 });
   gsap.set(light, { autoAlpha: 0.15, scale: 0.9 });
   setDigits(root, ["0", "0", "0"]);
   setStatus(root, statusText);
@@ -54,31 +34,26 @@ export function resetSafeScene(root, statusText) {
 
 export function showPrizeState(root, prize, statusText) {
   const door = root.querySelector("[data-gs-safe-door]");
-  const badge = root.querySelector("[data-gs-prize-badge]");
   const light = root.querySelector("[data-gs-safe-light]");
 
   applyPrizeState(root, prize, statusText);
 
   gsap.set(door, { rotateY: -105, rotateZ: -3 });
-  gsap.set(badge, { autoAlpha: 1, y: 0, scale: 1 });
   gsap.set(light, { autoAlpha: 0.95, scale: 1.15 });
 }
 
 export function revealPrizeState(root, prize, statusText) {
-  const badge = root.querySelector("[data-gs-prize-badge]");
   const light = root.querySelector("[data-gs-safe-light]");
 
   applyPrizeState(root, prize, statusText);
-  gsap.set(badge, { autoAlpha: 0, y: 22, scale: 0.88 });
   gsap.fromTo(
     light,
     { autoAlpha: 0.45, scale: 1 },
     { autoAlpha: 0.98, scale: 1.16, duration: 0.4, ease: "power2.out" },
   );
-  return gsap.to(badge, {
+  return gsap.to(light, {
     autoAlpha: 1,
-    y: 0,
-    scale: 1,
+    scale: 1.18,
     duration: 0.42,
     ease: "power2.out",
   });
@@ -87,7 +62,6 @@ export function revealPrizeState(root, prize, statusText) {
 export function playUnlockSequence(root, prize, statusText) {
   const door = root.querySelector("[data-gs-safe-door]");
   const lock = root.querySelector("[data-gs-lock]");
-  const badge = root.querySelector("[data-gs-prize-badge]");
   const light = root.querySelector("[data-gs-safe-light]");
 
   applyPrizeState(root, prize, statusText);
@@ -110,7 +84,6 @@ export function playUnlockSequence(root, prize, statusText) {
     });
 
     timeline
-      .set(badge, { autoAlpha: 0, y: 22, scale: 0.82 })
       .to(lock, {
         rotate: 540,
         scale: 1.08,
@@ -137,17 +110,6 @@ export function playUnlockSequence(root, prize, statusText) {
           duration: 0.95,
           ease: "power3.inOut",
           transformOrigin: "left center",
-        },
-        "-=0.05",
-      )
-      .to(
-        badge,
-        {
-          autoAlpha: 1,
-          y: 0,
-          scale: 1,
-          duration: 0.55,
-          ease: "back.out(1.6)",
         },
         "-=0.15",
       );
