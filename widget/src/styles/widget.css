@@ -513,7 +513,7 @@
 }
 
 .gs-panel--hero .gs-stage-wrap {
-  top: -6%;
+  top: -9%;
   width: min(65%, 430px);
 }
 
@@ -551,7 +551,7 @@
   align-items: center;
   justify-content: center;
   position: relative;
-  top: -15px;
+  top: -9px;
 }
 
 .gs-asset-button {
