@@ -622,6 +622,10 @@
   margin-top: 28px;
 }
 
+.gs-faq-view > .gs-asset-button {
+  align-self: center;
+}
+
 .gs-faq-header {
   display: flex;
   flex-direction: column;
@@ -643,8 +647,12 @@
 .gs-faq-header p {
   margin: 0;
   color: rgba(255, 255, 255, 0.86);
-  font-size: 15px;
-  line-height: 1.6;
+  font-family: var(--gs-display-font);
+  font-size: 18px;
+  font-weight: 400;
+  font-synthesis: none;
+  line-height: 1.35;
+  text-shadow: 0 4px 18px rgba(7, 10, 23, 0.2);
 }
 
 .gs-faq-list {
@@ -661,21 +669,24 @@
   overflow: hidden;
 }
 
-.gs-faq-item summary {
+.gs-faq-item-trigger {
+  width: 100%;
+  border: 0;
+  background: transparent;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
   padding: 18px 20px;
   color: #ffffff;
-  font-size: 16px;
-  font-weight: 800;
+  font-family: var(--gs-display-font);
+  font-size: 20px;
+  font-weight: 400;
+  font-synthesis: none;
+  line-height: 1.15;
+  text-align: left;
   cursor: pointer;
-  list-style: none;
-}
-
-.gs-faq-item summary::-webkit-details-marker {
-  display: none;
+  text-shadow: 0 3px 14px rgba(7, 10, 23, 0.22);
 }
 
 .gs-faq-item-icon {
@@ -689,40 +700,27 @@
   background: rgba(255, 255, 255, 0.12);
   font-size: 20px;
   line-height: 1;
-  transition: transform 0.2s ease;
-}
-
-.gs-faq-item[open] .gs-faq-item-icon {
-  transform: rotate(45deg);
 }
 
 .gs-faq-item-body {
-  display: grid;
-  grid-template-rows: 0fr;
-  padding: 0 20px;
+  height: 0;
   opacity: 0;
-  transition:
-    grid-template-rows 0.28s ease,
-    padding 0.28s ease,
-    opacity 0.24s ease;
-}
-
-.gs-faq-item[open] .gs-faq-item-body {
-  grid-template-rows: 1fr;
-  padding: 0 20px 18px;
-  opacity: 1;
-}
-
-.gs-faq-item-body > p {
   overflow: hidden;
-  min-height: 0;
+}
+
+.gs-faq-item-body-inner {
+  padding: 0 20px 18px;
 }
 
 .gs-faq-item-body p {
   margin: 0;
   color: rgba(255, 255, 255, 0.88);
-  font-size: 14px;
-  line-height: 1.6;
+  font-family: var(--gs-display-font);
+  font-size: 16px;
+  font-weight: 400;
+  font-synthesis: none;
+  line-height: 1.4;
+  text-shadow: 0 3px 12px rgba(7, 10, 23, 0.18);
 }
 
 .gs-copy-block {

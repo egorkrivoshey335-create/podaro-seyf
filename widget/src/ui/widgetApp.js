@@ -52,39 +52,46 @@ function getFabFallbackMarkup() {
 
 const FAQ_ITEMS = [
   {
-    question: "Что это за игра?",
+    question: "Что это вообще?",
     answer:
-      "Это приветственный сейф с гарантированным подарком для нового гостя. Нажимаешь кнопку, открываешь сейф и сразу видишь, какой бонус выпал.",
+      "Это подарок для новых гостей. Нажми на кнопку, открой сейф и сразу увидишь, что досталось именно тебе.",
   },
   {
-    question: "Какие подарки можно выиграть?",
+    question: "Что можно получить?",
     answer:
-      "Внутри могут быть промокоды, бонусные баллы, бесплатная доставка и отдельные подарки. Конкретный приз зависит от настроек акции.",
+      "Внутри могут быть скидка, бесплатная доставка, бонусы к заказу или приятный подарок. Пустых попыток здесь нет.",
   },
   {
-    question: "Как получить приз?",
+    question: "Как забрать подарок?",
     answer:
-      "После открытия подарок закрепляется за этим браузером. Дальше виджет подскажет следующий шаг: зарегистрироваться, подтвердить email или заполнить данные для доставки.",
+      "После открытия виджет сразу подскажет, что делать дальше. Иногда достаточно сохранить промокод, а иногда оставить контакты, чтобы закрепить подарок за собой.",
   },
   {
-    question: "Сколько времени действует выигрыш?",
+    question: "Сколько действует подарок?",
     answer:
-      "Обычно приз хранится 24 часа с момента открытия. Таймер и дальнейшие шаги покажутся в виджете автоматически.",
+      "После открытия подарок сохраняется за тобой на 24 часа, чтобы ты успел спокойно им воспользоваться.",
   },
 ];
 
 function getFaqMarkup() {
   return FAQ_ITEMS.map(
     (item, index) => `
-      <details class="gs-faq-item" ${index === 0 ? "open" : ""}>
-        <summary>
+      <div class="gs-faq-item ${index === 0 ? "is-open" : ""}" data-gs-faq-item>
+        <button
+          class="gs-faq-item-trigger"
+          type="button"
+          data-action="faq-toggle"
+          aria-expanded="${index === 0 ? "true" : "false"}"
+        >
           <span>${escapeHtml(item.question)}</span>
           <span class="gs-faq-item-icon">+</span>
-        </summary>
-        <div class="gs-faq-item-body">
-          <p>${escapeHtml(item.answer)}</p>
+        </button>
+        <div class="gs-faq-item-body" data-gs-faq-body>
+          <div class="gs-faq-item-body-inner">
+            <p>${escapeHtml(item.answer)}</p>
+          </div>
         </div>
-      </details>
+      </div>
     `,
   ).join("");
 }
@@ -650,6 +657,7 @@ export class WidgetApp {
   renderCopy(markup) {
     this.refs.copy.innerHTML = markup;
     this.bindPrizeMedia();
+    this.setupFaqAccordion();
 
     this.refs.copy.querySelector("[data-action='spin']")?.addEventListener("click", () => this.handleSpin());
     this.refs.copy.querySelector("[data-action='faq-open']")?.addEventListener("click", () => this.openFaq());
@@ -672,6 +680,86 @@ export class WidgetApp {
       { y: finalOffsetY + 18, autoAlpha: 0 },
       { y: finalOffsetY, autoAlpha: 1, duration: 0.34, stagger: 0.06, ease: "power2.out" },
     );
+  }
+
+  setupFaqAccordion() {
+    const items = Array.from(this.refs.copy.querySelectorAll("[data-gs-faq-item]"));
+    if (!items.length) {
+      return;
+    }
+
+    items.forEach((item) => {
+      const trigger = item.querySelector("[data-action='faq-toggle']");
+      const body = item.querySelector("[data-gs-faq-body]");
+      const icon = item.querySelector(".gs-faq-item-icon");
+      const isOpen = item.classList.contains("is-open");
+
+      if (!trigger || !body || !icon) {
+        return;
+      }
+
+      gsap.killTweensOf([body, icon]);
+      gsap.set(body, {
+        height: isOpen ? "auto" : 0,
+        autoAlpha: isOpen ? 1 : 0,
+        overflow: "hidden",
+      });
+      gsap.set(icon, { rotate: isOpen ? 45 : 0 });
+
+      trigger.addEventListener("click", () => {
+        const shouldOpen = !item.classList.contains("is-open");
+        items.forEach((otherItem) => {
+          this.setFaqItemState(otherItem, otherItem === item ? shouldOpen : false);
+        });
+      });
+    });
+  }
+
+  setFaqItemState(item, isOpen) {
+    const trigger = item.querySelector("[data-action='faq-toggle']");
+    const body = item.querySelector("[data-gs-faq-body]");
+    const icon = item.querySelector(".gs-faq-item-icon");
+
+    if (!trigger || !body || !icon) {
+      return;
+    }
+
+    gsap.killTweensOf([body, icon]);
+    trigger.setAttribute("aria-expanded", isOpen ? "true" : "false");
+
+    if (isOpen) {
+      item.classList.add("is-open");
+      gsap.set(body, { height: "auto", overflow: "hidden" });
+      const targetHeight = body.offsetHeight;
+      gsap.fromTo(
+        body,
+        { height: 0, autoAlpha: 0 },
+        {
+          height: targetHeight,
+          autoAlpha: 1,
+          duration: 0.3,
+          ease: "power2.out",
+          onComplete: () => gsap.set(body, { height: "auto" }),
+        },
+      );
+      gsap.to(icon, { rotate: 45, duration: 0.24, ease: "power2.out" });
+      return;
+    }
+
+    const currentHeight = body.offsetHeight;
+    item.classList.remove("is-open");
+    gsap.fromTo(
+      body,
+      { height: currentHeight, autoAlpha: 1 },
+      {
+        height: 0,
+        autoAlpha: 0,
+        duration: 0.24,
+        ease: "power2.inOut",
+        onComplete: () => gsap.set(body, { overflow: "hidden" }),
+      },
+    );
+    gsap.to(icon, { rotate: 0, duration: 0.22, ease: "power2.out" });
   }
 
   openFaq() {
@@ -758,8 +846,8 @@ export class WidgetApp {
     this.renderCopy(`
       <div class="gs-faq-view">
         <div class="gs-faq-header">
-          <h2>Что это за сейф?</h2>
-          <p>Коротко о том, как работает розыгрыш и что ждёт внутри.</p>
+          <h2>Что внутри сейфа?</h2>
+          <p>Коротко и по-человечески: что это за подарок и как его забрать.</p>
         </div>
         <div class="gs-faq-list">
           ${getFaqMarkup()}
