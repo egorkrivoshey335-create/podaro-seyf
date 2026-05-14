@@ -629,10 +629,11 @@ export class WidgetApp {
       this.destroy();
     });
 
+    const finalOffsetY = this.panelMode === "hero" ? -9 : 0;
     gsap.fromTo(
       this.refs.copy.children,
-      { y: 18, autoAlpha: 0 },
-      { y: 0, autoAlpha: 1, duration: 0.34, stagger: 0.06, ease: "power2.out" },
+      { y: finalOffsetY + 18, autoAlpha: 0 },
+      { y: finalOffsetY, autoAlpha: 1, duration: 0.34, stagger: 0.06, ease: "power2.out" },
     );
   }
 

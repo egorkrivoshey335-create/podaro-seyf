@@ -550,8 +550,6 @@
   width: 100%;
   align-items: center;
   justify-content: center;
-  position: relative;
-  top: -9px;
 }
 
 .gs-asset-button {
