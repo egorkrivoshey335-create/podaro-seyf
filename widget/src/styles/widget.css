@@ -22,6 +22,10 @@
   pointer-events: none !important;
 }
 
+[hidden] {
+  display: none !important;
+}
+
 .gs-fab {
   position: fixed;
   left: 24px;
@@ -523,6 +527,10 @@
   background: transparent;
 }
 
+.gs-panel--faq .gs-stage-wrap {
+  display: none !important;
+}
+
 .gs-panel--default .gs-stage {
   min-height: 460px;
 }
@@ -563,11 +571,16 @@
   background: transparent;
   color: #ffffff;
   font-family: var(--gs-display-font);
-  font-size: clamp(22px, 2.8vw, 31px);
+  font-size: clamp(22px, 2.8vw, 24px);
   font-weight: 400;
   font-synthesis: none;
   letter-spacing: 0;
   cursor: pointer;
+  transform-origin: center;
+  transition:
+    transform 0.18s ease,
+    filter 0.18s ease;
+  will-change: transform;
   text-shadow:
     0 2px 0 rgba(34, 41, 8, 0.45),
     0 4px 12px rgba(7, 10, 23, 0.28);
@@ -590,12 +603,15 @@
   pointer-events: none;
 }
 
-.gs-asset-button:hover {
-  transform: translateY(-2px);
+@media (hover: hover) and (pointer: fine) {
+  .gs-asset-button:hover {
+    transform: translateY(-2px) scale(1.01);
+    filter: brightness(1.03);
+  }
 }
 
 .gs-asset-button:active {
-  transform: translateY(0);
+  transform: translateY(0) scale(0.995);
 }
 
 .gs-faq-view {
@@ -681,7 +697,25 @@
 }
 
 .gs-faq-item-body {
+  display: grid;
+  grid-template-rows: 0fr;
+  padding: 0 20px;
+  opacity: 0;
+  transition:
+    grid-template-rows 0.28s ease,
+    padding 0.28s ease,
+    opacity 0.24s ease;
+}
+
+.gs-faq-item[open] .gs-faq-item-body {
+  grid-template-rows: 1fr;
   padding: 0 20px 18px;
+  opacity: 1;
+}
+
+.gs-faq-item-body > p {
+  overflow: hidden;
+  min-height: 0;
 }
 
 .gs-faq-item-body p {
