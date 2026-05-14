@@ -88,6 +88,12 @@ export function getRuntimeConfig() {
         externalConfig.primaryButtonImage || `${baseOrigin}/assets/ui/knopka-zelenaya.webp`,
       secondaryButton:
         externalConfig.secondaryButtonImage || `${baseOrigin}/assets/ui/knopka-sinyaya.webp`,
+      displayFontFamily:
+        externalConfig.displayFontFamily || "Buby Bambam Shine",
+      displayFontWoff2:
+        externalConfig.displayFontWoff2 || `${baseOrigin}/assets/fonts/buby-bambam-shine.woff2`,
+      displayFontWoff:
+        externalConfig.displayFontWoff || `${baseOrigin}/assets/fonts/buby-bambam-shine.woff`,
     },
     theme: {
       primary: externalConfig.primaryColor || "#e97cac",

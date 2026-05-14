@@ -172,13 +172,10 @@
   width: min(1080px, 100%);
   border-radius: 32px;
   overflow: hidden;
-  background-image:
-    var(--gs-ui-panel-bg),
-    radial-gradient(circle at top left, rgba(255, 255, 255, 0.12), transparent 36%),
-    radial-gradient(circle at 70% 10%, rgba(245, 158, 11, 0.2), transparent 28%),
-    linear-gradient(160deg, color-mix(in srgb, var(--gs-surface) 92%, #0f172a) 0%, #09011a 100%);
-  background-size: cover, auto, auto, auto;
-  background-position: center, center, center, center;
+  background-color: color-mix(in srgb, var(--gs-surface) 92%, #0f172a);
+  background-image: var(--gs-ui-panel-bg);
+  background-size: cover;
+  background-position: center;
   border: 1px solid rgba(255, 255, 255, 0.14);
   box-shadow: 0 40px 90px rgba(2, 6, 23, 0.55);
 }
@@ -219,26 +216,21 @@
 .gs-flag {
   position: absolute;
   top: 0;
-  width: 34%;
-  height: 124px;
+  width: min(28%, 164px);
+  aspect-ratio: 1;
   background-repeat: no-repeat;
   background-size: contain;
   background-position: top center;
-  filter: saturate(1.03);
 }
 
 .gs-flag--left {
   left: 0;
-  background-image:
-    var(--gs-ui-flag-left),
-    linear-gradient(135deg, rgba(124, 58, 237, 0.8), rgba(59, 130, 246, 0.3));
+  background-image: var(--gs-ui-flag-left);
 }
 
 .gs-flag--right {
   right: 0;
-  background-image:
-    var(--gs-ui-flag-right),
-    linear-gradient(135deg, rgba(245, 158, 11, 0.85), rgba(16, 185, 129, 0.35));
+  background-image: var(--gs-ui-flag-right);
 }
 
 .gs-close {
@@ -273,10 +265,8 @@
 .gs-stage-frame {
   position: relative;
   width: 100%;
-  aspect-ratio: 0.77;
-  background-image:
-    var(--gs-ui-frame),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.12));
+  aspect-ratio: 1;
+  background-image: var(--gs-ui-frame);
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
@@ -546,15 +536,14 @@
 }
 
 .gs-panel--hero .gs-stage-wrap {
-  width: min(44%, 420px);
+  width: min(52%, 430px);
   margin-top: 4px;
 }
 
 .gs-panel--hero .gs-stage,
 .gs-panel--faq .gs-stage {
   border: 0;
-  background:
-    radial-gradient(circle at center, rgba(255, 255, 255, 0.1), rgba(18, 8, 48, 0.08) 52%, rgba(18, 8, 48, 0.2));
+  background: transparent;
 }
 
 .gs-panel--default .gs-stage {
@@ -573,25 +562,31 @@
   border-radius: 24px;
 }
 
+.gs-panel--hero .gs-video-shell {
+  background: transparent;
+}
+
 .gs-hero-actions {
   display: flex;
   flex-direction: column;
   gap: 16px;
   width: 100%;
+  align-items: center;
 }
 
 .gs-asset-button {
-  width: 100%;
-  min-height: 92px;
+  width: min(300px, 100%);
+  aspect-ratio: 1;
+  min-height: 0;
   border: 0;
-  padding: 0 26px 8px;
+  padding: 0 52px 12px;
   display: flex;
   align-items: center;
   justify-content: center;
   background-color: transparent;
   background-repeat: no-repeat;
   background-position: center;
-  background-size: 100% 100%;
+  background-size: contain;
   color: #ffffff;
   font-family: var(--gs-display-font);
   font-size: clamp(22px, 2.8vw, 31px);
@@ -605,20 +600,16 @@
 
 .gs-asset-button span {
   display: inline-block;
-  transform: translateY(-2px);
+  transform: translateY(10px);
   pointer-events: none;
 }
 
 .gs-asset-button--primary {
-  background-image:
-    var(--gs-ui-button-primary),
-    linear-gradient(180deg, #84f900, #22c55e);
+  background-image: var(--gs-ui-button-primary);
 }
 
 .gs-asset-button--secondary {
-  background-image:
-    var(--gs-ui-button-secondary),
-    linear-gradient(180deg, #2dd4bf, #2563eb);
+  background-image: var(--gs-ui-button-secondary);
 }
 
 .gs-asset-button:hover {
@@ -947,7 +938,7 @@
   }
 
   .gs-panel--hero .gs-stage-wrap {
-    width: min(60%, 360px);
+    width: min(58%, 360px);
   }
 
   .gs-panel--default .gs-stage {
@@ -995,12 +986,11 @@
   }
 
   .gs-flag {
-    width: 40%;
-    height: 80px;
+    width: min(36%, 124px);
   }
 
   .gs-panel--hero .gs-stage-wrap {
-    width: min(76%, 330px);
+    width: min(78%, 330px);
   }
 
   .gs-stage-window {
@@ -1034,8 +1024,8 @@
   }
 
   .gs-asset-button {
-    min-height: 82px;
-    padding-inline: 18px;
+    width: min(240px, 100%);
+    padding-inline: 28px;
     font-size: 22px;
   }
 }

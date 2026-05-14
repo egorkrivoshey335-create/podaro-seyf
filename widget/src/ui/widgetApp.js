@@ -219,12 +219,63 @@ export class WidgetApp {
     this.host.style.setProperty("--gs-primary", this.runtimeConfig.theme.primary);
     this.host.style.setProperty("--gs-accent", this.runtimeConfig.theme.accent);
     this.host.style.setProperty("--gs-surface", this.runtimeConfig.theme.surface);
+    this.host.style.setProperty(
+      "--gs-display-font",
+      `"${this.runtimeConfig.uiAssets.displayFontFamily}", "Arial Rounded MT Bold", "Trebuchet MS", "Verdana", sans-serif`,
+    );
     this.host.style.setProperty("--gs-ui-panel-bg", `url("${this.runtimeConfig.uiAssets.panelBackground}")`);
     this.host.style.setProperty("--gs-ui-frame", `url("${this.runtimeConfig.uiAssets.frame}")`);
     this.host.style.setProperty("--gs-ui-flag-left", `url("${this.runtimeConfig.uiAssets.flagLeft}")`);
     this.host.style.setProperty("--gs-ui-flag-right", `url("${this.runtimeConfig.uiAssets.flagRight}")`);
     this.host.style.setProperty("--gs-ui-button-primary", `url("${this.runtimeConfig.uiAssets.primaryButton}")`);
     this.host.style.setProperty("--gs-ui-button-secondary", `url("${this.runtimeConfig.uiAssets.secondaryButton}")`);
+    this.applyDisplayFontFace();
+  }
+
+  applyDisplayFontFace() {
+    const family = this.runtimeConfig.uiAssets.displayFontFamily;
+    const sources = [
+      this.runtimeConfig.uiAssets.displayFontWoff2
+        ? `url("${this.runtimeConfig.uiAssets.displayFontWoff2}") format("woff2")`
+        : "",
+      this.runtimeConfig.uiAssets.displayFontWoff
+        ? `url("${this.runtimeConfig.uiAssets.displayFontWoff}") format("woff")`
+        : "",
+    ].filter(Boolean);
+
+    const existing = this.shadowRoot.querySelector("[data-gs-display-font]");
+    if (!sources.length) {
+      existing?.remove();
+      return;
+    }
+
+    const rules = `
+      @font-face {
+        font-family: "${family}";
+        src: ${sources.join(", ")};
+        font-weight: 400;
+        font-style: normal;
+        font-display: swap;
+      }
+
+      @font-face {
+        font-family: "${family}";
+        src: ${sources.join(", ")};
+        font-weight: 900;
+        font-style: normal;
+        font-display: swap;
+      }
+    `;
+
+    if (existing) {
+      existing.textContent = rules;
+      return;
+    }
+
+    const style = document.createElement("style");
+    style.setAttribute("data-gs-display-font", "");
+    style.textContent = rules;
+    this.shadowRoot.append(style);
   }
 
   renderShell() {
