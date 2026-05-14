@@ -314,6 +314,23 @@ async function fulfillSpinByPrizeType(spin, settings) {
   }
 }
 
+export function resolvePrizeForSpin(prizes, input) {
+  const forcedPrizeCode = config.debug.enabled
+    ? sanitizeText(input.debugPrizeCode) || sanitizeText(config.debug.forcePrizeCode)
+    : undefined;
+
+  if (forcedPrizeCode) {
+    const forcedPrize = prizes.find((prize) => prize.code === forcedPrizeCode && prize.active);
+    if (!forcedPrize) {
+      throw new AppError(400, "DEBUG_PRIZE_NOT_FOUND", `Приз ${forcedPrizeCode} не найден или выключен.`);
+    }
+
+    return forcedPrize;
+  }
+
+  return rollPrize(prizes);
+}
+
 export async function startSpin(input, db) {
   const settings = await ensureSettings(db);
 
@@ -321,32 +338,34 @@ export async function startSpin(input, db) {
     throw new AppError(403, "PROMO_INACTIVE", "Акция сейчас не активна.");
   }
 
-  const antiFraudResult = await canSpin(
-    {
-      guestId: input.guestId,
-      fingerprint: input.fingerprint,
-      ip: input.ip,
-      fingerprintWindowDays: config.fingerprintWindowDays,
-      ipSpinLimit: config.ipSpinLimit,
-    },
-    db,
-  );
+  if (!config.debug.allowRepeatSpins) {
+    const antiFraudResult = await canSpin(
+      {
+        guestId: input.guestId,
+        fingerprint: input.fingerprint,
+        ip: input.ip,
+        fingerprintWindowDays: config.fingerprintWindowDays,
+        ipSpinLimit: config.ipSpinLimit,
+      },
+      db,
+    );
 
-  if (!antiFraudResult.allowed && antiFraudResult.reason === "ALREADY_SPUN") {
-    const maybeExpired = await expireSpinIfNeeded(antiFraudResult.existingSpin, db);
+    if (!antiFraudResult.allowed && antiFraudResult.reason === "ALREADY_SPUN") {
+      const maybeExpired = await expireSpinIfNeeded(antiFraudResult.existingSpin, db);
 
-    if (maybeExpired.status === SpinStatus.EXPIRED) {
-      throw new AppError(410, "PRIZE_EXPIRED", "Время получения приза уже закончилось.");
+      if (maybeExpired.status === SpinStatus.EXPIRED) {
+        throw new AppError(410, "PRIZE_EXPIRED", "Время получения приза уже закончилось.");
+      }
+
+      return {
+        spin: maybeExpired,
+        alreadySpun: true,
+      };
     }
 
-    return {
-      spin: maybeExpired,
-      alreadySpun: true,
-    };
-  }
-
-  if (!antiFraudResult.allowed) {
-    throw new AppError(429, antiFraudResult.reason, "Повторная попытка розыгрыша заблокирована.");
+    if (!antiFraudResult.allowed) {
+      throw new AppError(429, antiFraudResult.reason, "Повторная попытка розыгрыша заблокирована.");
+    }
   }
 
   const prizes = await db.prize.findMany({
@@ -369,8 +388,11 @@ export async function startSpin(input, db) {
     throw new AppError(500, "NO_PRIZES", "Нет активных призов.");
   }
 
-  const pickedPrize = rollPrize(prizes);
-  const expiresAt = new Date(Date.now() + settings.prizeTtlHours * 60 * 60 * 1000);
+  const pickedPrize = resolvePrizeForSpin(prizes, input);
+  const ttlMs = config.debug.enabled && config.debug.spinTtlMinutes > 0
+    ? config.debug.spinTtlMinutes * 60 * 1000
+    : settings.prizeTtlHours * 60 * 60 * 1000;
+  const expiresAt = new Date(Date.now() + ttlMs);
 
   try {
     let spin = await db.$transaction(async (tx) => {

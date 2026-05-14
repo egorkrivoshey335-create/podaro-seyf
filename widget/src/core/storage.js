@@ -35,6 +35,13 @@ export function getOrCreateGuestId() {
   return guestId;
 }
 
+export function resetGuestId() {
+  const guestId = createUuid();
+  localStorage.setItem("gift-safe-guest-id", guestId);
+  writeCookie(GUEST_COOKIE_KEY, guestId);
+  return guestId;
+}
+
 export function readWidgetState() {
   try {
     const rawState = localStorage.getItem(STORAGE_KEY);

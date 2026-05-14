@@ -10,9 +10,40 @@ import {
   getOrCreateGuestId,
   isExpiredState,
   readWidgetState,
+  resetGuestId,
   writeWidgetState,
 } from "./core/storage.js";
 import { WidgetApp } from "./ui/widgetApp.js";
+
+function mergeRuntimeDebug(runtimeConfig, serverDebugConfig) {
+  const runtimeDebug = runtimeConfig.debug || {};
+  const serverDebug = serverDebugConfig?.enabled ? serverDebugConfig : {};
+
+  return {
+    ...runtimeConfig,
+    debug: {
+      forcePrizeCode: runtimeDebug.forcePrizeCode || serverDebug.forcePrizeCode || "",
+      allowRepeatSpins: runtimeDebug.allowRepeatSpins || Boolean(serverDebug.allowRepeatSpins),
+      resetState: runtimeDebug.resetState || false,
+      skipRegisterStep: runtimeDebug.skipRegisterStep || Boolean(serverDebug.skipRegisterStep),
+      forceAuthorized: runtimeDebug.forceAuthorized || Boolean(serverDebug.forceAuthorized),
+      clientId: runtimeDebug.clientId || serverDebug.clientId || "debug-client",
+      clientEmail: runtimeDebug.clientEmail || serverDebug.clientEmail || "dev@example.com",
+      clientPhone: runtimeDebug.clientPhone || serverDebug.clientPhone || "",
+      clientName: runtimeDebug.clientName || serverDebug.clientName || "Debug User",
+      spinTtlMinutes: Number(serverDebug.spinTtlMinutes || 0),
+    },
+  };
+}
+
+function createDebugClient(runtimeConfig) {
+  return {
+    id: runtimeConfig.debug.clientId,
+    email: runtimeConfig.debug.clientEmail,
+    phone: runtimeConfig.debug.clientPhone,
+    name: runtimeConfig.debug.clientName,
+  };
+}
 
 function mountWidget({ runtimeConfig, api, guestId, fingerprintPromise, client, widgetState, scenario }) {
   window.__giftSafeWidgetInstance?.destroy?.();
@@ -100,8 +131,16 @@ export async function initGiftSafeWidget() {
       return null;
   }
 
-  const runtimeConfig = getRuntimeConfig();
-  const api = createApiClient(runtimeConfig);
+  const baseRuntimeConfig = getRuntimeConfig();
+  const api = createApiClient(baseRuntimeConfig);
+  const serverDebugConfig = await api.debugConfig();
+  const runtimeConfig = mergeRuntimeDebug(baseRuntimeConfig, serverDebugConfig);
+
+  if (runtimeConfig.debug.resetState) {
+    clearWidgetState();
+    resetGuestId();
+  }
+
   const guestId = getOrCreateGuestId();
   const fingerprintPromise = getFingerprint();
 
@@ -111,7 +150,10 @@ export async function initGiftSafeWidget() {
     widgetState = null;
   }
 
-  const client = await getInsalesClient();
+  let client = await getInsalesClient();
+  if (!client && runtimeConfig.debug.forceAuthorized) {
+    client = createDebugClient(runtimeConfig);
+  }
   if (client) {
     widgetState = await syncAuthorizedState({
       api,
@@ -122,7 +164,7 @@ export async function initGiftSafeWidget() {
   }
 
   const scenario = resolveScenario({
-    client,
+    client: runtimeConfig.debug.forceAuthorized && !widgetState ? null : client,
     widgetState,
   });
 

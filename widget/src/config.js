@@ -60,6 +60,31 @@ function getBaseOrigin() {
   }
 }
 
+function getDebugFlag(externalConfig, externalKey, queryKey) {
+  if (typeof externalConfig[externalKey] === "boolean") {
+    return externalConfig[externalKey];
+  }
+
+  if (typeof window === "undefined") {
+    return false;
+  }
+
+  const value = new URLSearchParams(window.location.search).get(queryKey);
+  return value === "1" || value === "true";
+}
+
+function getDebugValue(externalConfig, externalKey, queryKey) {
+  if (externalConfig[externalKey]) {
+    return String(externalConfig[externalKey]).trim();
+  }
+
+  if (typeof window === "undefined") {
+    return "";
+  }
+
+  return new URLSearchParams(window.location.search).get(queryKey)?.trim() || "";
+}
+
 export function getRuntimeConfig() {
   const baseOrigin = getBaseOrigin();
   const externalConfig = window.GIFT_SAFE_CONFIG || {};
@@ -104,6 +129,17 @@ export function getRuntimeConfig() {
       primary: externalConfig.primaryColor || "#e97cac",
       accent: externalConfig.accentColor || "#f59e0b",
       surface: externalConfig.surfaceColor || "#120425",
+    },
+    debug: {
+      forcePrizeCode: getDebugValue(externalConfig, "debugPrizeCode", "gsPrize"),
+      allowRepeatSpins: getDebugFlag(externalConfig, "debugAllowRepeatSpins", "gsRepeat"),
+      resetState: getDebugFlag(externalConfig, "debugResetState", "gsReset"),
+      skipRegisterStep: getDebugFlag(externalConfig, "debugSkipRegisterStep", "gsSkipRegister"),
+      forceAuthorized: getDebugFlag(externalConfig, "debugForceAuthorized", "gsForceAuth"),
+      clientId: getDebugValue(externalConfig, "debugClientId", "gsClientId"),
+      clientEmail: getDebugValue(externalConfig, "debugClientEmail", "gsClientEmail"),
+      clientPhone: getDebugValue(externalConfig, "debugClientPhone", "gsClientPhone"),
+      clientName: getDebugValue(externalConfig, "debugClientName", "gsClientName"),
     },
   };
 }

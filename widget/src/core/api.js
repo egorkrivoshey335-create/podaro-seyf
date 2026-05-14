@@ -48,6 +48,13 @@ export function createApiClient(runtimeConfig) {
         throw error;
       }
     },
+    async debugConfig() {
+      try {
+        return await fetchJson(`${runtimeConfig.apiBaseUrl}/debug-config`);
+      } catch {
+        return null;
+      }
+    },
     deliver(payload) {
       return fetchJson(`${runtimeConfig.apiBaseUrl}/deliver`, {
         method: "POST",

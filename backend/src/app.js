@@ -145,12 +145,29 @@ app.get("/api/health", async (_request, response) => {
   });
 });
 
+app.get("/api/debug-config", async (_request, response) => {
+  response.json({
+    success: true,
+    enabled: config.debug.enabled,
+    forcePrizeCode: config.debug.enabled ? config.debug.forcePrizeCode : "",
+    allowRepeatSpins: config.debug.enabled ? config.debug.allowRepeatSpins : false,
+    skipRegisterStep: config.debug.enabled ? config.debug.skipRegisterStep : false,
+    forceAuthorized: config.debug.enabled ? config.debug.forceAuthorized : false,
+    clientId: config.debug.enabled ? config.debug.clientId : "",
+    clientEmail: config.debug.enabled ? config.debug.clientEmail : "",
+    clientPhone: config.debug.enabled ? config.debug.clientPhone : "",
+    clientName: config.debug.enabled ? config.debug.clientName : "",
+    spinTtlMinutes: config.debug.enabled ? config.debug.spinTtlMinutes : 0,
+  });
+});
+
 app.post("/api/spin", spinRateLimiter, async (request, response) => {
   const payload = parsePayload(
     z.object({
       guestId: z.string().trim().min(10).max(100),
       fingerprint: z.string().trim().max(255).optional(),
       userAgent: z.string().trim().max(500).optional(),
+      debugPrizeCode: z.string().trim().max(100).optional(),
     }),
     request.body,
   );

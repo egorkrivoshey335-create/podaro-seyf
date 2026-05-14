@@ -46,4 +46,16 @@ export const config = {
   promoPrefix: process.env.PROMO_PREFIX || "COSMO",
   promoMinOrderPrice: Number(process.env.PROMO_MIN_ORDER_PRICE || 500),
   promoIssueMode: process.env.PROMO_ISSUE_MODE || "pool",
+  debug: {
+    enabled: process.env.GIFT_SAFE_DEBUG === "true" || process.env.NODE_ENV !== "production",
+    forcePrizeCode: process.env.DEV_FORCE_PRIZE_CODE || "",
+    allowRepeatSpins: process.env.DEV_ALLOW_REPEAT_SPINS === "true" || process.env.DEV_DISABLE_ANTIFRAUD === "true",
+    skipRegisterStep: process.env.DEV_SKIP_REGISTER_STEP === "true",
+    forceAuthorized: process.env.DEV_FORCE_AUTHORIZED === "true",
+    spinTtlMinutes: Number(process.env.DEV_SPIN_TTL_MINUTES || 0),
+    clientId: process.env.DEV_FORCE_CLIENT_ID || "debug-client",
+    clientEmail: process.env.DEV_FORCE_CLIENT_EMAIL || "dev@example.com",
+    clientPhone: process.env.DEV_FORCE_CLIENT_PHONE || "",
+    clientName: process.env.DEV_FORCE_CLIENT_NAME || "Debug User",
+  },
 };

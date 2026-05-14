@@ -3,7 +3,8 @@ import lottie from "lottie-web/build/player/lottie_svg";
 
 import fabAnimationData from "../assets/fab-gift.json";
 import { TEXTS, getPrizeVisual } from "../config.js";
-import { patchWidgetState, writeWidgetState } from "../core/storage.js";
+import { getInsalesClient } from "../core/insales.js";
+import { patchWidgetState, resetGuestId, writeWidgetState } from "../core/storage.js";
 import { playUnlockSequence, resetSafeScene, revealPrizeState, showPrizeState } from "./safeSequence.js";
 import { hasSafeVideoSources, playSafeVideo, prepareSafeVideo, resetSafeVideo, showSafeVideoPreview } from "./safeVideo.js";
 
@@ -116,6 +117,8 @@ export class WidgetApp {
     this.fabLottie = null;
     this.fabLottieTimeout = null;
     this.panelMode = "default";
+    this.authSyncInFlight = null;
+    this.stopWatchingForAuthorizedReturn = null;
   }
 
   mount() {
@@ -135,6 +138,8 @@ export class WidgetApp {
     gsap.killTweensOf(this.refs?.backdrop);
     this.hideModalCall?.kill?.();
     this.hideModalCall = null;
+    this.stopWatchingForAuthorizedReturn?.();
+    this.stopWatchingForAuthorizedReturn = null;
     try {
       this.fabLottie?.destroy?.();
     } catch {
@@ -664,7 +669,7 @@ export class WidgetApp {
     this.refs.copy.querySelector("[data-action='faq-back']")?.addEventListener("click", () => this.closeFaq());
     this.refs.copy
       .querySelector("[data-action='register']")
-      ?.addEventListener("click", () => window.open(this.runtimeConfig.registerUrl, "_blank", "noopener"));
+      ?.addEventListener("click", () => this.openRegisterFlow());
     this.refs.copy.querySelector("[data-action='deliver']")?.addEventListener("submit", (event) => {
       event.preventDefault();
       this.handleDelivery(event.currentTarget);
@@ -692,6 +697,151 @@ export class WidgetApp {
     }
 
     return -25;
+  }
+
+  getDebugClient() {
+    const debug = this.runtimeConfig.debug || {};
+    if (!debug.clientId) {
+      return null;
+    }
+
+    return {
+      id: debug.clientId,
+      email: debug.clientEmail || "",
+      phone: debug.clientPhone || "",
+      name: debug.clientName || "",
+    };
+  }
+
+  hideCopyForSpin() {
+    const targets = [...this.refs.copy.children];
+    if (!targets.length) {
+      this.refs.copy.innerHTML = "";
+      return Promise.resolve();
+    }
+
+    gsap.killTweensOf(targets);
+    return new Promise((resolve) => {
+      gsap.to(targets, {
+        autoAlpha: 0,
+        y: -18,
+        duration: 0.2,
+        stagger: 0.03,
+        ease: "power2.in",
+        onComplete: () => {
+          this.refs.copy.innerHTML = "";
+          resolve();
+        },
+      });
+    });
+  }
+
+  async claimAuthorizedSpin() {
+    const claim = await this.api.claim({
+      guestId: this.guestId,
+      clientId: this.client.id,
+      clientEmail: this.client.email,
+      clientPhone: this.client.phone,
+    });
+
+    this.widgetState = {
+      ...this.widgetState,
+      spinId: claim.spinId,
+      prize: claim.prize,
+      expiresAt: claim.expiresAt,
+      status: claim.status,
+      clientEmail: this.client.email,
+    };
+    writeWidgetState(this.widgetState);
+    return claim;
+  }
+
+  async autoDeliverIfPossible() {
+    const prize = this.widgetState?.prize;
+    if (!this.client || !prize || prize.requiresAddress || !this.client.email) {
+      return null;
+    }
+
+    const result = await this.api.deliver({
+      spinId: this.widgetState.spinId,
+      clientId: this.client.id,
+      recipientEmail: this.client.email,
+    });
+
+    this.widgetState = patchWidgetState({
+      status: result.status,
+      promoCode: result.promoCode || this.widgetState.promoCode,
+      clientEmail: this.client.email,
+    });
+
+    return result;
+  }
+
+  openRegisterFlow() {
+    window.open(this.runtimeConfig.registerUrl, "_blank", "noopener");
+    this.watchForAuthorizedReturn();
+  }
+
+  watchForAuthorizedReturn() {
+    this.stopWatchingForAuthorizedReturn?.();
+
+    const checkForReturn = () => {
+      if (document.visibilityState === "hidden") {
+        return;
+      }
+
+      this.syncAuthorizedReturn().catch((error) => {
+        console.warn("[gift-safe] could not refresh authorized return", error);
+      });
+    };
+
+    const handleFocus = () => checkForReturn();
+    const handleVisibility = () => checkForReturn();
+
+    window.addEventListener("focus", handleFocus);
+    document.addEventListener("visibilitychange", handleVisibility);
+
+    this.stopWatchingForAuthorizedReturn = () => {
+      window.removeEventListener("focus", handleFocus);
+      document.removeEventListener("visibilitychange", handleVisibility);
+    };
+  }
+
+  async syncAuthorizedReturn() {
+    if (this.authSyncInFlight || this.scenario !== "guest-pending" || !this.widgetState?.spinId) {
+      return;
+    }
+
+    this.authSyncInFlight = (async () => {
+      const client = await getInsalesClient();
+      if (!client?.id) {
+        return;
+      }
+
+      this.client = client;
+      await this.claimAuthorizedSpin();
+      const autoDelivered = await this.autoDeliverIfPossible();
+      this.updateButton();
+
+      if (autoDelivered) {
+        this.scenario = "hidden";
+        window.clearInterval(this.countdownTimer);
+        this.renderSuccess(autoDelivered.message, autoDelivered.promoCode);
+      } else {
+        this.scenario = "authorized-claim";
+        this.setPanelMode("default");
+        this.renderDelivery();
+      }
+
+      this.stopWatchingForAuthorizedReturn?.();
+      this.stopWatchingForAuthorizedReturn = null;
+    })();
+
+    try {
+      await this.authSyncInFlight;
+    } finally {
+      this.authSyncInFlight = null;
+    }
   }
 
   setupFaqAccordion() {
@@ -1006,21 +1156,21 @@ export class WidgetApp {
     this.isUnlocking = true;
     this.setPanelMode("hero");
     this.refs.close.disabled = true;
-    this.renderCopy(`
-      <div class="gs-copy-block">
-        <span class="gs-kicker">Секундочку</span>
-        <h2>Сейф подбирает комбинацию</h2>
-        <p>${TEXTS.stageLoading}</p>
-      </div>
-    `);
 
     try {
+      if (this.runtimeConfig.debug.allowRepeatSpins) {
+        this.guestId = resetGuestId();
+      }
+
+      await this.hideCopyForSpin();
+
       const spinRequest = (async () => {
         const fingerprint = await this.fingerprintPromise;
         return this.api.spin({
           guestId: this.guestId,
           fingerprint,
           userAgent: navigator.userAgent,
+          debugPrizeCode: this.runtimeConfig.debug.forcePrizeCode || undefined,
         });
       })().then(
         (result) => ({ ok: true, result }),
@@ -1044,6 +1194,7 @@ export class WidgetApp {
         prize: result.prize,
         expiresAt: result.expiresAt,
         status: result.status,
+        clientEmail: this.client?.email || this.widgetState?.clientEmail || "",
       };
 
       writeWidgetState(this.widgetState);
@@ -1054,10 +1205,29 @@ export class WidgetApp {
         await playUnlockSequence(this.refs.stage, result.prize, "Сейф открыт. Приз закреплен.");
       }
 
-      this.scenario = "guest-pending";
-      this.setPanelMode("default");
-      this.updateButton();
-      this.renderPrizePending();
+      const effectiveClient = this.client || (this.runtimeConfig.debug.skipRegisterStep ? this.getDebugClient() : null);
+
+      if (effectiveClient) {
+        this.client = effectiveClient;
+        await this.claimAuthorizedSpin();
+        const autoDelivered = await this.autoDeliverIfPossible();
+        this.updateButton();
+
+        if (autoDelivered) {
+          this.scenario = "hidden";
+          window.clearInterval(this.countdownTimer);
+          this.renderSuccess(autoDelivered.message, autoDelivered.promoCode);
+        } else {
+          this.scenario = "authorized-claim";
+          this.setPanelMode("default");
+          this.renderDelivery();
+        }
+      } else {
+        this.scenario = "guest-pending";
+        this.setPanelMode("default");
+        this.updateButton();
+        this.renderPrizePending();
+      }
     } catch (error) {
       this.renderBlocked(error);
     } finally {
