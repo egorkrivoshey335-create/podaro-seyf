@@ -215,8 +215,8 @@
 
 .gs-flag {
   position: absolute;
-  top: 0;
-  width: min(28%, 164px);
+  top: -6%;
+  width: min(40%, 300px);
   pointer-events: none;
 }
 
@@ -227,11 +227,13 @@
 }
 
 .gs-flag--left {
-  left: 0;
+  left: 0%;
+  transform: rotate(15deg);
 }
 
 .gs-flag--right {
   right: 0;
+  transform: rotate(-15deg);
 }
 
 .gs-close {
@@ -270,14 +272,18 @@
 }
 
 .gs-stage-frame-image {
+  position: relative;
+  z-index: 2;
   display: block;
   width: 100%;
   height: auto;
+  pointer-events: none;
 }
 
 .gs-stage-window {
   position: absolute;
-  top: 30.5%;
+  z-index: 1;
+  top: 42.5%;
   left: 18.5%;
   right: 18.5%;
   aspect-ratio: 1;
@@ -527,7 +533,7 @@
 }
 
 .gs-panel--hero .gs-copy {
-  width: min(360px, 100%);
+  width: min(560px, 100%);
   padding: 0;
   justify-content: flex-start;
 }
@@ -539,8 +545,8 @@
 }
 
 .gs-panel--hero .gs-stage-wrap {
-  width: min(52%, 430px);
-  margin-top: 4px;
+  top: -5%;
+  width: min(60%, 430px);
 }
 
 .gs-panel--hero .gs-stage,
@@ -571,14 +577,17 @@
 
 .gs-hero-actions {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   gap: 16px;
   width: 100%;
   align-items: center;
+  justify-content: center;
 }
 
 .gs-asset-button {
-  width: min(300px, 100%);
+  flex: 1 1 0;
+  width: 100%;
+  max-width: 272px;
   position: relative;
   border: 0;
   padding: 0;
@@ -1029,10 +1038,16 @@
 
   .gs-asset-button {
     width: min(240px, 100%);
+    max-width: none;
+    flex: 0 1 auto;
     font-size: 22px;
   }
 
   .gs-asset-button span {
     padding-inline: 28px;
+  }
+
+  .gs-hero-actions {
+    flex-direction: column;
   }
 }
