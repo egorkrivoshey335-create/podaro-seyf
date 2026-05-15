@@ -1,8 +1,9 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
+import { config } from "../src/config.js";
 import { rollPrize } from "../src/services/prizeRoller.js";
-import { resolvePrizeForSpin } from "../src/services/spinService.js";
+import { generateManagedPromoCode, resolvePrizeForSpin } from "../src/services/spinService.js";
 
 test("rollPrize throws when there are no active prizes", () => {
   assert.throws(() => rollPrize([]), /No active prizes available/);
@@ -37,4 +38,12 @@ test("resolvePrizeForSpin returns the forced active prize in debug mode", () => 
 
   const result = resolvePrizeForSpin(prizes, { debugPrizeCode: "promo-20" });
   assert.equal(result.code, "promo-20");
+});
+
+test("generateManagedPromoCode uses configured prefix and numeric suffix", () => {
+  const code = generateManagedPromoCode();
+  const expectedPrefix = `${config.promoPrefix}-`;
+
+  assert.ok(code.startsWith(expectedPrefix));
+  assert.match(code.slice(expectedPrefix.length), /^\d{8}$/);
 });

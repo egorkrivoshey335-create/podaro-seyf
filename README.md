@@ -58,12 +58,19 @@ npm run dev:admin
 - `DATABASE_URL=postgresql://postgres:postgres@localhost:5433/gift_safe`
 - `ADMIN_LOGIN=admin`
 - `ADMIN_PASSWORD=admin123`
-- `PROMO_ISSUE_MODE=pool`
-- `PROMO_PREFIX=COSMO`
+- `PROMO_ISSUE_MODE=insales_api`
+- `PROMO_PREFIX=PODAROK`
 - `INSALES_EXTERNAL_DISCOUNT_TOKEN=...`
 - `INSALES_WEBHOOK_TOKEN=...`
 
 Для InSales лучше использовать именно `INSALES_SHOP_URL` на домене `*.myinsales.ru`, потому что admin API удобнее и стабильнее вызывать через него.
+
+Для призов типа `PROMO_CODE` основной сценарий теперь такой:
+
+- backend создает отдельный код в InSales на каждый выигрыш через `POST /admin/discount_codes.json`;
+- код генерируется в формате `PODAROK-12345678`;
+- срок жизни промокода берется из общего TTL приза (по умолчанию 24 часа);
+- если промокод не был использован за это время, cron удаляет его из InSales.
 
 ## FREE_SHIPPING в InSales
 

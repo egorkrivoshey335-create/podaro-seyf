@@ -1,4 +1,5 @@
 import prismaClientPkg from "@prisma/client";
+import { randomInt } from "node:crypto";
 
 import { config } from "../config.js";
 import { AppError } from "../lib/errors.js";
@@ -143,18 +144,28 @@ function formatInsalesDate(dateValue) {
   return new Date(dateValue).toISOString().split("T")[0];
 }
 
-function generateManagedPromoCode(prizeCode) {
-  const cleaned = prizeCode.replace(/[^a-z0-9]/gi, "").toUpperCase().slice(0, 8);
-  const randomPart = Math.random().toString(36).slice(2, 8).toUpperCase();
-  return `${config.promoPrefix}-${cleaned}-${randomPart}`;
+function getManagedPromoPrefix() {
+  const cleaned = String(config.promoPrefix || "PODAROK")
+    .toUpperCase()
+    .replace(/[^A-Z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
+  return cleaned || "PODAROK";
 }
 
-async function attachPromoToSpin(spin, db) {
-  if (spin.prize.type === PrizeType.PROMO_CODE && config.promoIssueMode === "insales_api") {
-    try {
-      const generatedCode = generateManagedPromoCode(spin.prize.code);
-      const discount = Number(spin.prize.payload?.discount || 0);
+export function generateManagedPromoCode() {
+  const randomPart = String(randomInt(10_000_000, 100_000_000));
+  return `${getManagedPromoPrefix()}-${randomPart}`;
+}
 
+async function issueManagedPromoCode(spin) {
+  const discount = Number(spin.prize.payload?.discount || 0);
+  let lastError;
+
+  for (let attempt = 1; attempt <= 5; attempt += 1) {
+    const generatedCode = generateManagedPromoCode();
+
+    try {
       const insalesDiscount = await insalesApi.issueDiscountCode({
         code: generatedCode,
         description: `Gift Safe — ${spin.prize.title} (24 часа)`,
@@ -164,23 +175,56 @@ async function attachPromoToSpin(spin, db) {
         minPrice: config.promoMinOrderPrice,
       });
 
+      return {
+        promoCode: insalesDiscount?.code || generatedCode,
+        promoExternalId: insalesDiscount?.id != null ? String(insalesDiscount.id) : null,
+      };
+    } catch (error) {
+      lastError = error;
+
+      if (error?.status !== 422) {
+        throw error;
+      }
+
+      logger.warn(
+        {
+          spinId: spin.id,
+          prizeCode: spin.prize.code,
+          attempt,
+          error: error.message,
+        },
+        "managed promo code collision, retrying with a new code",
+      );
+    }
+  }
+
+  throw lastError || new Error("Failed to generate a unique promo code.");
+}
+
+async function attachPromoToSpin(spin, db) {
+  if (spin.prize.type === PrizeType.PROMO_CODE && config.promoIssueMode === "insales_api") {
+    try {
+      const managedPromo = await issueManagedPromoCode(spin);
+
       return db.spin.update({
         where: { id: spin.id },
         data: {
-          promoCode: insalesDiscount?.code || generatedCode,
-          promoExternalId: insalesDiscount?.id != null ? String(insalesDiscount.id) : null,
+          promoCode: managedPromo.promoCode,
+          promoExternalId: managedPromo.promoExternalId,
         },
         include: INTERNAL_SPIN_INCLUDE,
       });
     } catch (error) {
-      logger.warn(
+      logger.error(
         {
           spinId: spin.id,
           prizeCode: spin.prize.code,
           error: error.message,
         },
-        "failed to issue promo through insales, falling back to local promo pool",
+        "failed to issue promo through insales",
       );
+
+      throw new AppError(502, "PROMO_ISSUE_FAILED", "Не удалось создать промокод в InSales.");
     }
   }
 
@@ -425,7 +469,23 @@ export async function startSpin(input, db) {
       return createdSpin;
     });
 
-    spin = await attachPromoToSpin(spin, db);
+    try {
+      spin = await attachPromoToSpin(spin, db);
+    } catch (error) {
+      await db.spin.delete({
+        where: { id: spin.id },
+      }).catch((cleanupError) => {
+        logger.warn(
+          {
+            spinId: spin.id,
+            error: cleanupError.message,
+          },
+          "failed to delete spin after promo issue error",
+        );
+      });
+
+      throw error;
+    }
 
     return {
       spin,

@@ -43,9 +43,9 @@ export const config = {
     externalDiscountToken: process.env.INSALES_EXTERNAL_DISCOUNT_TOKEN,
     webhookToken: process.env.INSALES_WEBHOOK_TOKEN,
   },
-  promoPrefix: process.env.PROMO_PREFIX || "COSMO",
+  promoPrefix: process.env.PROMO_PREFIX || "PODAROK",
   promoMinOrderPrice: Number(process.env.PROMO_MIN_ORDER_PRICE || 500),
-  promoIssueMode: process.env.PROMO_ISSUE_MODE || "pool",
+  promoIssueMode: process.env.PROMO_ISSUE_MODE || "insales_api",
   debug: {
     enabled: process.env.GIFT_SAFE_DEBUG === "true" || process.env.NODE_ENV !== "production",
     forcePrizeCode: process.env.DEV_FORCE_PRIZE_CODE || "",
