@@ -1419,9 +1419,8 @@ export class WidgetApp {
   }
 
   renderDeliveryDetails() {
-    this.setPanelMode("pending");
+    this.setPanelMode("faq");
     this.setPanelView("delivery-details");
-    this.showPrizeVideoInStage(this.widgetState.prize);
     const emailValue = escapeHtml(this.client?.email || this.widgetState?.clientEmail || "");
     const prizeType = this.widgetState?.prize?.type;
     const autoEmailHint =
@@ -1615,7 +1614,7 @@ export class WidgetApp {
   }
 
   openDeliveryDetails() {
-    this.transitionPanel("pending", () => this.renderDeliveryDetails());
+    this.transitionPanel("faq", () => this.renderDeliveryDetails());
   }
 
   closeDeliveryDetails() {
