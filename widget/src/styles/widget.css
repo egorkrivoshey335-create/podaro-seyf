@@ -1432,11 +1432,16 @@
   }
 
   .gs-prize-help-button--delivery-inline {
-    right: 12px;
+    right: 17px;
+    top: 48%;
   }
 
   .gs-prize-hint-card {
     width: min(420px, calc(80vw - 32px));
+  }
+
+  .gs-delivery-primary-action > .gs-asset-button span {
+    padding-right: 45px;
   }
 
   .gs-asset-button span {
