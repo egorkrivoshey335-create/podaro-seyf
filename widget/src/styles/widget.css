@@ -1424,15 +1424,19 @@
 
   .gs-delivery-primary-action > .gs-asset-button {
     width: 100%;
-    max-width: 260px;
+    max-width: 200px;
   }
 
   .gs-delivery-primary-action {
-    width: min(260px, 100%);
+    width: min(200px, 100%);
   }
 
   .gs-prize-help-button--delivery-inline {
     right: 12px;
+  }
+
+  .gs-prize-hint-card {
+    width: min(420px, calc(80vw - 32px));
   }
 
   .gs-asset-button span {
@@ -1448,6 +1452,14 @@
   .gs-asset-button {
     width: min(150px, 100%);
     font-size: 14px;
+  }
+
+  .gs-delivery-primary-action {
+    width: min(150px, 100%);
+  }
+
+  .gs-delivery-primary-action > .gs-asset-button {
+    max-width: 150px;
   }
 
   .gs-prize-register-row > .gs-asset-button {
