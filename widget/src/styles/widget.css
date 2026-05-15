@@ -1424,11 +1424,11 @@
 
   .gs-delivery-primary-action > .gs-asset-button {
     width: 100%;
-    max-width: 260px;
+    max-width: 200px;
   }
 
   .gs-delivery-primary-action {
-    width: min(260px, 100%);
+    width: min(200px, 100%);
   }
 
   .gs-prize-help-button--delivery-inline {
