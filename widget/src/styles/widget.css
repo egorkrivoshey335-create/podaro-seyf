@@ -767,7 +767,7 @@
 }
 
 .gs-prize-pending-view--delivery-details {
-  margin-top: -4px;
+  margin-top: 60px;
 }
 
 .gs-prize-pending-view--delivery-details > .gs-asset-button {
@@ -867,7 +867,7 @@
 .gs-prize-hint-overlay {
   position: fixed;
   inset: 0;
-  z-index: 30;
+  z-index: 120;
   display: grid;
   place-items: center;
   padding: 20px;
@@ -883,7 +883,7 @@
 
 .gs-prize-hint-card {
   position: relative;
-  z-index: 1;
+  z-index: 121;
   width: min(420px, calc(100vw - 32px));
   display: flex;
   flex-direction: column;

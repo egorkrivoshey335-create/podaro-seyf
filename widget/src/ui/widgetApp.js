@@ -825,12 +825,18 @@ export class WidgetApp {
           return;
         }
 
+        const targetY = Number(button.dataset.hintOffsetY || 0);
         title.textContent = button.dataset.hintTitle || "";
         text.textContent = button.dataset.hintText || "";
+        card.dataset.hintOffsetY = String(targetY);
         overlay.hidden = false;
         gsap.killTweensOf([overlay, card]);
         gsap.set(overlay, { autoAlpha: 1 });
-        gsap.fromTo(card, { autoAlpha: 0, y: 20, scale: 0.96 }, { autoAlpha: 1, y: 0, scale: 1, duration: 0.24, ease: "power2.out" });
+        gsap.fromTo(
+          card,
+          { autoAlpha: 0, x: 0, y: targetY + 20, scale: 0.96 },
+          { autoAlpha: 1, x: 0, y: targetY, scale: 1, duration: 0.24, ease: "power2.out" },
+        );
       });
     });
 
@@ -841,10 +847,12 @@ export class WidgetApp {
           return;
         }
 
+        const targetY = Number(card.dataset.hintOffsetY || 0);
         gsap.killTweensOf([overlay, card]);
         gsap.to(card, {
           autoAlpha: 0,
-          y: 12,
+          x: 0,
+          y: targetY + 12,
           scale: 0.97,
           duration: 0.18,
           ease: "power2.in",
@@ -1325,6 +1333,7 @@ export class WidgetApp {
                   data-action="hint-open"
                   data-hint-title="Что будет дальше?"
                   data-hint-text="${escapeHtml(deliveryHintText)}"
+                  data-hint-offset-y="-100"
                 >?</button>
               </div>
               <button class="gs-asset-button gs-asset-button--secondary" type="button" data-action="delivery-details-open">
