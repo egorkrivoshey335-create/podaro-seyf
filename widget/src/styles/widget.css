@@ -770,12 +770,26 @@
   margin-top: 60px;
 }
 
+.gs-prize-pending-view--delivery-details .gs-prize-pending-label,
+.gs-prize-pending-view--delivery-details .gs-prize-pending-timer span,
+.gs-prize-pending-view--delivery-details .gs-prize-pending-timer strong,
+.gs-prize-info-note--delivery-details strong,
+.gs-prize-info-note--delivery-details p {
+  font-family: var(--gs-display-font);
+}
+
 .gs-prize-pending-view--delivery-details > .gs-asset-button {
   align-self: center;
 }
 
 .gs-prize-pending-card--delivery-details {
   gap: 14px;
+}
+
+.gs-prize-pending-card--delivery-details .gs-prize-pending-label,
+.gs-prize-pending-card--delivery-details .gs-prize-pending-title {
+  width: 100%;
+  text-align: center;
 }
 
 .gs-prize-info-note--delivery-details {
