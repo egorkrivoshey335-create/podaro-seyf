@@ -735,6 +735,12 @@ export class WidgetApp {
     this.refs.copy.querySelector("[data-action='faq-open']")?.addEventListener("click", () => this.openFaq());
     this.refs.copy.querySelector("[data-action='faq-back']")?.addEventListener("click", () => this.closeFaq());
     this.refs.copy
+      .querySelector("[data-action='register-details-open']")
+      ?.addEventListener("click", () => this.openRegisterDetails());
+    this.refs.copy
+      .querySelector("[data-action='register-details-back']")
+      ?.addEventListener("click", () => this.closeRegisterDetails());
+    this.refs.copy
       .querySelector("[data-action='delivery-details-open']")
       ?.addEventListener("click", () => this.openDeliveryDetails());
     this.refs.copy
@@ -756,20 +762,20 @@ export class WidgetApp {
     gsap.fromTo(
       this.refs.copy.children,
       { y: finalOffsetY + 18, autoAlpha: 0 },
-      { y: finalOffsetY, autoAlpha: 1, duration: 0.34, stagger: 0.06, ease: "power2.out" },
+      { y: finalOffsetY, autoAlpha: 1, duration: 0.42, stagger: 0.08, ease: "power2.out" },
     );
   }
 
   getHeroActionsOffsetY() {
     if (window.matchMedia?.("(max-width: 640px)").matches) {
-      if (this.refs.panel.dataset.gsView === "delivery-main") {
+      if (this.refs.panel.dataset.gsView === "delivery-main" || this.refs.panel.dataset.gsView === "register-main") {
         return -20;
       }
 
       return 0;
     }
 
-    if (this.refs.panel.dataset.gsView === "delivery-main") {
+    if (this.refs.panel.dataset.gsView === "delivery-main" || this.refs.panel.dataset.gsView === "register-main") {
       return -35;
     }
 
@@ -884,9 +890,9 @@ export class WidgetApp {
       gsap.to(targets, {
         autoAlpha: 0,
         y: -18,
-        duration: 0.24,
-        stagger: 0.03,
-        ease: "power2.in",
+        duration: 0.34,
+        stagger: 0.05,
+        ease: "power2.inOut",
         onComplete: resolve,
       });
     });
@@ -1261,14 +1267,51 @@ export class WidgetApp {
 
   renderPrizePending() {
     this.setPanelMode("pending");
-    this.setPanelView("pending");
     this.showPrizeVideoInStage(this.widgetState.prize);
-    const prizeHintText = getPrizeHintText(this.widgetState.prize);
     const registerHintText = getRegisterHintText();
+    this.setPanelView("register-main");
     this.renderCopy(`
-      <div class="gs-prize-pending-view">
-        <div class="gs-prize-pending-card">
-          <div class="gs-prize-pending-head">
+      <div class="gs-prize-pending-view gs-prize-pending-view--register-main">
+        <div class="gs-register-actions">
+          <div class="gs-register-primary-action">
+            <button class="gs-asset-button gs-asset-button--primary" type="button" data-action="register">
+              <img class="gs-asset-button-image" src="${escapeHtml(this.runtimeConfig.uiAssets.primaryButton)}" alt="" />
+              <span>${TEXTS.registerButton}</span>
+            </button>
+            <button
+              class="gs-prize-help-button gs-prize-help-button--register-inline"
+              type="button"
+              data-action="hint-open"
+              data-hint-title="Что делать дальше?"
+              data-hint-text="${escapeHtml(registerHintText)}"
+              data-hint-offset-y="-100"
+            >?</button>
+          </div>
+          <button class="gs-asset-button gs-asset-button--secondary" type="button" data-action="register-details-open">
+            <img class="gs-asset-button-image" src="${escapeHtml(this.runtimeConfig.uiAssets.secondaryButton)}" alt="" />
+            <span>Подробнее</span>
+          </button>
+        </div>
+        <div class="gs-prize-hint-overlay" data-gs-hint-overlay hidden>
+          <button class="gs-prize-hint-backdrop" type="button" data-action="hint-close" aria-label="Закрыть подсказку"></button>
+          <div class="gs-prize-hint-card" data-gs-hint-card>
+            <button class="gs-prize-hint-close" type="button" data-action="hint-close" aria-label="Закрыть">×</button>
+            <h3 data-gs-hint-title></h3>
+            <p data-gs-hint-text></p>
+          </div>
+        </div>
+      </div>
+    `);
+  }
+
+  renderPrizePendingDetails() {
+    this.setPanelMode("faq");
+    this.setPanelView("register-details");
+    const prizeHintText = getPrizeHintText(this.widgetState.prize);
+    this.renderCopy(`
+      <div class="gs-prize-pending-view gs-prize-pending-view--register-details">
+        <div class="gs-prize-pending-card gs-prize-pending-card--register-details">
+          <div class="gs-prize-pending-head gs-prize-pending-head--register-details">
             <span class="gs-prize-pending-label">Твой подарок</span>
             <button
               class="gs-prize-help-button"
@@ -1284,19 +1327,10 @@ export class WidgetApp {
             <strong data-gs-countdown>${formatCountdown(this.widgetState.expiresAt)}</strong>
           </div>
         </div>
-        <div class="gs-prize-register-row">
-          <button class="gs-asset-button gs-asset-button--primary" type="button" data-action="register">
-            <img class="gs-asset-button-image" src="${escapeHtml(this.runtimeConfig.uiAssets.primaryButton)}" alt="" />
-            <span>${TEXTS.registerButton}</span>
-          </button>
-          <button
-            class="gs-prize-help-button gs-prize-help-button--corner"
-            type="button"
-            data-action="hint-open"
-            data-hint-title="Что делать дальше?"
-            data-hint-text="${escapeHtml(registerHintText)}"
-          >?</button>
-        </div>
+        <button class="gs-asset-button gs-asset-button--secondary" type="button" data-action="register-details-back">
+          <img class="gs-asset-button-image" src="${escapeHtml(this.runtimeConfig.uiAssets.secondaryButton)}" alt="" />
+          <span>${TEXTS.faqBackButton}</span>
+        </button>
         <div class="gs-prize-hint-overlay" data-gs-hint-overlay hidden>
           <button class="gs-prize-hint-backdrop" type="button" data-action="hint-close" aria-label="Закрыть подсказку"></button>
           <div class="gs-prize-hint-card" data-gs-hint-card>
@@ -1440,6 +1474,7 @@ export class WidgetApp {
     this.setPanelView("delivery-details");
     const emailValue = escapeHtml(this.client?.email || this.widgetState?.clientEmail || "");
     const prizeType = this.widgetState?.prize?.type;
+    const prizeHintText = getPrizeHintText(this.widgetState.prize);
     const autoEmailHint =
       prizeType === "FREE_SHIPPING"
         ? "После подтверждения бесплатная доставка закрепится за аккаунтом и применится автоматически в следующем заказе."
@@ -1450,7 +1485,16 @@ export class WidgetApp {
     this.renderCopy(`
       <div class="gs-prize-pending-view gs-prize-pending-view--delivery-details">
         <div class="gs-prize-pending-card gs-prize-pending-card--delivery-details">
-          <div class="gs-prize-pending-label">Подарок закреплен за профилем</div>
+          <div class="gs-prize-pending-head gs-prize-pending-head--delivery-details">
+            <div class="gs-prize-pending-label">Подарок закреплен за профилем</div>
+            <button
+              class="gs-prize-help-button"
+              type="button"
+              data-action="hint-open"
+              data-hint-title="Что это за приз?"
+              data-hint-text="${escapeHtml(prizeHintText)}"
+            >?</button>
+          </div>
           <div class="gs-prize-pending-title">${escapeHtml(this.widgetState.prize.title)}</div>
           <div class="gs-prize-pending-timer">
             <span>На подтверждение осталось</span>
@@ -1465,6 +1509,14 @@ export class WidgetApp {
           <img class="gs-asset-button-image" src="${escapeHtml(this.runtimeConfig.uiAssets.secondaryButton)}" alt="" />
           <span>${TEXTS.faqBackButton}</span>
         </button>
+        <div class="gs-prize-hint-overlay" data-gs-hint-overlay hidden>
+          <button class="gs-prize-hint-backdrop" type="button" data-action="hint-close" aria-label="Закрыть подсказку"></button>
+          <div class="gs-prize-hint-card" data-gs-hint-card>
+            <button class="gs-prize-hint-close" type="button" data-action="hint-close" aria-label="Закрыть">×</button>
+            <h3 data-gs-hint-title></h3>
+            <p data-gs-hint-text></p>
+          </div>
+        </div>
       </div>
     `);
   }
@@ -1628,6 +1680,14 @@ export class WidgetApp {
       this.isUnlocking = false;
       this.refs.close.disabled = false;
     }
+  }
+
+  openRegisterDetails() {
+    this.transitionPanel("faq", () => this.renderPrizePendingDetails());
+  }
+
+  closeRegisterDetails() {
+    this.transitionPanel("pending", () => this.renderPrizePending());
   }
 
   openDeliveryDetails() {
