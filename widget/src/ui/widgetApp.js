@@ -761,11 +761,15 @@ export class WidgetApp {
   }
 
   getHeroActionsOffsetY() {
-    if (this.panelMode !== "hero") {
+    if (window.matchMedia?.("(max-width: 640px)").matches) {
       return 0;
     }
 
-    if (window.matchMedia?.("(max-width: 640px)").matches) {
+    if (this.panelMode === "hero" || this.refs.panel.dataset.gsView === "delivery-main") {
+      return -25;
+    }
+
+    if (this.panelMode !== "hero") {
       return 0;
     }
 
@@ -1310,22 +1314,24 @@ export class WidgetApp {
         <div class="gs-prize-pending-view gs-prize-pending-view--delivery-main">
           <form class="gs-form gs-prize-delivery-form gs-prize-delivery-form--compact" data-action="deliver">
             <div class="gs-delivery-actions">
-              <button class="gs-asset-button gs-asset-button--primary" type="submit">
-                <img class="gs-asset-button-image" src="${escapeHtml(this.runtimeConfig.uiAssets.primaryButton)}" alt="" />
-                <span>${TEXTS.deliveryButton}</span>
-              </button>
+              <div class="gs-delivery-primary-action">
+                <button class="gs-asset-button gs-asset-button--primary" type="submit">
+                  <img class="gs-asset-button-image" src="${escapeHtml(this.runtimeConfig.uiAssets.primaryButton)}" alt="" />
+                  <span>${TEXTS.deliveryButton}</span>
+                </button>
+                <button
+                  class="gs-prize-help-button gs-prize-help-button--delivery-inline"
+                  type="button"
+                  data-action="hint-open"
+                  data-hint-title="Что будет дальше?"
+                  data-hint-text="${escapeHtml(deliveryHintText)}"
+                >?</button>
+              </div>
               <button class="gs-asset-button gs-asset-button--secondary" type="button" data-action="delivery-details-open">
                 <img class="gs-asset-button-image" src="${escapeHtml(this.runtimeConfig.uiAssets.secondaryButton)}" alt="" />
                 <span>Подробнее</span>
               </button>
             </div>
-            <button
-              class="gs-prize-help-button gs-prize-help-button--corner gs-prize-help-button--delivery"
-              type="button"
-              data-action="hint-open"
-              data-hint-title="Что будет дальше?"
-              data-hint-text="${escapeHtml(deliveryHintText)}"
-            >?</button>
           </form>
           <div class="gs-prize-hint-overlay" data-gs-hint-overlay hidden>
             <button class="gs-prize-hint-backdrop" type="button" data-action="hint-close" aria-label="Закрыть подсказку"></button>
