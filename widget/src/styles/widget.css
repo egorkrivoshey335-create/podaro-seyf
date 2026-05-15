@@ -959,16 +959,16 @@
 
 .gs-prize-help-button--delivery-inline {
   position: absolute;
-  top: 50%;
-  right: 14px;
+  top: 48%;
+  right: 25px;
   z-index: 2;
   transform: translateY(-50%);
 }
 
 .gs-prize-help-button--register-inline {
   position: absolute;
-  top: 50%;
-  right: 14px;
+  top: 48%;
+  right: 25px;
   z-index: 2;
   transform: translateY(-50%);
 }
@@ -1561,15 +1561,15 @@
   }
 
   .gs-delivery-primary-action > .gs-asset-button span {
-    padding-right: 45px;
+    padding-right: 55px;
   }
 
   .gs-register-primary-action > .gs-asset-button span {
-    padding-right: 45px;
+    padding-right: 55px;
   }
 
   .gs-asset-button span {
-    padding-inline: 28px;
+    padding-inline: 20px;
   }
 
   .gs-hero-actions {
