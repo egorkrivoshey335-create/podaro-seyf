@@ -485,6 +485,15 @@ export class WidgetApp {
         : this.runtimeConfig.uiAssets.frame;
   }
 
+  setPanelView(view = "") {
+    if (!view) {
+      delete this.refs.panel.dataset.gsView;
+      return;
+    }
+
+    this.refs.panel.dataset.gsView = view;
+  }
+
   animatePanelChrome() {
     const targets = [];
     if (!this.refs.panelFlags.hidden) {
@@ -725,6 +734,12 @@ export class WidgetApp {
     this.refs.copy.querySelector("[data-action='spin']")?.addEventListener("click", () => this.handleSpin());
     this.refs.copy.querySelector("[data-action='faq-open']")?.addEventListener("click", () => this.openFaq());
     this.refs.copy.querySelector("[data-action='faq-back']")?.addEventListener("click", () => this.closeFaq());
+    this.refs.copy
+      .querySelector("[data-action='delivery-details-open']")
+      ?.addEventListener("click", () => this.openDeliveryDetails());
+    this.refs.copy
+      .querySelector("[data-action='delivery-details-back']")
+      ?.addEventListener("click", () => this.closeDeliveryDetails());
     this.refs.copy
       .querySelector("[data-action='register']")
       ?.addEventListener("click", () => this.openRegisterFlow());
@@ -1189,6 +1204,7 @@ export class WidgetApp {
 
   renderWelcome() {
     this.setPanelMode("hero");
+    this.setPanelView("hero");
     this.renderCopy(`
       <div class="gs-hero-actions">
         <button class="gs-asset-button gs-asset-button--primary" type="button" data-action="spin">
@@ -1205,6 +1221,7 @@ export class WidgetApp {
 
   renderFaq() {
     this.setPanelMode("faq");
+    this.setPanelView("faq");
     this.renderCopy(`
       <div class="gs-faq-view">
         <div class="gs-faq-header">
@@ -1224,6 +1241,7 @@ export class WidgetApp {
 
   renderPrizePending() {
     this.setPanelMode("pending");
+    this.setPanelView("pending");
     this.showPrizeVideoInStage(this.widgetState.prize);
     const prizeHintText = getPrizeHintText(this.widgetState.prize);
     const registerHintText = getRegisterHintText();
@@ -1286,8 +1304,45 @@ export class WidgetApp {
           ? "Начислим выигрыш на твой аккаунт и отправим подтверждение на email из профиля."
           : TEXTS.readyEmailHint;
 
+    if (!needsAddress) {
+      this.setPanelView("delivery-main");
+      this.renderCopy(`
+        <div class="gs-prize-pending-view gs-prize-pending-view--delivery-main">
+          <form class="gs-form gs-prize-delivery-form gs-prize-delivery-form--compact" data-action="deliver">
+            <div class="gs-delivery-actions">
+              <button class="gs-asset-button gs-asset-button--primary" type="submit">
+                <img class="gs-asset-button-image" src="${escapeHtml(this.runtimeConfig.uiAssets.primaryButton)}" alt="" />
+                <span>${TEXTS.deliveryButton}</span>
+              </button>
+              <button class="gs-asset-button gs-asset-button--secondary" type="button" data-action="delivery-details-open">
+                <img class="gs-asset-button-image" src="${escapeHtml(this.runtimeConfig.uiAssets.secondaryButton)}" alt="" />
+                <span>Подробнее</span>
+              </button>
+            </div>
+            <button
+              class="gs-prize-help-button gs-prize-help-button--corner gs-prize-help-button--delivery"
+              type="button"
+              data-action="hint-open"
+              data-hint-title="Что будет дальше?"
+              data-hint-text="${escapeHtml(deliveryHintText)}"
+            >?</button>
+          </form>
+          <div class="gs-prize-hint-overlay" data-gs-hint-overlay hidden>
+            <button class="gs-prize-hint-backdrop" type="button" data-action="hint-close" aria-label="Закрыть подсказку"></button>
+            <div class="gs-prize-hint-card" data-gs-hint-card>
+              <button class="gs-prize-hint-close" type="button" data-action="hint-close" aria-label="Закрыть">×</button>
+              <h3 data-gs-hint-title></h3>
+              <p data-gs-hint-text></p>
+            </div>
+          </div>
+        </div>
+      `);
+      return;
+    }
+
+    this.setPanelView("delivery-form");
     this.renderCopy(`
-      <div class="gs-prize-pending-view gs-prize-pending-view--delivery">
+      <div class="gs-prize-pending-view gs-prize-pending-view--delivery-form">
         <div class="gs-prize-pending-card">
           <div class="gs-prize-pending-label">${needsAddress ? "Подарок ждёт отправки" : "Подарок закреплен за профилем"}</div>
           <div class="gs-prize-pending-title">${escapeHtml(this.widgetState.prize.title)}</div>
@@ -1357,8 +1412,44 @@ export class WidgetApp {
     `);
   }
 
+  renderDeliveryDetails() {
+    this.setPanelMode("pending");
+    this.setPanelView("delivery-details");
+    this.showPrizeVideoInStage(this.widgetState.prize);
+    const emailValue = escapeHtml(this.client?.email || this.widgetState?.clientEmail || "");
+    const prizeType = this.widgetState?.prize?.type;
+    const autoEmailHint =
+      prizeType === "FREE_SHIPPING"
+        ? "После подтверждения бесплатная доставка закрепится за аккаунтом и применится автоматически в следующем заказе."
+        : prizeType === "BONUS_POINTS"
+          ? "Начислим выигрыш на твой аккаунт и отправим подтверждение на email из профиля."
+          : TEXTS.readyEmailHint;
+
+    this.renderCopy(`
+      <div class="gs-prize-pending-view gs-prize-pending-view--delivery-details">
+        <div class="gs-prize-pending-card gs-prize-pending-card--delivery-details">
+          <div class="gs-prize-pending-label">Подарок закреплен за профилем</div>
+          <div class="gs-prize-pending-title">${escapeHtml(this.widgetState.prize.title)}</div>
+          <div class="gs-prize-pending-timer">
+            <span>На подтверждение осталось</span>
+            <strong data-gs-countdown>${formatCountdown(this.widgetState.expiresAt)}</strong>
+          </div>
+        </div>
+        <div class="gs-prize-info-note gs-prize-info-note--delivery-details">
+          <strong>${emailValue || "Email из профиля"}</strong>
+          <p>${escapeHtml(autoEmailHint)}</p>
+        </div>
+        <button class="gs-asset-button gs-asset-button--secondary" type="button" data-action="delivery-details-back">
+          <img class="gs-asset-button-image" src="${escapeHtml(this.runtimeConfig.uiAssets.secondaryButton)}" alt="" />
+          <span>${TEXTS.faqBackButton}</span>
+        </button>
+      </div>
+    `);
+  }
+
   renderSuccess(message, promoCode) {
     this.setPanelMode("pending");
+    this.setPanelView("success");
     this.showPrizeVideoInStage(this.widgetState?.prize);
     this.refs.fab.hidden = true;
     this.renderCopy(`
@@ -1383,6 +1474,7 @@ export class WidgetApp {
 
   renderBlocked(error) {
     this.setPanelMode("blocked");
+    this.setPanelView("blocked");
     this.refs.fab.hidden = true;
     const blockedText = getBlockedErrorText(error);
     if (!this.showBlockedVideoInStage()) {
@@ -1409,6 +1501,7 @@ export class WidgetApp {
 
   renderExpired() {
     this.setPanelMode("default");
+    this.setPanelView("expired");
     this.refs.fab.hidden = true;
     this.resetStage("Время розыгрыша истекло.");
     this.renderCopy(`
@@ -1513,6 +1606,14 @@ export class WidgetApp {
       this.isUnlocking = false;
       this.refs.close.disabled = false;
     }
+  }
+
+  openDeliveryDetails() {
+    this.transitionPanel("pending", () => this.renderDeliveryDetails());
+  }
+
+  closeDeliveryDetails() {
+    this.transitionPanel("pending", () => this.renderDelivery());
   }
 
   async handleDelivery(form) {
