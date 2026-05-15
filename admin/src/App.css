@@ -97,6 +97,10 @@ button.secondary {
   background: rgba(255, 255, 255, 0.12);
 }
 
+button.danger {
+  background: linear-gradient(135deg, #b91c1c, #ef4444);
+}
+
 .compact-button {
   min-height: 38px;
   padding: 8px 12px;
@@ -235,6 +239,12 @@ button.secondary {
 
 .table-wrap {
   overflow: auto;
+}
+
+.table-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 table {

@@ -17,6 +17,7 @@ import {
 } from "./services/externalDiscounts.js";
 import {
   claimSpin,
+  deleteSpin,
   deliverPrize,
   ensureSettings,
   exportSpinsCsv,
@@ -388,6 +389,14 @@ app.patch("/api/admin/spins/:id", requireAdmin, async (request, response) => {
 
   const spin = await updateSpin(request.params.id, payload, prisma);
 
+  response.json({
+    success: true,
+    spin: serializeSpin(spin),
+  });
+});
+
+app.delete("/api/admin/spins/:id", requireAdmin, async (request, response) => {
+  const spin = await deleteSpin(request.params.id, prisma);
   response.json({
     success: true,
     spin: serializeSpin(spin),

@@ -737,6 +737,51 @@ export async function updateSpin(id, input, db) {
   });
 }
 
+export async function deleteSpin(id, db) {
+  const spin = await db.spin.findUnique({
+    where: { id },
+    include: INTERNAL_SPIN_INCLUDE,
+  });
+
+  if (!spin) {
+    throw new AppError(404, "SPIN_NOT_FOUND", "Крутка не найдена.");
+  }
+
+  if (spin.promoExternalId) {
+    try {
+      await insalesApi.deleteDiscountCode(spin.promoExternalId);
+    } catch (error) {
+      if (error?.status !== 404) {
+        logger.warn(
+          {
+            spinId: spin.id,
+            promoExternalId: spin.promoExternalId,
+            error: error.message,
+          },
+          "failed to delete insales discount code while removing spin",
+        );
+      }
+    }
+  }
+
+  await db.$transaction(async (tx) => {
+    await tx.promoCodePool.updateMany({
+      where: { spinId: spin.id },
+      data: {
+        used: false,
+        usedAt: null,
+        spinId: null,
+      },
+    });
+
+    await tx.spin.delete({
+      where: { id: spin.id },
+    });
+  });
+
+  return spin;
+}
+
 export async function fulfillSpin(id, db) {
   return db.spin.update({
     where: { id },

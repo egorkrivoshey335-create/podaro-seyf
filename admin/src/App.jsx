@@ -258,6 +258,32 @@ function App() {
     loadDashboard(token);
   }
 
+  async function handleSpinDelete(spinId) {
+    const confirmed = window.confirm(
+      "Удалить эту крутку? Это снимет привязку приза к аккаунту и очистит запись для повторного теста.",
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      await request(`/admin/spins/${spinId}`, {
+        token,
+        method: "DELETE",
+      });
+
+      if (selectedSpin?.id === spinId) {
+        setSelectedSpin(null);
+      }
+
+      setSpinNoteStatus("");
+      loadDashboard(token);
+    } catch (deleteError) {
+      setError(deleteError.message);
+    }
+  }
+
   async function handleSpinOpen(spinId) {
     setSelectedSpinLoading(true);
     setSpinNoteStatus("");
@@ -588,7 +614,7 @@ function App() {
                 <th>Получатель</th>
                 <th>Адрес</th>
                 <th>Изменить статус</th>
-                <th>Карточка</th>
+                <th>Действия</th>
               </tr>
             </thead>
             <tbody>
@@ -611,9 +637,18 @@ function App() {
                     </select>
                   </td>
                   <td>
-                    <button type="button" className="secondary compact-button" onClick={() => handleSpinOpen(spin.id)}>
-                      Подробнее
-                    </button>
+                    <div className="table-actions">
+                      <button type="button" className="secondary compact-button" onClick={() => handleSpinOpen(spin.id)}>
+                        Подробнее
+                      </button>
+                      <button
+                        type="button"
+                        className="danger compact-button"
+                        onClick={() => handleSpinDelete(spin.id)}
+                      >
+                        Удалить
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
