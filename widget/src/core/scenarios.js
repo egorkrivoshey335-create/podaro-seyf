@@ -9,7 +9,7 @@ export function resolveScenario({ client, widgetState }) {
     return "hidden";
   }
 
-  if (!client && !widgetState?.spinId) {
+  if (!widgetState?.spinId) {
     return "guest-fresh";
   }
 
