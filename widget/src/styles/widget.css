@@ -867,7 +867,7 @@
 .gs-prize-hint-overlay {
   position: fixed;
   inset: 0;
-  z-index: 120;
+  z-index: 1000;
   display: grid;
   place-items: center;
   padding: 20px;
@@ -876,6 +876,7 @@
 .gs-prize-hint-backdrop {
   position: absolute;
   inset: 0;
+  z-index: 1000;
   border: 0;
   background: transparent;
   backdrop-filter: none;
@@ -883,7 +884,7 @@
 
 .gs-prize-hint-card {
   position: relative;
-  z-index: 121;
+  z-index: 1001;
   width: min(420px, calc(100vw - 32px));
   display: flex;
   flex-direction: column;
@@ -921,6 +922,7 @@
 .gs-prize-hint-card p {
   margin: 0;
   color: rgba(255, 255, 255, 0.9);
+  font-family: var(--gs-display-font);
   font-size: 15px;
   line-height: 1.55;
 }
