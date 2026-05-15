@@ -765,7 +765,11 @@ export class WidgetApp {
       return 0;
     }
 
-    if (this.panelMode === "hero" || this.refs.panel.dataset.gsView === "delivery-main") {
+    if (this.refs.panel.dataset.gsView === "delivery-main") {
+      return -35;
+    }
+
+    if (this.panelMode === "hero") {
       return -25;
     }
 
