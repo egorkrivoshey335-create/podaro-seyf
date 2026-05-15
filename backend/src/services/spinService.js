@@ -299,17 +299,35 @@ async function fulfillSpinByPrizeType(spin, settings) {
       }
 
       if (spin.prize.type === PrizeType.PROMO_CODE) {
-        await sendPromoCodeEmail({
-          to: recipientEmail,
-          code: spin.promoCode,
-          title: spin.prize.title,
-        });
+        try {
+          await sendPromoCodeEmail({
+            to: recipientEmail,
+            code: spin.promoCode,
+            title: spin.prize.title,
+          });
 
-        return {
-          status: SpinStatus.FULFILLED,
-          emailSentAt: new Date(),
-          message: `Промокод отправлен на ${recipientEmail}.`,
-        };
+          return {
+            status: SpinStatus.FULFILLED,
+            emailSentAt: new Date(),
+            message: `Промокод отправлен на ${recipientEmail}.`,
+          };
+        } catch (error) {
+          logger.warn(
+            {
+              spinId: spin.id,
+              recipientEmail,
+              error: error.message,
+            },
+            "failed to send promo code email, keeping promo reward fulfilled",
+          );
+
+          return {
+            status: SpinStatus.FULFILLED,
+            emailSentAt: null,
+            emailError: error.message,
+            message: "Промокод готов. Показываем его прямо в виджете, а письмо можно отправить позже.",
+          };
+        }
       }
 
       return {
@@ -663,7 +681,7 @@ export async function deliverPrize(input, db) {
       status: fulfillment.status,
       fulfilledAt: fulfillment.status === SpinStatus.FULFILLED ? new Date() : preparedSpin.fulfilledAt,
       emailSentAt: fulfillment.emailSentAt,
-      emailError: null,
+      emailError: fulfillment.emailError || null,
     },
     include: INTERNAL_SPIN_INCLUDE,
   });

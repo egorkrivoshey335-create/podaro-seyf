@@ -131,6 +131,22 @@ function getDeliveryHintText(prize) {
   }
 }
 
+function getBlockedErrorText(error) {
+  if (!error) {
+    return TEXTS.blockedDescription;
+  }
+
+  if (error?.message === "Failed to fetch") {
+    return "Не удалось связаться с сервером. Попробуй еще раз через минуту.";
+  }
+
+  if (error?.code === "PROMO_ISSUE_FAILED") {
+    return "Промокод временно не удалось подготовить. Попробуй открыть сейф еще раз чуть позже.";
+  }
+
+  return error?.message || TEXTS.blockedDescription;
+}
+
 export class WidgetApp {
   constructor({ host, shadowRoot, runtimeConfig, api, guestId, fingerprintPromise, client, widgetState, scenario }) {
     this.host = host;
@@ -456,14 +472,17 @@ export class WidgetApp {
     this.panelMode = mode;
     this.refs.panel.classList.toggle("gs-panel--hero", mode === "hero");
     this.refs.panel.classList.toggle("gs-panel--faq", mode === "faq");
-    this.refs.panel.classList.toggle("gs-panel--pending", mode === "pending");
+    this.refs.panel.classList.toggle("gs-panel--pending", mode === "pending" || mode === "blocked");
+    this.refs.panel.classList.toggle("gs-panel--blocked", mode === "blocked");
     this.refs.panel.classList.toggle("gs-panel--default", mode === "default");
 
     this.refs.stageWrap.hidden = mode === "faq";
     this.refs.panelFlags.hidden = mode === "default";
-    this.refs.stageFrameImage.src = mode === "pending"
-      ? this.runtimeConfig.uiAssets.prizeFrame
-      : this.runtimeConfig.uiAssets.frame;
+    this.refs.stageFrameImage.src = mode === "blocked"
+      ? this.runtimeConfig.uiAssets.blockedFrame
+      : mode === "pending"
+        ? this.runtimeConfig.uiAssets.prizeFrame
+        : this.runtimeConfig.uiAssets.frame;
   }
 
   animatePanelChrome() {
@@ -860,24 +879,24 @@ export class WidgetApp {
     return null;
   }
 
-  showPrizeVideoInStage(prize) {
+  showVideoInStage(videoUrl, options = {}) {
     const shell = this.refs.stage.querySelector("[data-gs-video-shell]");
     const video = this.refs.stage.querySelector("[data-gs-video]");
     if (!shell || !video) {
-      return;
+      return false;
     }
 
-    const prizeVideoUrl = this.resolvePrizeVideoUrl(prize);
     const fallbackVideoUrl = this.runtimeConfig.safeVideo.mp4Url || this.runtimeConfig.safeVideo.webmUrl || "";
-    const primaryVideoUrl = prizeVideoUrl || fallbackVideoUrl;
+    const primaryVideoUrl = videoUrl || fallbackVideoUrl;
     if (!primaryVideoUrl) {
-      return;
+      return false;
     }
 
     video.poster = "";
-    video.loop = true;
+    video.loop = options.loop ?? true;
     video.muted = true;
     video.volume = 0;
+    video.onended = null;
     video.innerHTML = `
       <source src="${escapeHtml(primaryVideoUrl)}" type="video/mp4" />
       ${fallbackVideoUrl && fallbackVideoUrl !== primaryVideoUrl ? `<source src="${escapeHtml(fallbackVideoUrl)}" type="video/mp4" />` : ""}
@@ -889,10 +908,32 @@ export class WidgetApp {
     try {
       video.load();
       video.currentTime = 0;
+      if (video.loop === false) {
+        video.onended = () => {
+          try {
+            if (Number.isFinite(video.duration) && video.duration > 0) {
+              video.currentTime = Math.max(0, video.duration - 0.05);
+            }
+            video.pause();
+          } catch {
+            // ignore last-frame freeze issues
+          }
+        };
+      }
       video.play().catch(() => {});
     } catch {
       // ignore preview playback issues
     }
+
+    return true;
+  }
+
+  showPrizeVideoInStage(prize) {
+    this.showVideoInStage(this.resolvePrizeVideoUrl(prize));
+  }
+
+  showBlockedVideoInStage() {
+    return this.showVideoInStage(this.runtimeConfig.blockedVideoUrl, { loop: false });
   }
 
   async claimAuthorizedSpin() {
@@ -1341,17 +1382,28 @@ export class WidgetApp {
   }
 
   renderBlocked(error) {
-    this.setPanelMode("default");
-    this.resetStage("Защита остановила повторную попытку.");
+    this.setPanelMode("blocked");
+    this.refs.fab.hidden = true;
+    const blockedText = getBlockedErrorText(error);
+    if (!this.showBlockedVideoInStage()) {
+      this.resetStage("Розыгрыш временно недоступен.");
+    }
     this.renderCopy(`
-      <div class="gs-copy-block">
-        <span class="gs-kicker">Защита виджета</span>
-        <h2>${TEXTS.blockedTitle}</h2>
-        <p>${escapeHtml(error?.message || TEXTS.blockedDescription)}</p>
+      <div class="gs-prize-pending-view gs-prize-pending-view--blocked">
+        <div class="gs-prize-pending-card">
+          <div class="gs-prize-pending-label">Пауза</div>
+          <div class="gs-prize-info-note gs-prize-info-note--blocked">
+            <strong>Розыгрыш временно недоступен</strong>
+            <p>${escapeHtml(blockedText)}</p>
+          </div>
+        </div>
+        <div class="gs-prize-register-row">
+          <button class="gs-asset-button gs-asset-button--secondary" type="button" data-action="final-close">
+            <img class="gs-asset-button-image" src="${escapeHtml(this.runtimeConfig.uiAssets.secondaryButton)}" alt="" />
+            <span>Понятно</span>
+          </button>
+        </div>
       </div>
-      <button class="gs-button gs-button--secondary" type="button" data-action="final-close">
-        Понятно
-      </button>
     `);
   }
 
@@ -1454,6 +1506,7 @@ export class WidgetApp {
         this.renderPrizePending();
       }
     } catch (error) {
+      await this.transitionCopyToNextStep();
       this.renderBlocked(error);
     } finally {
       this.setSpinPendingState(false);

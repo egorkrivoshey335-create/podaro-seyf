@@ -12,6 +12,10 @@ function createTransporter() {
     host: config.smtp.host,
     port: config.smtp.port,
     secure: config.smtp.port === 465,
+    connectionTimeout: 10_000,
+    greetingTimeout: 10_000,
+    socketTimeout: 15_000,
+    dnsTimeout: 10_000,
     auth: {
       user: config.smtp.user,
       pass: config.smtp.pass,
@@ -20,6 +24,44 @@ function createTransporter() {
 }
 
 const transporter = createTransporter();
+
+export async function verifyNotifierConnection() {
+  if (!transporter || !config.smtp.from) {
+    logger.warn(
+      {
+        host: config.smtp.host || null,
+        port: config.smtp.port,
+        from: config.smtp.from || null,
+      },
+      "smtp is not fully configured",
+    );
+    return false;
+  }
+
+  try {
+    await transporter.verify();
+    logger.info(
+      {
+        host: config.smtp.host,
+        port: config.smtp.port,
+        from: config.smtp.from,
+      },
+      "smtp connection verified",
+    );
+    return true;
+  } catch (error) {
+    logger.error(
+      {
+        host: config.smtp.host,
+        port: config.smtp.port,
+        from: config.smtp.from,
+        error: error.message,
+      },
+      "smtp connection verification failed",
+    );
+    return false;
+  }
+}
 
 async function sendMail({ to, subject, text, html }) {
   if (!transporter || !config.smtp.from) {

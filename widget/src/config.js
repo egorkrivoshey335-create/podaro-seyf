@@ -95,6 +95,7 @@ export function getRuntimeConfig() {
     registerUrl: externalConfig.registerUrl || "/client/new",
     modalDelayMs: externalConfig.modalDelayMs || MODAL_DELAY_MS,
     prizeVideoBaseUrl: externalConfig.prizeVideoBaseUrl || `${baseOrigin}/assets/prizes`,
+    blockedVideoUrl: externalConfig.blockedVideoMp4 || `${baseOrigin}/assets/prizes/blocked-state.mp4`,
     safeVideo: {
       mp4Url: externalConfig.safeVideoMp4 || `${baseOrigin}/assets/safe-open.mp4`,
       webmUrl: externalConfig.safeVideoWebm || "",
@@ -107,6 +108,8 @@ export function getRuntimeConfig() {
         externalConfig.frameImage || `${baseOrigin}/assets/ui/ramka.webp`,
       prizeFrame:
         externalConfig.prizeFrameImage || `${baseOrigin}/assets/ui/ramka-1.webp`,
+      blockedFrame:
+        externalConfig.blockedFrameImage || `${baseOrigin}/assets/ui/ramka-blocked.webp`,
       flagLeft:
         externalConfig.flagLeftImage || `${baseOrigin}/assets/ui/flag-left.webp`,
       flagRight:

@@ -3,11 +3,15 @@ import { config } from "./config.js";
 import { logger } from "./lib/logger.js";
 import { prisma } from "./lib/prisma.js";
 import { startExpirer } from "./services/expirer.js";
+import { verifyNotifierConnection } from "./services/notifier.js";
 
 const expirerTask = startExpirer(prisma);
 
 const server = app.listen(config.port, () => {
   logger.info({ port: config.port }, "gift safe backend started");
+  verifyNotifierConnection().catch((error) => {
+    logger.error({ error }, "smtp verification task failed");
+  });
 });
 
 for (const signal of ["SIGINT", "SIGTERM"]) {
