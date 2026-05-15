@@ -762,6 +762,10 @@ export class WidgetApp {
 
   getHeroActionsOffsetY() {
     if (window.matchMedia?.("(max-width: 640px)").matches) {
+      if (this.refs.panel.dataset.gsView === "delivery-main") {
+        return -20;
+      }
+
       return 0;
     }
 

@@ -1347,6 +1347,10 @@
     top: -4%;
   }
 
+  .gs-panel[data-gs-view="delivery-main"] .gs-stage-wrap {
+    top: -6%;
+  }
+
   .gs-panel--default .gs-stage {
     min-height: 320px;
   }
